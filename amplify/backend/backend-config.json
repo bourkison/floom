@@ -28,7 +28,7 @@
     }
   },
   "function": {
-    "teenderteenderMongoose": {
+    "teenderMongooseModels": {
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer",
       "build": true
