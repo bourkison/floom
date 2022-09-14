@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 let conn = null;
 
-module.exports = () => {
+module.exports = async () => {
     if (conn === null) {
         conn = await mongoose.createConnection({
             useNewUrlParser: true,
@@ -11,7 +11,7 @@ module.exports = () => {
             reconnectTries: Number.MAX_VALUE,
             reconnectInterval: 1000,
             keepAlive: 30000,
-            bufferMaxEntries: false
+            bufferMaxEntries: false,
         });
     } else {
         conn = await conn;
@@ -20,10 +20,10 @@ module.exports = () => {
     // Close the Mongoose connection, when receiving SIGINT
     process.on('SIGINT', () => {
         mongoose.connection.close(() => {
-            console.log('Force to close the MongoDB connection after SIGINT')
-            process.exit(0)
-        })
-    })
+            console.log('Force to close the MongoDB connection after SIGINT');
+            process.exit(0);
+        });
+    });
 
     return conn;
-}
+};

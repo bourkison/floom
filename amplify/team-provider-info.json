@@ -9,11 +9,24 @@
       "UnauthRoleName": "amplify-teender-dev-222138-unauthRole",
       "StackName": "amplify-teender-dev-222138",
       "StackId": "arn:aws:cloudformation:eu-west-2:586865842618:stack/amplify-teender-dev-222138/38a193b0-3473-11ed-b24b-0237e794d8f6",
-      "AmplifyAppId": "dgclxwislld0g"
+      "AmplifyAppId": "dgclxwislld0g",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-teender-dev-222138-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
-        "teenderf3c943f2f3c943f2": {}
+        "teenderf3c943f2f3c943f2": {},
+        "true": {}
+      },
+      "function": {
+        "teenderUserHandler": {
+          "secretsPathAmplifyAppId": "dgclxwislld0g",
+          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
+          "s3Key": "amplify-builds/teenderUserHandler-35306154775371474935-build.zip"
+        },
+        "teenderMongooseModels": {
+          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
+          "s3Key": "amplify-builds/teenderMongooseModels-LambdaLayerVersion9c09fd36-build.zip"
+        }
       }
     }
   }
