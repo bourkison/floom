@@ -6,7 +6,7 @@
       "types": ["node"],
       "esModuleInterop": true,
       "moduleResolution": "node",
-      "module": "CommonJS"
+      "module":"CommonJS"
     },
     "include": ["."],
     "exclude": ["node_modules", "**/*.spec.ts"]

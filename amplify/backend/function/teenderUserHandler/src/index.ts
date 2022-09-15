@@ -29,7 +29,7 @@ exports.handler = async (
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': '*',
                 },
-                body: JSON.stringify('Hello from Lambda!'),
+                body: JSON.stringify('Hello from Lambda v3!'),
             };
     }
 
