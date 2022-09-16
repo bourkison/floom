@@ -22,11 +22,11 @@
         "teenderUserHandler": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderUserHandler-62427572314668613431-build.zip"
+          "s3Key": "amplify-builds/teenderUserHandler-6b69446659544f4a4231-build.zip"
         },
         "teenderMongooseModels": {
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderMongooseModels-LambdaLayerVersion63bbfc42-build.zip"
+          "s3Key": "amplify-builds/teenderMongooseModels-LambdaLayerVersione9b4f11b-build.zip"
         },
         "teenderf3c943f2f3c943f2PreSignup": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",

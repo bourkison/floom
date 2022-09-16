@@ -1,21 +1,12 @@
 const mongoose = require('mongoose');
 let conn = null;
 
-module.exports = async () => {
+module.exports = async uri => {
     if (conn === null) {
-        conn = await mongoose.createConnection({
-            useNewUrlParser: true,
-            bufferCommands: false,
-            serverSelectionTimeoutMS: 5000,
-            autoReconnect: true,
-            reconnectTries: Number.MAX_VALUE,
-            reconnectInterval: 1000,
-            keepAlive: 30000,
-            bufferMaxEntries: false,
-        });
-    } else {
-        conn = await conn;
+        conn = mongoose.createConnection(uri).asPromise();
     }
+
+    await conn;
 
     // Close the Mongoose connection, when receiving SIGINT
     process.on('SIGINT', () => {
