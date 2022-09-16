@@ -11,29 +11,45 @@ const ProductList = () => {
         loadProducts();
     }, []);
 
-    const loadProducts = () => {
+    const saveProduct = (): void => {
+        setProducts(products.slice(1, products.length));
+    };
+
+    useEffect(() => {
+        console.log('PRODUCTS CHANGED:', products.length, products);
+    }, [products]);
+
+    const loadProducts = (): void => {
         // GENERATE FAKE PRODUCT DATA.
-        const FAKE_DATA_AMOUNT = 1;
-        setProducts([]);
+        const FAKE_DATA_AMOUNT = 5;
+        let temp: ProductType[] = [];
+
         for (let i = 0; i < FAKE_DATA_AMOUNT; i++) {
-            setProducts(current => [
-                ...current,
-                {
-                    id: faker.datatype.uuid(),
-                    title: faker.vehicle.vehicle(),
-                    price: Math.floor(Math.random() * 1000),
-                    imageLink: [faker.image.animals(500, 400)],
-                    link: 'https://www.strenive.com',
-                },
-            ]);
+            temp.push({
+                id: faker.datatype.uuid(),
+                title: faker.vehicle.vehicle(),
+                price: Math.floor(Math.random() * 100000) / 100,
+                imageLink: [faker.image.animals(300, 300, true)],
+                link: 'https://www.strenive.com',
+            });
         }
+
+        setProducts(temp);
     };
 
     return (
         <View style={styles.container}>
-            {products.map(product => (
-                <Product key={product.id} product={product} />
-            ))}
+            {/* Slice array so that we don't mutate with reverse() */}
+            {products
+                .slice()
+                .reverse()
+                .map(product => (
+                    <Product
+                        key={product.id}
+                        product={product}
+                        onSave={saveProduct}
+                    />
+                ))}
         </View>
     );
 };
