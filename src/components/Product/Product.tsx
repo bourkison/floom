@@ -10,11 +10,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {LinearGradient} from 'expo-linear-gradient';
+import {useWindowDimensions} from 'react-native';
 
 type ProductComponentProps = {
     product: ProductType;
     onSave: () => void;
 };
+
+const IMAGE_RATIO = 0.9;
+const IMAGE_PADDING = 40;
+const GRADIENT_HEIGHT = 100;
 
 const Product: React.FC<ProductComponentProps> = ({product, onSave}) => {
     const offsetX = useSharedValue(0);
@@ -24,6 +29,8 @@ const Product: React.FC<ProductComponentProps> = ({product, onSave}) => {
     const saveOpacity = useSharedValue(0);
     const deleteOpacity = useSharedValue(0);
     const ctx = useSharedValue({x: 0, y: 0});
+
+    const {width} = useWindowDimensions();
 
     const rTileStyle = useAnimatedStyle(() => {
         return {
@@ -113,7 +120,10 @@ const Product: React.FC<ProductComponentProps> = ({product, onSave}) => {
             <GestureDetector gesture={panGesture}>
                 <View>
                     <ImageBackground
-                        style={styles.image}
+                        style={{
+                            width: width - IMAGE_PADDING,
+                            height: (width - IMAGE_PADDING) / IMAGE_RATIO,
+                        }}
                         source={{uri: product.imageLink[0]}}>
                         <View style={styles.imageOverlayContainer}>
                             <View style={styles.gradientContainer}>
@@ -174,10 +184,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.2,
     },
-    image: {
-        width: 300,
-        height: 300,
-    },
     imageOverlayContainer: {
         position: 'absolute',
         top: 0,
@@ -192,7 +198,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         width: '100%',
-        height: 100,
+        height: GRADIENT_HEIGHT,
     },
     linearGradient: {
         flex: 1,

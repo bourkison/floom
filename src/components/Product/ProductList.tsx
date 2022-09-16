@@ -29,7 +29,10 @@ const ProductList = () => {
                 id: faker.datatype.uuid(),
                 title: faker.vehicle.vehicle(),
                 price: Math.floor(Math.random() * 100000) / 100,
-                imageLink: [faker.image.animals(300, 300, true)],
+                imageLink: [
+                    faker.image.animals(300, 300, true),
+                    faker.image.animals(300, 300, true),
+                ],
                 link: 'https://www.strenive.com',
             });
         }
