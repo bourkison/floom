@@ -1,13 +1,19 @@
 import React from 'react';
 import ProductList from '@/components/Product/ProductList';
-import {View} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 
 const Swipe = () => {
     return (
-        <View>
+        <View style={styles.container}>
             <ProductList />
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        paddingTop: 20,
+    },
+});
 
 export default Swipe;

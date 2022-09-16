@@ -10,6 +10,7 @@ module.exports = function (api) {
                     rootPathSuffix: './',
                 },
             ],
+            'react-native-reanimated/plugin',
         ],
     };
 };
