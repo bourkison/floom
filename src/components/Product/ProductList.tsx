@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, useWindowDimensions} from 'react-native';
 import {Product as ProductType} from '@/types/Product';
 import {faker} from '@faker-js/faker';
 import Product from '@/components/Product/Product';
@@ -30,8 +30,8 @@ const ProductList = () => {
                 title: faker.vehicle.vehicle(),
                 price: Math.floor(Math.random() * 100000) / 100,
                 imageLink: [
-                    faker.image.animals(300, 300, true),
-                    faker.image.animals(300, 300, true),
+                    faker.image.animals(100, 100, true),
+                    faker.image.animals(100, 100, true),
                 ],
                 link: 'https://www.strenive.com',
             });
@@ -43,16 +43,28 @@ const ProductList = () => {
     return (
         <View style={styles.container}>
             {/* Slice array so that we don't mutate with reverse() */}
-            {products
-                .slice()
-                .reverse()
-                .map(product => (
-                    <Product
-                        key={product.id}
-                        product={product}
-                        onSave={saveProduct}
-                    />
-                ))}
+            {products.length > 0 ? (
+                <View>
+                    {products.length > 1 ? (
+                        <View>
+                            <Product
+                                product={products[1]}
+                                onSave={saveProduct}
+                                animated={false}
+                                key={products[1].id}
+                            />
+                        </View>
+                    ) : undefined}
+                    <View>
+                        <Product
+                            product={products[0]}
+                            onSave={saveProduct}
+                            animated={true}
+                            key={products[0].id}
+                        />
+                    </View>
+                </View>
+            ) : undefined}
         </View>
     );
 };
@@ -60,7 +72,6 @@ const ProductList = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
     },
 });
 

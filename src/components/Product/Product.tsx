@@ -1,6 +1,8 @@
 import React from 'react';
 import {ImageBackground, StyleSheet, Text, View} from 'react-native';
 import {Product as ProductType} from '@/types/Product';
+import {LinearGradient} from 'expo-linear-gradient';
+import {useWindowDimensions} from 'react-native';
 import Animated, {
     runOnJS,
     useAnimatedStyle,
@@ -9,19 +11,22 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {LinearGradient} from 'expo-linear-gradient';
-import {useWindowDimensions} from 'react-native';
 
 type ProductComponentProps = {
     product: ProductType;
     onSave: () => void;
+    animated: boolean;
 };
 
 const IMAGE_RATIO = 0.9;
 const IMAGE_PADDING = 40;
 const GRADIENT_HEIGHT = 100;
 
-const Product: React.FC<ProductComponentProps> = ({product, onSave}) => {
+const Product: React.FC<ProductComponentProps> = ({
+    product,
+    onSave,
+    animated,
+}) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
     const rotation = useSharedValue(0);
@@ -115,36 +120,36 @@ const Product: React.FC<ProductComponentProps> = ({product, onSave}) => {
             }
         });
 
-    return (
-        <Animated.View style={[rTileStyle, styles.container]}>
-            <GestureDetector gesture={panGesture}>
-                <View>
-                    <ImageBackground
-                        style={{
-                            width: width - IMAGE_PADDING,
-                            height: (width - IMAGE_PADDING) / IMAGE_RATIO,
-                        }}
-                        source={{uri: product.imageLink[0]}}>
-                        <View style={styles.imageOverlayContainer}>
-                            <View style={styles.gradientContainer}>
-                                <LinearGradient
-                                    colors={['#00000000', '#000000']}
-                                    style={styles.linearGradient}>
-                                    <View style={styles.textContainer}>
-                                        <View style={{flex: 3}}>
-                                            <Text style={styles.titleText}>
-                                                {product.title}
-                                            </Text>
-                                        </View>
-                                        <View style={{flex: 1}}>
-                                            <Text style={styles.priceText}>
-                                                ${product.price}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </LinearGradient>
+    let baseComponent = (
+        <View style={styles.container}>
+            <ImageBackground
+                style={{
+                    width: width - IMAGE_PADDING,
+                    height: (width - IMAGE_PADDING) / IMAGE_RATIO,
+                }}
+                source={{uri: product.imageLink[0]}}>
+                <View style={styles.imageOverlayContainer}>
+                    <View style={styles.gradientContainer}>
+                        <LinearGradient
+                            colors={['#00000000', '#000000']}
+                            style={styles.linearGradient}>
+                            <View style={styles.textContainer}>
+                                <View style={{flex: 3}}>
+                                    <Text style={styles.titleText}>
+                                        {product.title}
+                                    </Text>
+                                </View>
+                                <View style={{flex: 1}}>
+                                    <Text style={styles.priceText}>
+                                        ${product.price}
+                                    </Text>
+                                </View>
                             </View>
+                        </LinearGradient>
+                    </View>
 
+                    {animated ? (
+                        <View>
                             <View style={styles.actionContainer}>
                                 <Animated.View
                                     style={[
@@ -167,11 +172,23 @@ const Product: React.FC<ProductComponentProps> = ({product, onSave}) => {
                                 </Animated.View>
                             </View>
                         </View>
-                    </ImageBackground>
+                    ) : undefined}
                 </View>
-            </GestureDetector>
-        </Animated.View>
+            </ImageBackground>
+        </View>
     );
+
+    if (animated) {
+        return (
+            <Animated.View style={[rTileStyle]}>
+                <GestureDetector gesture={panGesture}>
+                    {baseComponent}
+                </GestureDetector>
+            </Animated.View>
+        );
+    } else {
+        return baseComponent;
+    }
 };
 
 const styles = StyleSheet.create({
