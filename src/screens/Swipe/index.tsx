@@ -1,8 +1,13 @@
 import React from 'react';
-import {Text} from 'react-native';
+import ProductList from '@/components/Product/ProductList';
+import {View} from 'react-native';
 
 const Swipe = () => {
-    return <Text>Swipe</Text>;
+    return (
+        <View>
+            <ProductList />
+        </View>
+    );
 };
 
 export default Swipe;
