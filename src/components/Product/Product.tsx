@@ -18,7 +18,6 @@ import {REMOVE_TOP_PRODUCT} from '@/store/slices/product';
 
 type ProductComponentProps = {
     product: ProductType;
-    onSave: () => void;
     animated: boolean;
 };
 
@@ -30,11 +29,9 @@ const MAX_ROTATION = 10;
 const ROTATION_WIDTH = 200;
 const ACTION_VISIBILITY_THRESHOLD = 0.2;
 
-const Product: React.FC<ProductComponentProps> = ({
-    product,
-    onSave,
-    animated,
-}) => {
+const ANIMATION_DURATION = 300;
+
+const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
     const rotation = useSharedValue(0);
@@ -68,9 +65,19 @@ const Product: React.FC<ProductComponentProps> = ({
     // Called when like button is pressed (by watching store).
     const likeAnimation = () => {
         'worklet';
-        offsetX.value = withTiming(width * 0.75);
-        saveOpacity.value = withTiming(1);
-        rotation.value = withTiming(MAX_ROTATION, {}, fadeAndRemove);
+        offsetX.value = withTiming(width * 0.75, {
+            duration: ANIMATION_DURATION,
+        });
+        saveOpacity.value = withTiming(1, {
+            duration: ANIMATION_DURATION / 2,
+        });
+        rotation.value = withTiming(
+            MAX_ROTATION,
+            {
+                duration: ANIMATION_DURATION,
+            },
+            fadeAndRemove,
+        );
     };
 
     const rTileStyle = useAnimatedStyle(() => {

@@ -17,10 +17,6 @@ const ProductList: React.FC<ProductListProps> = () => {
         loadProducts();
     }, []);
 
-    const saveProduct = (): void => {
-        dispatch(SET_PRODUCTS(products.slice(1, products.length)));
-    };
-
     const loadProducts = (): void => {
         // GENERATE FAKE PRODUCT DATA.
         const FAKE_DATA_AMOUNT = 5;
@@ -51,7 +47,6 @@ const ProductList: React.FC<ProductListProps> = () => {
                         <View>
                             <Product
                                 product={products[1]}
-                                onSave={saveProduct}
                                 animated={false}
                                 key={products[1].id}
                             />
@@ -60,7 +55,6 @@ const ProductList: React.FC<ProductListProps> = () => {
                     <View>
                         <Product
                             product={products[0]}
-                            onSave={saveProduct}
                             animated={true}
                             key={products[0].id}
                         />

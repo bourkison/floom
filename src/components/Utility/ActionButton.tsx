@@ -61,6 +61,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
                     height: radius,
                     borderRadius: radius / 2,
                 },
+                style,
                 rStyle,
             ]}>
             <GestureDetector gesture={touchGesture}>
