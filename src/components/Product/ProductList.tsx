@@ -4,15 +4,24 @@ import {Product as ProductType} from '@/types/Product';
 import {faker} from '@faker-js/faker';
 import Product from '@/components/Product/Product';
 
-const ProductList = () => {
-    const [products, setProducts] = useState<ProductType[]>([]);
+import {SET_PRODUCTS} from '@/store/slices/product';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
+
+type ProductListProps = {
+    isSaving: boolean;
+    setIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const ProductList: React.FC<ProductListProps> = () => {
+    const products = useAppSelector(state => state.product.products);
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         loadProducts();
     }, []);
 
     const saveProduct = (): void => {
-        setProducts(products.slice(1, products.length));
+        dispatch(SET_PRODUCTS(products.slice(1, products.length)));
     };
 
     const loadProducts = (): void => {
@@ -33,7 +42,7 @@ const ProductList = () => {
             });
         }
 
-        setProducts(temp);
+        dispatch(SET_PRODUCTS(temp));
     };
 
     return (

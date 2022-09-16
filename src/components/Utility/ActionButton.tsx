@@ -11,6 +11,7 @@ type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
     radius: number;
     style?: ViewStyle;
+    onPress: (type: 'save' | 'buy' | 'delete') => void;
 };
 
 const PRESSED_SCALE = 0.97;

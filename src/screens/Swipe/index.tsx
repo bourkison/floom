@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ProductList from '@/components/Product/ProductList';
 import {View, StyleSheet, Text} from 'react-native';
 import ActionButton from '@/components/Utility/ActionButton';
@@ -9,6 +9,11 @@ const IMAGE_PADDING = 40;
 
 const Swipe = () => {
     const {width} = useWindowDimensions();
+
+    const [isSaving, setIsSaving] = useState(false);
+
+    const actionPress = (type: 'save' | 'buy' | 'delete') => {};
+
     return (
         <View style={styles.container}>
             <View
@@ -16,10 +21,10 @@ const Swipe = () => {
                     styles.productContainer,
                     {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
                 ]}>
-                <ProductList />
+                <ProductList isSaving={isSaving} setIsSaving={setIsSaving} />
             </View>
             <View style={styles.buttonsContainer}>
-                <ActionButton type="save" radius={50} />
+                <ActionButton type="save" radius={50} onPress={actionPress} />
             </View>
             <View style={{flex: 1}}>
                 <Text>TEST TEST</Text>
