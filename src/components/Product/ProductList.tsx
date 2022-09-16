@@ -15,10 +15,6 @@ const ProductList = () => {
         setProducts(products.slice(1, products.length));
     };
 
-    useEffect(() => {
-        console.log('PRODUCTS CHANGED:', products.length, products);
-    }, [products]);
-
     const loadProducts = (): void => {
         // GENERATE FAKE PRODUCT DATA.
         const FAKE_DATA_AMOUNT = 5;
@@ -30,8 +26,8 @@ const ProductList = () => {
                 title: faker.vehicle.vehicle(),
                 price: Math.floor(Math.random() * 100000) / 100,
                 imageLink: [
-                    faker.image.animals(100, 100, true),
-                    faker.image.animals(100, 100, true),
+                    faker.image.animals(400, Math.floor(400 / 0.9), true),
+                    faker.image.animals(400, Math.floor(400 / 0.9), true),
                 ],
                 link: 'https://www.strenive.com',
             });
