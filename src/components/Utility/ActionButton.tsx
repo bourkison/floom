@@ -1,23 +1,26 @@
 import React from 'react';
 import Animated, {
+    runOnJS,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {View, StyleSheet, ViewStyle, Text} from 'react-native';
+import {useAppDispatch} from '@/store/hooks';
+import {COMMENCE_SAVE_TOP_PRODUCT} from '@/store/slices/product';
 
 type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
     radius: number;
     style?: ViewStyle;
-    onPress: (type: 'save' | 'buy' | 'delete') => void;
 };
 
 const PRESSED_SCALE = 0.97;
 
 const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
     const scale = useSharedValue(1);
+    const dispatch = useAppDispatch();
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -29,6 +32,10 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
         };
     });
 
+    const actionPress = () => {
+        dispatch(COMMENCE_SAVE_TOP_PRODUCT());
+    };
+
     const touchGesture = Gesture.Tap()
         .maxDuration(250)
         .onTouchesDown(() => {
@@ -37,7 +44,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
             });
         })
         .onTouchesUp(() => {
-            console.log('TOUCH UP');
+            runOnJS(actionPress)();
         })
         .onFinalize(() => {
             scale.value = withTiming(1, {

@@ -7,10 +7,7 @@ import Product from '@/components/Product/Product';
 import {SET_PRODUCTS} from '@/store/slices/product';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 
-type ProductListProps = {
-    isSaving: boolean;
-    setIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
-};
+type ProductListProps = {};
 
 const ProductList: React.FC<ProductListProps> = () => {
     const products = useAppSelector(state => state.product.products);

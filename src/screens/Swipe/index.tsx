@@ -10,10 +10,6 @@ const IMAGE_PADDING = 40;
 const Swipe = () => {
     const {width} = useWindowDimensions();
 
-    const [isSaving, setIsSaving] = useState(false);
-
-    const actionPress = (type: 'save' | 'buy' | 'delete') => {};
-
     return (
         <View style={styles.container}>
             <View
@@ -21,10 +17,10 @@ const Swipe = () => {
                     styles.productContainer,
                     {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
                 ]}>
-                <ProductList isSaving={isSaving} setIsSaving={setIsSaving} />
+                <ProductList />
             </View>
             <View style={styles.buttonsContainer}>
-                <ActionButton type="save" radius={50} onPress={actionPress} />
+                <ActionButton type="save" radius={50} />
             </View>
             <View style={{flex: 1}}>
                 <Text>TEST TEST</Text>

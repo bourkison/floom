@@ -5,12 +5,16 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {useWindowDimensions} from 'react-native';
 import Animated, {
     runOnJS,
+    runOnUI,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
     withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
+import {useEffect} from 'react';
+import {REMOVE_TOP_PRODUCT} from '@/store/slices/product';
 
 type ProductComponentProps = {
     product: ProductType;
@@ -21,6 +25,10 @@ type ProductComponentProps = {
 const IMAGE_RATIO = 0.9;
 const IMAGE_PADDING = 40;
 const GRADIENT_HEIGHT = 100;
+
+const MAX_ROTATION = 10;
+const ROTATION_WIDTH = 200;
+const ACTION_VISIBILITY_THRESHOLD = 0.2;
 
 const Product: React.FC<ProductComponentProps> = ({
     product,
@@ -36,6 +44,34 @@ const Product: React.FC<ProductComponentProps> = ({
     const ctx = useSharedValue({x: 0, y: 0});
 
     const {width} = useWindowDimensions();
+
+    const dispatch = useAppDispatch();
+    const isAnimatingSave = useAppSelector(
+        state => state.product.isAnimatingSave,
+    );
+
+    useEffect(() => {
+        if (isAnimatingSave && animated) {
+            runOnUI(likeAnimation)();
+        }
+    }, [isAnimatingSave]);
+
+    const removeTopProduct = () => {
+        dispatch(REMOVE_TOP_PRODUCT());
+    };
+
+    const fadeAndRemove = () => {
+        'worklet';
+        tileOpacity.value = withTiming(0, {}, runOnJS(removeTopProduct));
+    };
+
+    // Called when like button is pressed (by watching store).
+    const likeAnimation = () => {
+        'worklet';
+        offsetX.value = withTiming(width * 0.75);
+        saveOpacity.value = withTiming(1);
+        rotation.value = withTiming(MAX_ROTATION, {}, fadeAndRemove);
+    };
 
     const rTileStyle = useAnimatedStyle(() => {
         return {
@@ -78,10 +114,6 @@ const Product: React.FC<ProductComponentProps> = ({
             offsetY.value = e.translationY + ctx.value.y;
 
             // Calculate rotation
-            const MAX_ROTATION = 10;
-            const ROTATION_WIDTH = 200;
-            const ACTION_VISIBILITY_THRESHOLD = 0.2;
-
             let percentageToAction = e.translationX / ROTATION_WIDTH;
             if (percentageToAction > 1) {
                 percentageToAction = 1;
@@ -107,10 +139,10 @@ const Product: React.FC<ProductComponentProps> = ({
 
             if (offsetX.value > ACTION_THRESHOLD) {
                 // SAVE
-                tileOpacity.value = withTiming(0, {}, runOnJS(onSave));
+                tileOpacity.value = withTiming(0, {}, fadeAndRemove);
             } else if (offsetX.value < -ACTION_THRESHOLD) {
                 // DELETE
-                tileOpacity.value = withTiming(0, {}, runOnJS(onSave));
+                tileOpacity.value = withTiming(0, {}, fadeAndRemove);
             } else {
                 offsetX.value = withSpring(0);
                 offsetY.value = withSpring(0);
