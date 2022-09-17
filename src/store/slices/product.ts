@@ -9,7 +9,7 @@ const productAdapter = createEntityAdapter();
 
 const initialState = productAdapter.getInitialState({
     products: [] as ProductType[],
-    isAnimatingSave: false,
+    animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
 });
 
 const productSlice = createSlice({
@@ -19,16 +19,19 @@ const productSlice = createSlice({
         SET_PRODUCTS(state, action: PayloadAction<ProductType[]>) {
             state.products = action.payload;
         },
-        COMMENCE_SAVE_TOP_PRODUCT(state) {
-            state.isAnimatingSave = true;
+        COMMENCE_ANIMATE(
+            state,
+            action: PayloadAction<'idle' | 'save' | 'buy' | 'delete'>,
+        ) {
+            state.animation = action.payload;
         },
         REMOVE_TOP_PRODUCT(state) {
-            state.isAnimatingSave = false;
+            state.animation = 'idle';
             state.products = state.products.slice(1, state.products.length);
         },
     },
 });
 
-export const {SET_PRODUCTS, COMMENCE_SAVE_TOP_PRODUCT, REMOVE_TOP_PRODUCT} =
+export const {SET_PRODUCTS, REMOVE_TOP_PRODUCT, COMMENCE_ANIMATE} =
     productSlice.actions;
 export default productSlice.reducer;

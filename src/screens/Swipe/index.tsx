@@ -20,10 +20,21 @@ const Swipe = () => {
                 <ProductList />
             </View>
             <View style={styles.buttonsContainer}>
-                <ActionButton type="save" radius={50} />
-            </View>
-            <View style={{flex: 1}}>
-                <Text>TEST TEST</Text>
+                <ActionButton
+                    type="delete"
+                    radius={50}
+                    style={{marginHorizontal: 10}}
+                />
+                <ActionButton
+                    type="buy"
+                    radius={50}
+                    style={{marginHorizontal: 10}}
+                />
+                <ActionButton
+                    type="save"
+                    radius={50}
+                    style={{marginHorizontal: 10}}
+                />
             </View>
         </View>
     );
@@ -43,6 +54,7 @@ const styles = StyleSheet.create({
     },
     buttonsContainer: {
         marginTop: 40,
+        flexDirection: 'row',
     },
 });
 

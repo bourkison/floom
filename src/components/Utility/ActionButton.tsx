@@ -8,7 +8,8 @@ import Animated, {
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {View, StyleSheet, ViewStyle, Text} from 'react-native';
 import {useAppDispatch} from '@/store/hooks';
-import {COMMENCE_SAVE_TOP_PRODUCT} from '@/store/slices/product';
+import {COMMENCE_ANIMATE} from '@/store/slices/product';
+import {Entypo, AntDesign, Feather} from '@expo/vector-icons';
 
 type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
@@ -33,7 +34,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
     });
 
     const actionPress = () => {
-        dispatch(COMMENCE_SAVE_TOP_PRODUCT());
+        dispatch(COMMENCE_ANIMATE(type));
     };
 
     const touchGesture = Gesture.Tap()
@@ -52,6 +53,34 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
             });
         });
 
+    let icon: JSX.Element;
+
+    switch (type) {
+        case 'save':
+            icon = (
+                <Entypo
+                    name="heart"
+                    size={Math.floor(radius * 0.6)}
+                    color="green"
+                />
+            );
+            break;
+        case 'buy':
+            icon = (
+                <AntDesign
+                    name="shoppingcart"
+                    size={Math.floor(radius * 0.6)}
+                    color="blue"
+                />
+            );
+            break;
+        case 'delete':
+            icon = (
+                <Feather name="x" size={Math.floor(radius * 0.6)} color="red" />
+            );
+            break;
+    }
+
     return (
         <Animated.View
             style={[
@@ -65,8 +94,14 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
                 rStyle,
             ]}>
             <GestureDetector gesture={touchGesture}>
-                <View style={{flex: 1}}>
-                    <Text>Save</Text>
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        alignContent: 'center',
+                    }}>
+                    {icon}
                 </View>
             </GestureDetector>
         </Animated.View>

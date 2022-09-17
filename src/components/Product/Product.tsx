@@ -43,41 +43,57 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     const {width} = useWindowDimensions();
 
     const dispatch = useAppDispatch();
-    const isAnimatingSave = useAppSelector(
-        state => state.product.isAnimatingSave,
-    );
+    const animationAction = useAppSelector(state => state.product.animation);
 
     useEffect(() => {
-        if (isAnimatingSave && animated) {
-            runOnUI(likeAnimation)();
+        if (animated && animationAction !== 'idle') {
+            runOnUI(commenceAnimation)(animationAction);
         }
-    }, [isAnimatingSave]);
+    }, [animationAction]);
 
     const removeTopProduct = () => {
         dispatch(REMOVE_TOP_PRODUCT());
     };
 
+    // Fade this product out and remove it from products array.
+    // Called post pan gesture and after like animation.
     const fadeAndRemove = () => {
         'worklet';
         tileOpacity.value = withTiming(0, {}, runOnJS(removeTopProduct));
     };
 
-    // Called when like button is pressed (by watching store).
-    const likeAnimation = () => {
+    // Called when an action button is pressed (by watching store).
+    const commenceAnimation = (type: typeof animationAction) => {
         'worklet';
-        offsetX.value = withTiming(width * 0.75, {
-            duration: ANIMATION_DURATION,
-        });
-        saveOpacity.value = withTiming(1, {
-            duration: ANIMATION_DURATION / 2,
-        });
-        rotation.value = withTiming(
-            MAX_ROTATION,
-            {
+        if (type === 'save') {
+            offsetX.value = withTiming(width * 0.75, {
                 duration: ANIMATION_DURATION,
-            },
-            fadeAndRemove,
-        );
+            });
+            saveOpacity.value = withTiming(1, {
+                duration: ANIMATION_DURATION / 2,
+            });
+            rotation.value = withTiming(
+                MAX_ROTATION,
+                {
+                    duration: ANIMATION_DURATION,
+                },
+                fadeAndRemove,
+            );
+        } else if (type === 'delete') {
+            offsetX.value = withTiming(-width * 0.75, {
+                duration: ANIMATION_DURATION,
+            });
+            deleteOpacity.value = withTiming(1, {
+                duration: ANIMATION_DURATION / 2,
+            });
+            rotation.value = withTiming(
+                -MAX_ROTATION,
+                {
+                    duration: ANIMATION_DURATION,
+                },
+                fadeAndRemove,
+            );
+        }
     };
 
     const rTileStyle = useAnimatedStyle(() => {
@@ -165,6 +181,8 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
                 style={{
                     width: width - IMAGE_PADDING,
                     height: (width - IMAGE_PADDING) / IMAGE_RATIO,
+                    borderRadius: 5,
+                    overflow: 'hidden',
                 }}
                 source={{uri: product.imageLink[0]}}>
                 <View style={styles.imageOverlayContainer}>
