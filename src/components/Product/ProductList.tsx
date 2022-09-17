@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, useWindowDimensions} from 'react-native';
-import {Product as ProductType} from '@/types/Product';
+import {Product as ProductType} from '@/types/product';
 import {faker} from '@faker-js/faker';
 import Product from '@/components/Product/Product';
 
@@ -19,7 +19,7 @@ const ProductList: React.FC<ProductListProps> = () => {
 
     const loadProducts = (): void => {
         // GENERATE FAKE PRODUCT DATA.
-        const FAKE_DATA_AMOUNT = 5;
+        const FAKE_DATA_AMOUNT = 20;
         let temp: ProductType[] = [];
 
         for (let i = 0; i < FAKE_DATA_AMOUNT; i++) {

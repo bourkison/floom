@@ -3,7 +3,7 @@ import {
     createSlice,
     PayloadAction,
 } from '@reduxjs/toolkit';
-import {Product as ProductType} from '@/types/Product';
+import {Product as ProductType} from '@/types/product';
 
 const productAdapter = createEntityAdapter();
 

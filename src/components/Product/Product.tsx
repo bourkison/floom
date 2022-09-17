@@ -1,6 +1,6 @@
 import React from 'react';
 import {ImageBackground, StyleSheet, Text, View} from 'react-native';
-import {Product as ProductType} from '@/types/Product';
+import {Product as ProductType} from '@/types/product';
 import {LinearGradient} from 'expo-linear-gradient';
 import {useWindowDimensions} from 'react-native';
 import Animated, {
@@ -69,9 +69,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
             offsetX.value = withTiming(width * 0.75, {
                 duration: ANIMATION_DURATION,
             });
-            saveOpacity.value = withTiming(1, {
-                duration: ANIMATION_DURATION / 2,
-            });
+            saveOpacity.value = 1;
             rotation.value = withTiming(
                 MAX_ROTATION,
                 {
@@ -83,9 +81,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
             offsetX.value = withTiming(-width * 0.75, {
                 duration: ANIMATION_DURATION,
             });
-            deleteOpacity.value = withTiming(1, {
-                duration: ANIMATION_DURATION / 2,
-            });
+            deleteOpacity.value = 1;
             rotation.value = withTiming(
                 -MAX_ROTATION,
                 {
@@ -237,7 +233,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
 
     if (animated) {
         return (
-            <Animated.View style={[rTileStyle]}>
+            <Animated.View style={rTileStyle}>
                 <GestureDetector gesture={panGesture}>
                     {baseComponent}
                 </GestureDetector>
