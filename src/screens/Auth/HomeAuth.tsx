@@ -1,25 +1,25 @@
-import React, {useState} from 'react';
-import {View, Text, Button, TextInput, StyleSheet} from 'react-native';
-import {Auth} from 'aws-amplify';
-import {StatusBar} from 'expo-status-bar';
+import React from 'react';
+import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {StackScreenProps} from '@react-navigation/stack';
+import {AuthStackParamList} from '@/nav/Navigator';
+
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 
-const HomeAuth = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+const HomeAuth = ({
+    navigation,
+}: StackScreenProps<AuthStackParamList, 'HomeAuth'>) => {
+    // const signup = async () => {
+    //     console.log('Signing up with email', email, 'password', password);
+    //     const response = await Auth.signUp({
+    //         username: email,
+    //         password: password,
+    //         attributes: {
+    //             email: email,
+    //         },
+    //     });
 
-    const signup = async () => {
-        console.log('Signing up with email', email, 'password', password);
-        const response = await Auth.signUp({
-            username: email,
-            password: password,
-            attributes: {
-                email: email,
-            },
-        });
-
-        console.log('Signed up!', response);
-    };
+    //     console.log('Signed up!', response);
+    // };
 
     const navigateToLogin = () => {
         console.log('LOGIN');
@@ -30,7 +30,7 @@ const HomeAuth = () => {
     };
 
     const navigateToGuest = () => {
-        console.log('GUEST');
+        navigation.push('GuestWelcome');
     };
 
     return (
@@ -47,13 +47,9 @@ const HomeAuth = () => {
                 onPress={navigateToSignUp}>
                 Create Account
             </AnimatedButton>
-            <AnimatedButton
-                style={styles.guestButton}
-                textStyle={styles.guestButtonText}
-                onPress={navigateToGuest}
-                scale={1}>
-                Continue as Guest
-            </AnimatedButton>
+            <Pressable style={styles.guestButton} onPress={navigateToGuest}>
+                <Text style={styles.guestButtonText}>Continue as Guest</Text>
+            </Pressable>
         </View>
     );
 };
