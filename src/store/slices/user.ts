@@ -19,7 +19,6 @@ const initialState = userAdapter.getInitialState({
 export const FETCH_USER = createAsyncThunk(
     'user/FETCH_USER',
     async (): Promise<UserDocData> => {
-        console.log('Fetching user.');
         await Auth.currentSession();
 
         const username = (await Auth.currentUserInfo()).username;
@@ -34,17 +33,20 @@ const userSlice = createSlice({
     extraReducers: builder => {
         builder
             .addCase(FETCH_USER.pending, state => {
+                console.log('Fetching user.');
                 state.status = 'loading';
             })
             .addCase(FETCH_USER.fulfilled, (state, action) => {
+                console.log('User logged in.');
                 state.loggedIn = true;
                 state.docData = action.payload;
                 state.status = 'succeeded';
             })
             .addCase(FETCH_USER.rejected, state => {
+                console.log('Fetch user rejected, user logged out.');
                 state.loggedIn = false;
                 state.docData = null;
-                state.status = 'idle';
+                state.status = 'failed';
             });
     },
 });
