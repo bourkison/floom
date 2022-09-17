@@ -23,6 +23,14 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    likedProducts: {
+        type: mongoose.Types.ObjectId[],
+        default: []
+    },
+    deletedProducts: {
+        type: mongoose.Types.ObjectId[],
+        default: []
+    }
 });
 
 const productSchema = mongoose.Schema({

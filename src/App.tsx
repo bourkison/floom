@@ -6,6 +6,8 @@ import Navigator from '@/nav/Navigator';
 import {Provider} from 'react-redux';
 import store from '@/store';
 
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+
 import {Amplify} from 'aws-amplify';
 import awsconfig from './aws-exports';
 import {FETCH_USER} from './store/slices/user';
@@ -13,18 +15,20 @@ Amplify.configure(awsconfig);
 
 const App = () => {
     useEffect(() => {
-        const fetchUser = async () => {
+        const initFetch = async () => {
             store.dispatch(FETCH_USER());
         };
 
-        fetchUser();
+        initFetch();
     }, []);
 
     return (
         <Provider store={store}>
-            <NavigationContainer>
-                <Navigator />
-            </NavigationContainer>
+            <GestureHandlerRootView style={{flex: 1}}>
+                <NavigationContainer>
+                    <Navigator />
+                </NavigationContainer>
+            </GestureHandlerRootView>
         </Provider>
     );
 };

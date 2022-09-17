@@ -10,6 +10,7 @@ import {Auth} from 'aws-amplify';
 const userAdapter = createEntityAdapter();
 
 const initialState = userAdapter.getInitialState({
+    isGuest: false,
     loggedIn: false,
     docData: null as UserDocData | null,
     status: 'idle' as 'idle' | 'loading' | 'succeeded' | 'failed',
