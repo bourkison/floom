@@ -37,6 +37,7 @@ const App = () => {
 
     const onLayoutRootView = useCallback(async () => {
         if (appIsReady) {
+            // When app is ready, hide the splashscreen.
             await SplashScreen.hideAsync();
         }
     }, [appIsReady]);
