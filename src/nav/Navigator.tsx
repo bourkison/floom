@@ -1,9 +1,11 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useAppSelector} from '@/store/hooks';
 
-import Swipe from '@/screens/Swipe';
+import Home from '@/screens/Swipe/Home';
+import Options from '@/screens/Swipe/Options';
+import LikedProducts from '@/screens/Swipe/LikedProducts';
+
 import HomeAuth from '@/screens/Auth/HomeAuth';
 import GuestWelcome from '@/screens/Auth/GuestWelcome';
 import SignUp from '@/screens/Auth/SignUp';
@@ -22,28 +24,51 @@ export type AuthStackParamList = {
     Login: undefined;
 };
 
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator<AuthStackParamList>();
+export type MainStackParamList = {
+    Home: undefined;
+    Options: undefined;
+    LikedProducts: undefined;
+};
+
+const MainStack = createStackNavigator<MainStackParamList>();
+const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const Navigator = () => {
     const loggedIn = useAppSelector(state => state.user.loggedIn);
 
     if (!loggedIn) {
         return (
-            <Stack.Navigator initialRouteName="HomeAuth">
-                <Stack.Screen name="HomeAuth" component={HomeAuth} />
-                <Stack.Screen name="GuestWelcome" component={GuestWelcome} />
-                <Stack.Screen name="SignUp" component={SignUp} />
-                <Stack.Screen name="VerifyEmail" component={VerifyEmail} />
-                <Stack.Screen name="Login" component={Login} />
-            </Stack.Navigator>
+            <AuthStack.Navigator initialRouteName="HomeAuth">
+                <AuthStack.Screen name="HomeAuth" component={HomeAuth} />
+                <AuthStack.Screen
+                    name="GuestWelcome"
+                    component={GuestWelcome}
+                />
+                <AuthStack.Screen name="SignUp" component={SignUp} />
+                <AuthStack.Screen name="VerifyEmail" component={VerifyEmail} />
+                <AuthStack.Screen name="Login" component={Login} />
+            </AuthStack.Navigator>
         );
     }
 
     return (
-        <Tab.Navigator>
-            <Tab.Screen name="Home" component={Swipe} />
-        </Tab.Navigator>
+        <MainStack.Navigator initialRouteName="Home">
+            <MainStack.Screen name="Home" component={Home} />
+            <MainStack.Screen
+                name="Options"
+                component={Options}
+                options={{
+                    gestureDirection: 'horizontal-inverted',
+                }}
+            />
+            <MainStack.Screen
+                name="LikedProducts"
+                component={LikedProducts}
+                options={{
+                    gestureDirection: 'horizontal',
+                }}
+            />
+        </MainStack.Navigator>
     );
 };
 

@@ -16,9 +16,8 @@ type UserDocData = {
 const getUser = async (
     event: APIGatewayEvent,
 ): Promise<APIGatewayProxyResult> => {
-    console.log('RC:', event.requestContext);
-    console.log('Authorizer v2:', event.requestContext.authorizer);
     const email = event.pathParameters.proxy;
+    const authEmail = event.requestContext.authorizer.claims.email;
     const User: Model<UserDocData> = await MongooseModels().User(MONGODB_URI);
 
     let response: APIGatewayProxyResult = {
@@ -29,6 +28,22 @@ const getUser = async (
         },
         body: JSON.stringify({success: false}),
     };
+
+    if (email !== authEmail) {
+        response = {
+            statusCode: 403,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: `${authEmail} does not have permission to access ${email}`,
+            }),
+        };
+
+        return response;
+    }
 
     try {
         const result = await User.findOne(
