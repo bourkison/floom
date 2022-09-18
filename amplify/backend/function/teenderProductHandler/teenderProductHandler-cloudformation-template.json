@@ -54,12 +54,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "teenderTestProducts",
+            "teenderProductHandler",
             {
               "Fn::Join": [
                 "",
                 [
-                  "teenderTestProducts",
+                  "teenderProductHandler",
                   "-",
                   {
                     "Ref": "env"
@@ -91,7 +91,7 @@
                         "env": {
                           "Ref": "env"
                         },
-                        "functionName": "teenderTestProducts"
+                        "functionName": "teenderProductHandler"
                       }
                     ]
                   },
@@ -122,12 +122,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "teenderLambdaRole5db2caee",
+            "teenderLambdaRole4088002c",
             {
               "Fn::Join": [
                 "",
                 [
-                  "teenderLambdaRole5db2caee",
+                  "teenderLambdaRole4088002c",
                   "-",
                   {
                     "Ref": "env"
@@ -198,45 +198,6 @@
         }
       }
     },
-    "CloudWatchEvent": {
-      "Type": "AWS::Events::Rule",
-      "Properties": {
-        "Description": "Schedule rule for Lambda",
-        "ScheduleExpression": {
-          "Ref": "CloudWatchRule"
-        },
-        "State": "ENABLED",
-        "Targets": [
-          {
-            "Arn": {
-              "Fn::GetAtt": [
-                "LambdaFunction",
-                "Arn"
-              ]
-            },
-            "Id": {
-              "Ref": "LambdaFunction"
-            }
-          }
-        ]
-      }
-    },
-    "PermissionForEventsToInvokeLambda": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "LambdaFunction"
-        },
-        "Action": "lambda:InvokeFunction",
-        "Principal": "events.amazonaws.com",
-        "SourceArn": {
-          "Fn::GetAtt": [
-            "CloudWatchEvent",
-            "Arn"
-          ]
-        }
-      }
-    },
     "AmplifyFunctionSecretsPolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
@@ -278,7 +239,7 @@
                           "env": {
                             "Ref": "env"
                           },
-                          "functionName": "teenderTestProducts"
+                          "functionName": "teenderProductHandler"
                         }
                       ]
                     },
@@ -317,11 +278,6 @@
     "LambdaExecutionRole": {
       "Value": {
         "Ref": "LambdaExecutionRole"
-      }
-    },
-    "CloudWatchEventRule": {
-      "Value": {
-        "Ref": "CloudWatchEvent"
       }
     }
   }

@@ -84,6 +84,20 @@
           ]
         }
       ]
+    },
+    "teenderProductHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "teenderMongooseModels",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ]
     }
   },
   "api": {
@@ -94,6 +108,14 @@
         {
           "category": "function",
           "resourceName": "teenderUserHandler",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "teenderProductHandler",
           "attributes": [
             "Name",
             "Arn"

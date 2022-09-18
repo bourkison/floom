@@ -1,6 +1,8 @@
 {
   "version": "1",
   "cognitoConfig": {
+    "identityPoolName": "teenderf3c943f2f3c943f2_identitypool_01ce3cc8",
+    "allowUnauthenticatedIdentities": true,
     "resourceNameTruncated": "teendef3c943f2",
     "userPoolName": "teenderf3c943f2_userpool_f3c943f2",
     "autoVerifiedAttributes": [
@@ -41,7 +43,7 @@
     "userpoolClientSetAttributes": true,
     "sharedId": "f3c943f2",
     "resourceName": "teenderf3c943f2f3c943f2",
-    "authSelections": "userPoolOnly",
+    "authSelections": "identityPoolAndUserPool",
     "useDefault": "manual",
     "usernameAttributes": [
       "email"
@@ -85,7 +87,9 @@
     "parentStack": {
       "Ref": "AWS::StackId"
     },
-    "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PreSignUp\",\n    \"lambdaFunctionName\": \"teenderf3c943f2f3c943f2PreSignup\"\n  }\n]",
+    "authTriggerConnections": [
+      "{\"triggerType\":\"PreSignUp\",\"lambdaFunctionName\":\"teenderf3c943f2f3c943f2PreSignup\"}"
+    ],
     "permissions": [],
     "authProviders": []
   }

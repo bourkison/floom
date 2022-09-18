@@ -62,6 +62,7 @@ module.exports = () => {
     const Product = async uri => {
         const connection = await mongooseConnect(uri);
         const response = await connection.model('Product', productSchema);
+        return response;
     };
 
     return {User, Product};

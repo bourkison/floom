@@ -1,7 +1,7 @@
 const MongooseModels = require('/opt/nodejs/models');
 import aws from 'aws-sdk';
 import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
-import {Document, Model} from 'mongoose';
+import {Model} from 'mongoose';
 
 let MONGODB_URI: string;
 
@@ -85,6 +85,7 @@ const getUser = async (
             }),
         };
     } catch {
+        // TODO: Handle error and return appropriate response.
         return response;
     }
 

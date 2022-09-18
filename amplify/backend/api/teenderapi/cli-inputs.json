@@ -13,6 +13,19 @@
           "delete"
         ]
       }
+    },
+    "/product": {
+      "name": "/product",
+      "lambdaFunction": "teenderProductHandler",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "read"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
     }
   }
 }
