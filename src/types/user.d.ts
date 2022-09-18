@@ -4,7 +4,6 @@ export type UserDocData = {
     gender: string;
     dob: Date;
     country: string;
-    likedProducts: string[];
 };
 
 // API

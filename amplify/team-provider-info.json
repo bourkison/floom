@@ -22,7 +22,7 @@
         "teenderUserHandler": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderUserHandler-6b69446659544f4a4231-build.zip"
+          "s3Key": "amplify-builds/teenderUserHandler-664753305532344f526d-build.zip"
         },
         "teenderMongooseModels": {
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
