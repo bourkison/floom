@@ -73,19 +73,35 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     // Called when an action button is pressed (by watching store).
     const commenceAnimation = (type: typeof animationAction) => {
         'worklet';
-        offsetX.value = withTiming(width * 0.75, {
-            duration: ANIMATION_DURATION,
-        });
-        saveOpacity.value = 1;
-        rotation.value = withTiming(
-            MAX_ROTATION,
-            {
+        if (type === 'save') {
+            offsetX.value = withTiming(width * 0.75, {
                 duration: ANIMATION_DURATION,
-            },
-            () => {
-                fadeAndRemove(type);
-            },
-        );
+            });
+            saveOpacity.value = 1;
+            rotation.value = withTiming(
+                MAX_ROTATION,
+                {
+                    duration: ANIMATION_DURATION,
+                },
+                () => {
+                    fadeAndRemove(type);
+                },
+            );
+        } else if (type === 'delete') {
+            offsetX.value = withTiming(-width * 0.75, {
+                duration: ANIMATION_DURATION,
+            });
+            deleteOpacity.value = 1;
+            rotation.value = withTiming(
+                -MAX_ROTATION,
+                {
+                    duration: ANIMATION_DURATION,
+                },
+                () => {
+                    fadeAndRemove(type);
+                },
+            );
+        }
     };
 
     const rTileStyle = useAnimatedStyle(() => {
@@ -154,10 +170,14 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
 
             if (offsetX.value > ACTION_THRESHOLD) {
                 // SAVE
-                tileOpacity.value = withTiming(0, {}, () => { fadeAndRemove('save') });
+                tileOpacity.value = withTiming(0, {}, () => {
+                    fadeAndRemove('save');
+                });
             } else if (offsetX.value < -ACTION_THRESHOLD) {
                 // DELETE
-                tileOpacity.value = withTiming(0, {}, () => { fadeAndRemove('delete') });
+                tileOpacity.value = withTiming(0, {}, () => {
+                    fadeAndRemove('delete');
+                });
             } else {
                 offsetX.value = withSpring(0);
                 offsetY.value = withSpring(0);

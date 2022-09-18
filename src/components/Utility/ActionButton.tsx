@@ -6,7 +6,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {View, StyleSheet, ViewStyle, Text} from 'react-native';
+import {View, StyleSheet, ViewStyle} from 'react-native';
 import {useAppDispatch} from '@/store/hooks';
 import {COMMENCE_ANIMATE} from '@/store/slices/product';
 import {Entypo, AntDesign, Feather} from '@expo/vector-icons';

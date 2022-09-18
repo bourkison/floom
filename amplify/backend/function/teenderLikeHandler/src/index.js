@@ -8,6 +8,7 @@ const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const models_1 = __importDefault(require("/opt/nodejs/models"));
 let MONGODB_URI;
 const createLike = async (event) => {
+    const type = event.queryStringParameters.type || 'like';
     const email = event.requestContext.authorizer.claims.email;
     const _id = event.pathParameters.proxy;
     const User = await (0, models_1.default)().User(MONGODB_URI);
@@ -20,7 +21,10 @@ const createLike = async (event) => {
         body: JSON.stringify({ success: false }),
     };
     try {
-        await User.findOneAndUpdate({ email: email }, { $push: { likedProducts: _id } });
+        let update = type === 'like'
+            ? { $push: { likedProducts: _id } }
+            : { $push: { deletedProducts: _id } };
+        await User.findOneAndUpdate({ email: email }, update);
         response = {
             statusCode: 200,
             headers: {
