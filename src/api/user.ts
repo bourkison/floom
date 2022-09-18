@@ -23,7 +23,7 @@ export async function getUser(input: GetUserParams): Promise<UserDocData> {
         email: data.data.email,
         name: data.data.name,
         gender: data.data.gender,
-        dob: new Date(data.data.dob),
+        dob: data.data.dob,
         country: data.data.country,
     };
 }

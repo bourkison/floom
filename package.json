@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "scripts": {
         "amplify:teenderUserHandler": "cd amplify/backend/function/teenderUserHandler/src && tsc",
-    "amplify:teenderf3c943f2f3c943f2PreSignup": "cd amplify/backend/function/teenderf3c943f2f3c943f2PreSignup/src && tsc"
+        "amplify:teenderf3c943f2f3c943f2PreSignup": "cd amplify/backend/function/teenderf3c943f2f3c943f2PreSignup/src && tsc",
+        "amplify:teenderTestProducts": "cd amplify/backend/function/teenderTestProducts/src && tsc"
     }
 }

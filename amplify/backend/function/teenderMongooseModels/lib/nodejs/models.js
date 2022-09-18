@@ -46,12 +46,10 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    imageLink: [
-        {
-            type: String,
-            required: true,
-        },
-    ],
+    imageLink: {
+        type: [String],
+        required: true,
+    },
 });
 
 module.exports = () => {
