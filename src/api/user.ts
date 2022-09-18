@@ -10,14 +10,10 @@ export async function getUser(input: GetUserParams): Promise<UserDocData> {
     init.headers.Authorization =
         init.headers.Authorization || (await fetchJwtToken());
 
-    console.log('CALLING API:', API_NAME, path, init);
-
     const data = await API.get(API_NAME, path, init).catch(err => {
-        console.error(err.message);
+        console.error(err);
         throw err;
     });
-
-    console.log('RESPONSE:', data);
 
     return {
         email: data.data.email,

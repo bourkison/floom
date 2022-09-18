@@ -2,7 +2,7 @@ import aws from 'aws-sdk';
 import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 // @ts-ignore
 import MongooseModels from '/opt/nodejs/models';
-import {Model, Types} from 'mongoose';
+import {Model, Types, UpdateQuery} from 'mongoose';
 
 let MONGODB_URI: string;
 
@@ -20,6 +20,7 @@ type UserType = {
 const createLike = async (
     event: APIGatewayEvent,
 ): Promise<APIGatewayProxyResult> => {
+    const type = event.queryStringParameters.type || 'like';
     const email = event.requestContext.authorizer.claims.email;
     const _id = event.pathParameters.proxy;
 
@@ -35,10 +36,11 @@ const createLike = async (
     };
 
     try {
-        await User.findOneAndUpdate(
-            {email: email},
-            {$push: {likedProducts: _id}},
-        );
+        let update: UpdateQuery<UserType> =
+            type === 'like'
+                ? {$push: {likedProducts: _id}}
+                : {$push: {deletedProducts: _id}};
+        await User.findOneAndUpdate({email: email}, update);
 
         response = {
             statusCode: 200,

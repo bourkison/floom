@@ -1,6 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, useWindowDimensions} from 'react-native';
-import {Product as ProductType} from '@/types/product';
+import React, {useEffect} from 'react';
+import {View, StyleSheet} from 'react-native';
 import {queryProduct} from '@/api/product';
 import Product from '@/components/Product/Product';
 
