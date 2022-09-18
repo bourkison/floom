@@ -28,11 +28,14 @@ exports.handler = async (
 
     const User = await MongooseModels().User(MONGODB_URI);
     const userObj: TUser = {
-        name: 'Jane Citizen',
-        gender: 'female',
-        dob: new Date(),
+        name: event.request.userAttributes.name,
+        gender: event.request.userAttributes.gender as
+            | 'male'
+            | 'female'
+            | 'other',
+        dob: new Date(event.request.userAttributes.birthdate),
         email: event.request.userAttributes.email,
-        country: 'United Kingdom',
+        country: event.request.userAttributes.locale,
     };
     const user = new User(userObj);
 

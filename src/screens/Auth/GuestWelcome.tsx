@@ -5,15 +5,20 @@ import {StyleSheet} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {AuthStackParamList} from '@/nav/Navigator';
 
+import {useAppDispatch} from '@/store/hooks';
+import {CONTINUE_AS_GUEST} from '@/store/slices/user';
+
 const GuestWelcome = ({
     navigation,
 }: StackScreenProps<AuthStackParamList, 'GuestWelcome'>) => {
+    const dispatch = useAppDispatch();
+
     const navigateToSignUp = () => {
-        console.log('Sign Up');
+        navigation.replace('SignUp');
     };
 
     const continueAsGuest = () => {
-        console.log('Continue');
+        dispatch(CONTINUE_AS_GUEST());
     };
 
     return (

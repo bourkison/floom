@@ -24,13 +24,21 @@
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
     "userpoolClientWriteAttributes": [
+      "birthdate",
+      "gender",
+      "locale",
+      "name",
       "email"
     ],
     "userpoolClientReadAttributes": [
-      "email"
+      "birthdate",
+      "email",
+      "gender",
+      "locale",
+      "name"
     ],
     "userpoolClientLambdaRole": "teendef3c943f2_userpoolclient_lambda_role",
-    "userpoolClientSetAttributes": false,
+    "userpoolClientSetAttributes": true,
     "sharedId": "f3c943f2",
     "resourceName": "teenderf3c943f2f3c943f2",
     "authSelections": "userPoolOnly",
@@ -74,11 +82,11 @@
         ]
       }
     ],
-    "authProviders": [],
     "parentStack": {
       "Ref": "AWS::StackId"
     },
     "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PreSignUp\",\n    \"lambdaFunctionName\": \"teenderf3c943f2f3c943f2PreSignup\"\n  }\n]",
-    "permissions": []
+    "permissions": [],
+    "authProviders": []
   }
 }

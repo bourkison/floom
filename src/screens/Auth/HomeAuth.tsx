@@ -26,7 +26,7 @@ const HomeAuth = ({
     };
 
     const navigateToSignUp = () => {
-        console.log('SIGN UP');
+        navigation.push('SignUp');
     };
 
     const navigateToGuest = () => {

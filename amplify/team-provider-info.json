@@ -26,12 +26,12 @@
         },
         "teenderMongooseModels": {
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderMongooseModels-LambdaLayerVersione9b4f11b-build.zip"
+          "s3Key": "amplify-builds/teenderMongooseModels-LambdaLayerVersionbe2012b8-build.zip"
         },
         "teenderf3c943f2f3c943f2PreSignup": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderf3c943f2f3c943f2PreSignup-3059546236735a735953-build.zip"
+          "s3Key": "amplify-builds/teenderf3c943f2f3c943f2PreSignup-4e6a446a4346736e534b-build.zip"
         }
       }
     }

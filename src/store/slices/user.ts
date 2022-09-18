@@ -29,7 +29,13 @@ export const FETCH_USER = createAsyncThunk(
 const userSlice = createSlice({
     name: 'user',
     initialState,
-    reducers: {},
+    reducers: {
+        CONTINUE_AS_GUEST(state) {
+            state.isGuest = true;
+            state.loggedIn = true;
+            state.status = 'succeeded';
+        },
+    },
     extraReducers: builder => {
         builder
             .addCase(FETCH_USER.pending, state => {
@@ -51,4 +57,5 @@ const userSlice = createSlice({
     },
 });
 
+export const {CONTINUE_AS_GUEST} = userSlice.actions;
 export default userSlice.reducer;

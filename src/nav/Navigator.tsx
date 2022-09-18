@@ -6,10 +6,13 @@ import {useAppSelector} from '@/store/hooks';
 import Swipe from '@/screens/Swipe';
 import HomeAuth from '@/screens/Auth/HomeAuth';
 import GuestWelcome from '@/screens/Auth/GuestWelcome';
+import SignUp from '@/screens/Auth/SignUp';
 
 export type AuthStackParamList = {
     HomeAuth: undefined;
     GuestWelcome: undefined;
+    SignUp: undefined;
+    VerifyEmail: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -23,6 +26,7 @@ const Navigator = () => {
             <Stack.Navigator initialRouteName="HomeAuth">
                 <Stack.Screen name="HomeAuth" component={HomeAuth} />
                 <Stack.Screen name="GuestWelcome" component={GuestWelcome} />
+                <Stack.Screen name="SignUp" component={SignUp} />
             </Stack.Navigator>
         );
     }
