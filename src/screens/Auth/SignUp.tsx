@@ -17,7 +17,9 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 import Spinner from '@/components/Utility/Spinner';
 import dayjs from 'dayjs';
 
-const SignUp = ({}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
+const SignUp = ({
+    navigation,
+}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
     const [secureText, setSecureText] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -55,12 +57,17 @@ const SignUp = ({}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
 
             console.log('Signing up with:', payload);
 
-            await Auth.signUp(payload).catch(err => {\
+            const user = await Auth.signUp(payload).catch(err => {
                 // TODO: Handle sign up error.
                 console.error(err);
             });
 
-            
+            if (user) {
+                navigation.replace('VerifyEmail', {
+                    username: email,
+                    password: password,
+                });
+            }
 
             setIsLoading(false);
         }

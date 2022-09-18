@@ -26,7 +26,10 @@ const HomeAuth = ({
     };
 
     const navigateToSignUp = () => {
-        navigation.push('SignUp');
+        navigation.push('VerifyEmail', {
+            username: 'harrisonbourke97@gmail.com',
+            password: 'Barrison1',
+        });
     };
 
     const navigateToGuest = () => {
