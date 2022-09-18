@@ -6,14 +6,6 @@ import {Model, Types} from 'mongoose';
 
 let MONGODB_URI: string;
 
-type ProductType = {
-    _id: Types.ObjectId;
-    title: string;
-    price: number;
-    link: string;
-    imageLink: string[];
-};
-
 type UserType = {
     _id: Types.ObjectId;
     email: string;
@@ -25,15 +17,12 @@ type UserType = {
     deletedProducts: string[];
 };
 
-const queryProduct = async (
+const createLike = async (
     event: APIGatewayEvent,
 ): Promise<APIGatewayProxyResult> => {
-    const email = event.requestContext.authorizer.claims.email || undefined;
-    const loadAmount = parseInt(event.queryStringParameters.loadAmount) || 5;
+    const email = event.requestContext.authorizer.claims.email;
+    const _id = event.pathParameters.proxy;
 
-    const Product: Model<ProductType> = await MongooseModels().Product(
-        MONGODB_URI,
-    );
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
 
     let response: APIGatewayProxyResult = {
@@ -46,43 +35,10 @@ const queryProduct = async (
     };
 
     try {
-        const user = await User.findOne({email}, {email: 1, likedProducts: 1});
-
-        if (!user) {
-            response = {
-                statusCode: 403,
-                headers: {
-                    'Access-Control-Allow-Headers': '*',
-                    'Access-Control-Allow-Origin': '*',
-                },
-                body: JSON.stringify({success: false, message: 'Unknown user'}),
-            };
-        }
-
-        const products = await Product.find(
-            {
-                _id: {
-                    $nin: user.toObject().likedProducts,
-                },
-            },
-            {title: 1, price: 1, link: 1, imageLink: 1},
-        ).limit(loadAmount);
-
-        if (!products || !products.length) {
-            response = {
-                statusCode: 404,
-                headers: {
-                    'Access-Control-Allow-Headers': '*',
-                    'Access-Control-Allow-Origin': '*',
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: 'No products found',
-                }),
-            };
-
-            return response;
-        }
+        await User.findOneAndUpdate(
+            {email: email},
+            {$push: {likedProducts: _id}},
+        );
 
         response = {
             statusCode: 200,
@@ -90,7 +46,7 @@ const queryProduct = async (
                 'Access-Control-Allow-Headers': '*',
                 'Access-Control-Allow-Origin': '*',
             },
-            body: JSON.stringify({success: true, data: products}),
+            body: JSON.stringify({success: true}),
         };
 
         return response;
@@ -115,12 +71,11 @@ exports.handler = async (
         .promise();
 
     MONGODB_URI = Parameters[0].Value;
-
     let response: APIGatewayProxyResult;
 
     switch (event.httpMethod) {
-        case 'GET':
-            response = await queryProduct(event);
+        case 'POST':
+            response = await createLike(event);
             break;
         default:
             response = {

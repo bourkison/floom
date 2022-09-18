@@ -26,6 +26,19 @@
           "read"
         ]
       }
+    },
+    "/like": {
+      "name": "/like",
+      "lambdaFunction": "teenderLikeHandler",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
     }
   }
 }
