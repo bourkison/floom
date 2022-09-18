@@ -27,9 +27,9 @@
         ]
       }
     },
-    "/like": {
-      "name": "/like",
-      "lambdaFunction": "teenderLikeHandler",
+    "/save": {
+      "name": "/save",
+      "lambdaFunction": "teenderSaveHandler",
       "permissions": {
         "setting": "private",
         "auth": [

@@ -54,12 +54,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "teenderLikeHandler",
+            "teenderSaveHandler",
             {
               "Fn::Join": [
                 "",
                 [
-                  "teenderLikeHandler",
+                  "teenderSaveHandler",
                   "-",
                   {
                     "Ref": "env"
@@ -91,7 +91,7 @@
                         "env": {
                           "Ref": "env"
                         },
-                        "functionName": "teenderLikeHandler"
+                        "functionName": "teenderSaveHandler"
                       }
                     ]
                   },
@@ -122,12 +122,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "teenderLambdaRolef590f230",
+            "teenderLambdaRole87f56e4e",
             {
               "Fn::Join": [
                 "",
                 [
-                  "teenderLambdaRolef590f230",
+                  "teenderLambdaRole87f56e4e",
                   "-",
                   {
                     "Ref": "env"
@@ -239,7 +239,7 @@
                           "env": {
                             "Ref": "env"
                           },
-                          "functionName": "teenderLikeHandler"
+                          "functionName": "teenderSaveHandler"
                         }
                       ]
                     },

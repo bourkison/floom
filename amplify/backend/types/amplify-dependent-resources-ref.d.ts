@@ -39,7 +39,7 @@ export type AmplifyDependentResourcesAttributes = {
             "Region": "string",
             "LambdaExecutionRole": "string"
         },
-        "teenderLikeHandler": {
+        "teenderSaveHandler": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",

@@ -5,7 +5,7 @@ import {
     PayloadAction,
 } from '@reduxjs/toolkit';
 import {Product as ProductType} from '@/types/product';
-import {createLike, createDelete} from '@/api/like';
+import {createSaveOrDelete} from '@/api/save';
 
 const productAdapter = createEntityAdapter();
 
@@ -14,12 +14,12 @@ const initialState = productAdapter.getInitialState({
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
 });
 
-export const LIKE_PRODUCT = createAsyncThunk(
-    'product/LIKE_PRODUCT',
+export const SAVE_PRODUCT = createAsyncThunk(
+    'product/SAVE_PRODUCT',
     async (_id: string) => {
-        await createLike({
+        await createSaveOrDelete({
             productId: _id,
-            init: {queryStringParameters: {type: 'like'}},
+            init: {queryStringParameters: {type: 'save'}},
         });
     },
 );
@@ -27,7 +27,7 @@ export const LIKE_PRODUCT = createAsyncThunk(
 export const DELETE_PRODUCT = createAsyncThunk(
     'product/DELETE_PRODUCT',
     async (_id: string) => {
-        await createDelete({
+        await createSaveOrDelete({
             productId: _id,
             init: {queryStringParameters: {type: 'delete'}},
         });
@@ -50,11 +50,11 @@ const productSlice = createSlice({
     },
     extraReducers: builder => {
         builder
-            .addCase(LIKE_PRODUCT.pending, state => {
+            .addCase(SAVE_PRODUCT.pending, state => {
                 state.animation = 'idle';
                 state.products = state.products.slice(1, state.products.length);
             })
-            .addCase(LIKE_PRODUCT.rejected, () => {
+            .addCase(SAVE_PRODUCT.rejected, () => {
                 console.warn('Like product rejected');
             })
             .addCase(DELETE_PRODUCT.pending, state => {

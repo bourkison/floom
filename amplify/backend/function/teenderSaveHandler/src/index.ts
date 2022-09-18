@@ -17,10 +17,10 @@ type UserType = {
     deletedProducts: string[];
 };
 
-const createLike = async (
+const createSaveOrDelete = async (
     event: APIGatewayEvent,
 ): Promise<APIGatewayProxyResult> => {
-    const type = event.queryStringParameters.type || 'like';
+    const type = event.queryStringParameters.type || 'save';
     const email = event.requestContext.authorizer.claims.email;
     const _id = event.pathParameters.proxy;
 
@@ -37,7 +37,7 @@ const createLike = async (
 
     try {
         let update: UpdateQuery<UserType> =
-            type === 'like'
+            type === 'save'
                 ? {$push: {likedProducts: _id}}
                 : {$push: {deletedProducts: _id}};
         await User.findOneAndUpdate({email: email}, update);
@@ -77,7 +77,7 @@ exports.handler = async (
 
     switch (event.httpMethod) {
         case 'POST':
-            response = await createLike(event);
+            response = await createSaveOrDelete(event);
             break;
         default:
             response = {

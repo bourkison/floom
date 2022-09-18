@@ -14,7 +14,7 @@ import Animated, {
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {useEffect} from 'react';
-import {LIKE_PRODUCT, DELETE_PRODUCT} from '@/store/slices/product';
+import {SAVE_PRODUCT, DELETE_PRODUCT} from '@/store/slices/product';
 
 type ProductComponentProps = {
     product: ProductType;
@@ -52,7 +52,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     }, [animationAction]);
 
     const saveProduct = () => {
-        dispatch(LIKE_PRODUCT(product._id));
+        dispatch(SAVE_PRODUCT(product._id));
     };
 
     const deleteProduct = () => {

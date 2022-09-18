@@ -99,7 +99,7 @@
         }
       ]
     },
-    "teenderLikeHandler": {
+    "teenderSaveHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
@@ -137,7 +137,7 @@
         },
         {
           "category": "function",
-          "resourceName": "teenderLikeHandler",
+          "resourceName": "teenderSaveHandler",
           "attributes": [
             "Name",
             "Arn"
