@@ -3,7 +3,7 @@ import {GetUserParams, UserDocData} from '@/types/user';
 import {API} from 'aws-amplify';
 
 export async function getUser(input: GetUserParams): Promise<UserDocData> {
-    const path = '/users/' + input.username;
+    const path = '/user/' + input.username;
 
     let init = input.init;
     init.headers = init.headers || {};
