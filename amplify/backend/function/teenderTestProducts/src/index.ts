@@ -39,7 +39,7 @@ exports.handler = async (event: ScheduledEvent) => {
             imageLink: [],
         };
 
-        for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
+        for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
             product.imageLink.push(
                 faker.image.animals(400, Math.floor(400 / 0.9), true),
             );

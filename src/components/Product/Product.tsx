@@ -180,7 +180,11 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
                     borderRadius: 5,
                     overflow: 'hidden',
                 }}
-                source={{uri: product.imageLink[0]}}>
+                source={{
+                    uri:
+                        product.imageLink[0] ||
+                        'https://preview.redd.it/ishxhuztqlo91.jpg?width=640&crop=smart&auto=webp&s=e148af80aea3ad1ac17b54f4626852165acd193e',
+                }}>
                 <View style={styles.imageOverlayContainer}>
                     <View style={styles.gradientContainer}>
                         <LinearGradient
