@@ -108,7 +108,7 @@ const queryUnsavedProduct = async (
             link: 1,
             imageLink: 1,
         })
-            .sort({$createdAt: -1, _id: -1})
+            .sort({createdAt: -1, _id: -1})
             .limit(loadAmount);
 
         if (!products || !products.length) {
