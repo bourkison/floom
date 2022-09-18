@@ -19,9 +19,13 @@ const initialState = userAdapter.getInitialState({
 export const FETCH_USER = createAsyncThunk(
     'user/FETCH_USER',
     async (): Promise<UserDocData> => {
+        console.log('Current session.');
         await Auth.currentSession();
 
-        const username = (await Auth.currentUserInfo()).username;
+        console.log('Username.');
+        const username = (await Auth.currentUserInfo()).attributes.email;
+
+        console.log('getUser', username);
         return await getUser({username: username, init: {}});
     },
 );

@@ -102,12 +102,11 @@ const VerifyEmail = ({
                     onChangeText={setVerificationCode}
                     placeholder="Verification Code"
                     placeholderTextColor="#343E4B"
-                    autoComplete="email"
+                    autoComplete="off"
                     autoCorrect={false}
                     autoCapitalize="none"
                     style={styles.textInput}
                     selectionColor="#000"
-                    keyboardType="email-address"
                     returnKeyType="done"
                     onSubmitEditing={verify}
                 />

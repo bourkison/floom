@@ -17,6 +17,7 @@ export type AuthStackParamList = {
     VerifyEmail: {
         username: string;
         password: string;
+        sendCodeOnLoad?: boolean;
     };
     Login: undefined;
 };

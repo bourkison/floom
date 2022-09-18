@@ -118,8 +118,8 @@ const SignUp = ({
                         placeholder="Name"
                         placeholderTextColor="#343E4B"
                         onChangeText={setName}
-                        autoCapitalize="none"
-                        autoComplete="off"
+                        autoCapitalize="sentences"
+                        autoComplete="name"
                         autoCorrect={false}
                         style={styles.textInput}
                     />

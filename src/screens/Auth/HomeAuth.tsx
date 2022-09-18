@@ -22,7 +22,7 @@ const HomeAuth = ({
     // };
 
     const navigateToLogin = () => {
-        console.log('LOGIN');
+        navigation.push('Login');
     };
 
     const navigateToSignUp = () => {
