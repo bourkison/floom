@@ -38,8 +38,8 @@ const createSaveOrDelete = async (
     try {
         let update: UpdateQuery<UserType> =
             type === 'save'
-                ? {$push: {likedProducts: _id}}
-                : {$push: {deletedProducts: _id}};
+                ? {$addToSet: {likedProducts: _id}}
+                : {$addToSet: {deletedProducts: _id}};
         await User.findOneAndUpdate({email: email}, update);
 
         response = {

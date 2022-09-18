@@ -17,11 +17,9 @@ const ProductList: React.FC<ProductListProps> = () => {
     }, []);
 
     const loadProducts = async () => {
-        console.log('Loading products');
         const products = await queryProduct({
-            init: {queryStringParameters: {loadAmount: 10}},
+            init: {queryStringParameters: {loadAmount: 10, type: 'unsaved'}},
         });
-        console.log('PRODUCTS:', products);
         dispatch(SET_PRODUCTS(products));
     };
 

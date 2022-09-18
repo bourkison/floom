@@ -11,6 +11,8 @@ export async function queryProduct(
     init.headers.Authorization =
         init.headers.Authorization || (await fetchJwtToken());
 
+    console.log(init.headers.Authorization);
+
     const data = await API.get(API_NAME, path, init).catch(err => {
         console.error(err);
         throw err;

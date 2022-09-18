@@ -17,5 +17,6 @@ export type GetProductInit = {
     };
     queryStringParameters?: {
         loadAmount?: number;
+        type: 'saved' | 'unsaved';
     };
 };
