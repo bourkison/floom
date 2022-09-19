@@ -15,6 +15,10 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {useEffect} from 'react';
 import {SAVE_PRODUCT, DELETE_PRODUCT} from '@/store/slices/product';
+import {useNavigation} from '@react-navigation/native';
+
+import {MainStackParamList} from '@/nav/Navigator';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 type ProductComponentProps = {
     product: ProductType;
@@ -39,6 +43,8 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     const saveOpacity = useSharedValue(0);
     const deleteOpacity = useSharedValue(0);
     const ctx = useSharedValue({x: 0, y: 0});
+
+    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
     const {width} = useWindowDimensions();
 
@@ -134,6 +140,8 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     });
 
     const panGesture = Gesture.Pan()
+        .activeOffsetX([-5, 5])
+        .activeOffsetY([-5, 5])
         .onStart(() => {
             ctx.value = {
                 x: offsetX.value,
@@ -186,6 +194,16 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
                 deleteOpacity.value = withTiming(0);
             }
         });
+
+    const openProduct = () => {
+        navigation.push('ProductView', {
+            product: product,
+        });
+    };
+
+    const touchGesture = Gesture.Tap().onTouchesUp(e => {
+        runOnJS(openProduct)();
+    });
 
     let baseComponent = (
         <View style={styles.container}>
@@ -254,8 +272,10 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     if (animated) {
         return (
             <Animated.View style={rTileStyle}>
-                <GestureDetector gesture={panGesture}>
-                    {baseComponent}
+                <GestureDetector gesture={touchGesture}>
+                    <GestureDetector gesture={panGesture}>
+                        {baseComponent}
+                    </GestureDetector>
                 </GestureDetector>
             </Animated.View>
         );
