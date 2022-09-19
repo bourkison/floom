@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, useWindowDimensions} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import * as Haptics from 'expo-haptics';
@@ -14,7 +14,7 @@ import {GestureDetector, Gesture} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 
 import {useAppDispatch} from '@/store/hooks';
-import {REMOVE_SAVED_PRODUCT} from '@/store/slices/product';
+import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -57,7 +57,7 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
     });
 
     const deleteProduct = () => {
-        dispatch(REMOVE_SAVED_PRODUCT(index));
+        dispatch(DELETE_SAVED_PRODUCT({_id: product._id, index}));
     };
 
     const navigateToProduct = () => {
@@ -67,7 +67,7 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
     };
 
     const panGesture = Gesture.Pan()
-        .activeOffsetX([-10, 10])
+        .activeOffsetX(-10)
         .failOffsetY([-10, 10])
         .onStart(() => {
             contextX.value = offsetX.value;
@@ -76,7 +76,8 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
             if (!isAnimating.value) {
                 let v = e.translationX + contextX.value;
 
-                if (v < -width / 2 && !isDeleting.value) {
+                if (v > 0) return;
+                else if (v < -width / 2 && !isDeleting.value) {
                     // Snap to delete.
                     isDeleting.value = true;
                     isAnimating.value = true;

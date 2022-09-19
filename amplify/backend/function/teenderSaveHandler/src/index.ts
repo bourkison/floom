@@ -59,6 +59,48 @@ const createSaveOrDelete = async (
     }
 };
 
+const deleteSaveOrDelete = async (
+    event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> => {
+    const type = event.queryStringParameters.type || 'save';
+    const email = event.requestContext.authorizer.claims.email;
+    const _id = event.pathParameters.proxy;
+
+    const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
+
+    let response: APIGatewayProxyResult = {
+        statusCode: 500,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: false}),
+    };
+
+    try {
+        let update: UpdateQuery<UserType> =
+            type == 'save'
+                ? {$pull: {likedProducts: _id}}
+                : {$pull: {deletedProducts: _id}};
+
+        await User.findOneAndUpdate({email: email}, update);
+
+        response = {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: true}),
+        };
+
+        return response;
+    } catch (err) {
+        console.error(err);
+        return response;
+    }
+};
+
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
@@ -78,6 +120,9 @@ exports.handler = async (
     switch (event.httpMethod) {
         case 'POST':
             response = await createSaveOrDelete(event);
+            break;
+        case 'DELETE':
+            response = await deleteSaveOrDelete(event);
             break;
         default:
             response = {

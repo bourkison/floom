@@ -12,3 +12,17 @@ export type CreateSaveInit = {
         type: 'save' | 'delete';
     };
 };
+
+export type DeleteSaveParams = {
+    productId: string;
+    init: DeleteSaveInit;
+};
+
+export type DeleteSaveInit = {
+    headers?: {
+        Authorization?: string;
+    };
+    queryStringParameters: {
+        type: 'save' | 'delete';
+    };
+};

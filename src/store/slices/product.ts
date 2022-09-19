@@ -5,7 +5,7 @@ import {
     PayloadAction,
 } from '@reduxjs/toolkit';
 import {Product as ProductType} from '@/types/product';
-import {createSaveOrDelete} from '@/api/save';
+import {createSaveOrDelete, deleteSaveOrDelete} from '@/api/save';
 import {getProduct, queryProduct} from '@/api/product';
 
 const productAdapter = createEntityAdapter();
@@ -32,6 +32,16 @@ export const DELETE_PRODUCT = createAsyncThunk(
         await createSaveOrDelete({
             productId: _id,
             init: {queryStringParameters: {type: 'delete'}},
+        });
+    },
+);
+
+export const DELETE_SAVED_PRODUCT = createAsyncThunk(
+    'product/DELETE_SAVED_PRODUCT',
+    async (input: {_id: string; index: number}) => {
+        await deleteSaveOrDelete({
+            productId: input._id,
+            init: {queryStringParameters: {type: 'save'}},
         });
     },
 );
@@ -69,14 +79,6 @@ const productSlice = createSlice({
         ) {
             state.animation = action.payload;
         },
-        REMOVE_SAVED_PRODUCT(state, action: PayloadAction<number>) {
-            // TODO: Turn to async thunk and send DELETE request.
-            console.log('Deleting product', action.payload);
-            state.savedProducts = [
-                ...state.savedProducts.slice(0, action.payload),
-                ...state.savedProducts.slice(action.payload + 1),
-            ];
-        },
     },
     extraReducers: builder => {
         builder
@@ -102,10 +104,22 @@ const productSlice = createSlice({
             .addCase(LOAD_SAVED_PRODUCTS.rejected, () => {
                 // TODO: Handle rejections.
                 console.warn('Get product rejected');
+            })
+            .addCase(DELETE_SAVED_PRODUCT.pending, (state, action) => {
+                state.savedProducts = [
+                    ...state.savedProducts.slice(0, action.meta.arg.index),
+                    ...state.savedProducts.slice(action.meta.arg.index + 1),
+                ];
+            })
+            .addCase(DELETE_SAVED_PRODUCT.fulfilled, state => {
+                console.log('Deleted saved product');
+            })
+            .addCase(DELETE_SAVED_PRODUCT.rejected, state => {
+                // TODO: Handle rejections.
+                console.log('Delete saved product rejected');
             });
     },
 });
 
-export const {SET_PRODUCTS, COMMENCE_ANIMATE, REMOVE_SAVED_PRODUCT} =
-    productSlice.actions;
+export const {SET_PRODUCTS, COMMENCE_ANIMATE} = productSlice.actions;
 export default productSlice.reducer;
