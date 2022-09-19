@@ -6,41 +6,41 @@ import {
     QueryProductParams,
 } from '@/types/product';
 
-type ProductExample = {
-    title: string;
-    price: number;
-};
+// type ProductExample = {
+//     title: string;
+//     price: number;
+// };
 
-type QueryExample<T> = T extends 'unsaved'
-    ? ProductExample[]
-    : T extends 'saved'
-    ? string[]
-    : never;
+// type QueryExample<T> = T extends 'unsaved'
+//     ? ProductExample[]
+//     : T extends 'saved'
+//     ? string[]
+//     : never;
 
-export async function queryDb<T extends 'saved' | 'unsaved'>(
-    type: T,
-): Promise<QueryExample<T>> {
-    // Get correct DB URL based on type input.
-    let dbUrl: string;
-    if (type === 'saved') {
-        dbUrl = 'DATABASEURL/saved';
-    } else {
-        dbUrl = 'DATABASEURL/unsaved';
-    }
+// export async function queryDb<T extends 'saved' | 'unsaved'>(
+//     type: T,
+// ): Promise<QueryExample<T>> {
+//     // Get correct DB URL based on type input.
+//     let dbUrl: string;
+//     if (type === 'saved') {
+//         dbUrl = 'DATABASEURL/saved';
+//     } else {
+//         dbUrl = 'DATABASEURL/unsaved';
+//     }
 
-    // Fetch data from the database.
-    const r = await fetch(dbUrl);
-    const dbResult = JSON.parse(await r.json());
+//     // Fetch data from the database.
+//     const r = await fetch(dbUrl);
+//     const dbResult = JSON.parse(await r.json());
 
-    // Structure the data correctly to be in line with the types.
-    if (type === 'saved') {
-        let response: string[] = dbResult.data;
-        return response;
-    } else {
-        let response: ProductExample[] = dbResult.data;
-        return response;
-    }
-}
+//     // Structure the data correctly to be in line with the types.
+//     if (type === 'saved') {
+//         let response: string[] = dbResult.data;
+//         return response;
+//     } else {
+//         let response: ProductExample[] = dbResult.data;
+//         return response;
+//     }
+// }
 
 type QueryResponse<T> = T extends 'unsaved'
     ? ProductType[]
