@@ -208,6 +208,50 @@ const querySavedProduct = async (
     return response;
 };
 
+const getProduct = async (
+    event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> => {
+    const _id = event.pathParameters.proxy;
+
+    const Product: Model<ProductType> = await MongooseModels().Product(
+        MONGODB_URI,
+    );
+
+    let response: APIGatewayProxyResult = {
+        statusCode: 500,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: false}),
+    };
+
+    const product = (await Product.findById(_id)).toObject();
+
+    if (!product) {
+        response = {
+            statusCode: 404,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: false, message: 'No product found'}),
+        };
+        return response;
+    }
+
+    response = {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: true, data: product}),
+    };
+
+    return response;
+};
+
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
@@ -227,23 +271,28 @@ exports.handler = async (
 
     switch (event.httpMethod) {
         case 'GET':
-            const type = event.queryStringParameters.type || 'unsaved';
-            if (type === 'saved') {
-                response = await querySavedProduct(event);
-            } else if (type === 'unsaved') {
-                response = await queryUnsavedProduct(event);
+            const proxy = event.pathParameters?.proxy || '';
+            if (proxy) {
+                response = await getProduct(event);
             } else {
-                response = {
-                    statusCode: 400,
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Headers': '*',
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'Unknown GET type',
-                    }),
-                };
+                const type = event.queryStringParameters.type || 'unsaved';
+                if (type === 'saved') {
+                    response = await querySavedProduct(event);
+                } else if (type === 'unsaved') {
+                    response = await queryUnsavedProduct(event);
+                } else {
+                    response = {
+                        statusCode: 400,
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Headers': '*',
+                        },
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Unknown GET type',
+                        }),
+                    };
+                }
             }
             break;
         default:

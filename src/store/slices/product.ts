@@ -6,11 +6,13 @@ import {
 } from '@reduxjs/toolkit';
 import {Product as ProductType} from '@/types/product';
 import {createSaveOrDelete} from '@/api/save';
+import {getProduct, querySavedProduct} from '@/api/product';
 
 const productAdapter = createEntityAdapter();
 
 const initialState = productAdapter.getInitialState({
     products: [] as ProductType[],
+    savedProducts: [] as ProductType[],
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
 });
 
@@ -31,6 +33,26 @@ export const DELETE_PRODUCT = createAsyncThunk(
             productId: _id,
             init: {queryStringParameters: {type: 'delete'}},
         });
+    },
+);
+
+export const LOAD_SAVED_PRODUCTS = createAsyncThunk(
+    'product/LOAD_SAVED_PRODUCTS',
+    async (loadAmount: number = 10): Promise<ProductType[]> => {
+        const savedProductIds = await querySavedProduct({
+            init: {
+                queryStringParameters: {loadAmount: loadAmount, type: 'saved'},
+            },
+        });
+
+        let promises = [];
+        for (let i = 0; i < savedProductIds.length; i++) {
+            promises.push(
+                getProduct({init: {}, productId: savedProductIds[i]}),
+            );
+        }
+
+        return await Promise.all(promises);
     },
 );
 
@@ -55,6 +77,7 @@ const productSlice = createSlice({
                 state.products = state.products.slice(1, state.products.length);
             })
             .addCase(SAVE_PRODUCT.rejected, () => {
+                // TODO: Handle rejections.
                 console.warn('Like product rejected');
             })
             .addCase(DELETE_PRODUCT.pending, state => {
@@ -62,7 +85,15 @@ const productSlice = createSlice({
                 state.products = state.products.slice(1, state.products.length);
             })
             .addCase(DELETE_PRODUCT.rejected, () => {
+                // TODO: Handle rejections.
                 console.warn('Delete product rejected');
+            })
+            .addCase(LOAD_SAVED_PRODUCTS.fulfilled, (state, action) => {
+                state.savedProducts = action.payload;
+            })
+            .addCase(LOAD_SAVED_PRODUCTS.rejected, () => {
+                // TODO: Handle rejections.
+                console.warn('Get product rejected');
             });
     },
 });

@@ -7,16 +7,27 @@ export type Product = {
 };
 
 // API
-export type GetProductParams = {
-    init: GetProductInit;
+export type QueryProductParams = {
+    init: QueryProductInit;
 };
 
-export type GetProductInit = {
+export type QueryProductInit = {
     headers?: {
         Authorization?: string;
     };
     queryStringParameters?: {
         loadAmount?: number;
-        type: 'saved' | 'unsaved';
+        type?: 'saved' | 'unsaved';
     };
 };
+
+export type GetProductParams = {
+    init: GetProductInit;
+    productId: string;
+}
+
+export type GetProductInit = {
+    headers?: {
+        Authorization?: string;
+    };
+}

@@ -1,14 +1,12 @@
 import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {queryProduct} from '@/api/product';
+import {queryUnsavedProduct} from '@/api/product';
 import Product from '@/components/Product/Product';
 
 import {SET_PRODUCTS} from '@/store/slices/product';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 
-type ProductListProps = {};
-
-const ProductList: React.FC<ProductListProps> = () => {
+const ProductList = () => {
     const products = useAppSelector(state => state.product.products);
     const dispatch = useAppDispatch();
 
@@ -17,7 +15,7 @@ const ProductList: React.FC<ProductListProps> = () => {
     }, []);
 
     const loadProducts = async () => {
-        const products = await queryProduct({
+        const products = await queryUnsavedProduct({
             init: {queryStringParameters: {loadAmount: 10, type: 'unsaved'}},
         });
         dispatch(SET_PRODUCTS(products));
