@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 import {
     SafeAreaView,
     StyleSheet,
-    ScrollView,
     ActivityIndicator,
     RefreshControl,
 } from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
 
 import SavedProduct from '@/components/Product/SavedProduct';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
@@ -43,10 +43,6 @@ const SavedProducts = ({
         await dispatch(LOAD_SAVED_PRODUCTS());
         setRefereshing(false);
     };
-
-    useEffect(() => {
-        console.log('SAVED PRODUCTS:', savedProducts);
-    }, [savedProducts]);
 
     return (
         <SafeAreaView style={styles.safeContainer}>

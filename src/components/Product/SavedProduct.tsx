@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {View, Text, StyleSheet, useWindowDimensions} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import * as Haptics from 'expo-haptics';
@@ -11,9 +11,13 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
+import {useNavigation} from '@react-navigation/native';
 
 import {useAppDispatch} from '@/store/hooks';
 import {REMOVE_SAVED_PRODUCT} from '@/store/slices/product';
+
+import {MainStackParamList} from '@/nav/Navigator';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 type SavedProductProps = {
     product: ProductType;
@@ -32,6 +36,8 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
 
     const {width} = useWindowDimensions();
     const dispatch = useAppDispatch();
+
+    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -54,7 +60,15 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
         dispatch(REMOVE_SAVED_PRODUCT(index));
     };
 
+    const navigateToProduct = () => {
+        navigation.push('ProductView', {
+            product: product,
+        });
+    };
+
     const panGesture = Gesture.Pan()
+        .activeOffsetX([-10, 10])
+        .failOffsetY([-10, 10])
         .onStart(() => {
             contextX.value = offsetX.value;
         })
@@ -85,8 +99,8 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
                 }
             }
         })
-        .onEnd(() => {
-            if (isDeleting.value) {
+        .onEnd(e => {
+            if (isDeleting.value && e.state === 5) {
                 // Run delete animation and remove from the store.
                 offsetX.value = withTiming(-width, {}, () => {
                     sHeight.value = withTiming(0, {}, () => {
@@ -96,6 +110,15 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
             } else {
                 offsetX.value = withSpring(0);
             }
+        });
+
+    const touchGesture = Gesture.Tap()
+        .maxDuration(250)
+        .onTouchesDown(() => {
+            // TODO: Change background color of item for user feedback
+        })
+        .onTouchesUp(() => {
+            runOnJS(navigateToProduct)();
         });
 
     return (
@@ -112,9 +135,11 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
                     rStyle,
                 ]}>
                 <GestureDetector gesture={panGesture}>
-                    <View style={{flex: 1}}>
-                        <Text>{product.title}</Text>
-                    </View>
+                    <GestureDetector gesture={touchGesture}>
+                        <View style={{flex: 1}}>
+                            <Text>{product.title}</Text>
+                        </View>
+                    </GestureDetector>
                 </GestureDetector>
             </Animated.View>
         </View>

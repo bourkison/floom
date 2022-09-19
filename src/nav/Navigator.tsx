@@ -1,10 +1,12 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useAppSelector} from '@/store/hooks';
+import {Product as ProductType} from '@/types/product';
 
 import Home from '@/screens/Swipe/Home';
 import Options from '@/screens/Swipe/Options';
 import LikedProducts from '@/screens/Swipe/LikedProducts';
+import ProductView from '@/screens/Swipe/ProductView';
 
 import HomeAuth from '@/screens/Auth/HomeAuth';
 import GuestWelcome from '@/screens/Auth/GuestWelcome';
@@ -28,6 +30,9 @@ export type MainStackParamList = {
     Home: undefined;
     Options: undefined;
     LikedProducts: undefined;
+    ProductView: {
+        product: ProductType;
+    };
 };
 
 const MainStack = createStackNavigator<MainStackParamList>();
@@ -64,6 +69,13 @@ const Navigator = () => {
             <MainStack.Screen
                 name="LikedProducts"
                 component={LikedProducts}
+                options={{
+                    gestureDirection: 'horizontal',
+                }}
+            />
+            <MainStack.Screen
+                name="ProductView"
+                component={ProductView}
                 options={{
                     gestureDirection: 'horizontal',
                 }}
