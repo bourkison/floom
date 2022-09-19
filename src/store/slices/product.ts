@@ -6,7 +6,7 @@ import {
 } from '@reduxjs/toolkit';
 import {Product as ProductType} from '@/types/product';
 import {createSaveOrDelete} from '@/api/save';
-import {getProduct, querySavedProduct} from '@/api/product';
+import {getProduct, queryProduct} from '@/api/product';
 
 const productAdapter = createEntityAdapter();
 
@@ -39,7 +39,7 @@ export const DELETE_PRODUCT = createAsyncThunk(
 export const LOAD_SAVED_PRODUCTS = createAsyncThunk(
     'product/LOAD_SAVED_PRODUCTS',
     async (loadAmount: number = 10): Promise<ProductType[]> => {
-        const savedProductIds = await querySavedProduct({
+        const savedProductIds = await queryProduct('saved', {
             init: {
                 queryStringParameters: {loadAmount: loadAmount, type: 'saved'},
             },

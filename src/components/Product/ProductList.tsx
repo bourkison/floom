@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {queryUnsavedProduct} from '@/api/product';
+import {queryProduct} from '@/api/product';
 import Product from '@/components/Product/Product';
 
 import {SET_PRODUCTS} from '@/store/slices/product';
@@ -15,7 +15,7 @@ const ProductList = () => {
     }, []);
 
     const loadProducts = async () => {
-        const products = await queryUnsavedProduct({
+        const products = await queryProduct('unsaved', {
             init: {queryStringParameters: {loadAmount: 10, type: 'unsaved'}},
         });
         dispatch(SET_PRODUCTS(products));
