@@ -69,6 +69,14 @@ const productSlice = createSlice({
         ) {
             state.animation = action.payload;
         },
+        REMOVE_SAVED_PRODUCT(state, action: PayloadAction<number>) {
+            // TODO: Turn to async thunk and send DELETE request.
+            console.log('Deleting product', action.payload);
+            state.savedProducts = [
+                ...state.savedProducts.slice(0, action.payload),
+                ...state.savedProducts.slice(action.payload + 1),
+            ];
+        },
     },
     extraReducers: builder => {
         builder
@@ -98,5 +106,6 @@ const productSlice = createSlice({
     },
 });
 
-export const {SET_PRODUCTS, COMMENCE_ANIMATE} = productSlice.actions;
+export const {SET_PRODUCTS, COMMENCE_ANIMATE, REMOVE_SAVED_PRODUCT} =
+    productSlice.actions;
 export default productSlice.reducer;

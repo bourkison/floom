@@ -54,8 +54,8 @@ const SavedProducts = ({
                 style={styles.container}
                 refreshControl={
                     <RefreshControl
-                        refreshing={refreshing}
                         onRefresh={refresh}
+                        refreshing={refreshing}
                     />
                 }>
                 {isLoading ? (
