@@ -41,12 +41,12 @@
         "teenderProductHandler": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderProductHandler-4b696f536532796d5736-build.zip"
+          "s3Key": "amplify-builds/teenderProductHandler-734f6677727944542b75-build.zip"
         },
         "teenderSaveHandler": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderSaveHandler-39636974696d69314858-build.zip"
+          "s3Key": "amplify-builds/teenderSaveHandler-49385445582b63575239-build.zip"
         }
       }
     }

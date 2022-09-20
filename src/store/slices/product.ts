@@ -70,8 +70,8 @@ const productSlice = createSlice({
     name: 'product',
     initialState,
     reducers: {
-        SET_PRODUCTS(state, action: PayloadAction<ProductType[]>) {
-            state.products = action.payload;
+        PUSH_PRODUCTS(state, action: PayloadAction<ProductType[]>) {
+            state.products = [...state.products, ...action.payload];
         },
         COMMENCE_ANIMATE(
             state,
@@ -84,10 +84,7 @@ const productSlice = createSlice({
         builder
             .addCase(SAVE_PRODUCT.pending, state => {
                 state.animation = 'idle';
-                state.products = state.products.slice(
-                    0,
-                    state.products.length - 1,
-                );
+                state.products = state.products.slice(1);
             })
             .addCase(SAVE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
@@ -95,10 +92,7 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_PRODUCT.pending, state => {
                 state.animation = 'idle';
-                state.products = state.products.slice(
-                    0,
-                    state.products.length - 1,
-                );
+                state.products = state.products.slice(1);
             })
             .addCase(DELETE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
@@ -127,5 +121,5 @@ const productSlice = createSlice({
     },
 });
 
-export const {SET_PRODUCTS, COMMENCE_ANIMATE} = productSlice.actions;
+export const {PUSH_PRODUCTS, COMMENCE_ANIMATE} = productSlice.actions;
 export default productSlice.reducer;

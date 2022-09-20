@@ -1,0 +1,6 @@
+// PAGINATION TEST:
+db.products.find(
+    {_id: { $nin: ['123'], $lt: ObjectId("632a14df11712281a7be319e") }}, 
+    { _id: 1 }
+).sort({_id: -1})
+.limit(3);

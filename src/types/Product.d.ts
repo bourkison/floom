@@ -18,16 +18,17 @@ export type QueryProductInit = {
     queryStringParameters?: {
         loadAmount?: number;
         type?: 'saved' | 'unsaved';
+        startAt?: string;
     };
 };
 
 export type GetProductParams = {
     init: GetProductInit;
     productId: string;
-}
+};
 
 export type GetProductInit = {
     headers?: {
         Authorization?: string;
     };
-}
+};

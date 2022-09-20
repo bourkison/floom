@@ -24,6 +24,8 @@ export async function queryProduct(
     init.headers.Authorization =
         init.headers.Authorization || (await fetchJwtToken());
 
+    console.log(await fetchJwtToken());
+
     init.queryStringParameters = init.queryStringParameters || {};
     init.queryStringParameters.type = type;
 

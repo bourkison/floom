@@ -81,25 +81,10 @@ const queryUnsavedProduct = async (
         };
 
         if (startAt) {
-            // As we order by createdAt, we need to find the createdAt field of startAt element,
-            // then filter for when greater than that value.
-            const startAtCreatedAt = (
-                await Product.findOne(
-                    {_id: new Types.ObjectId(startAt)},
-                    {createdAt: 1},
-                )
-            ).createdAt;
-
-            // Then add query for where exercise is greater than createdAt OR its equal and ID is bigger.
-            query.$or = [
-                {
-                    createdAt: {$lt: startAtCreatedAt},
-                },
-                {
-                    createdAt: startAtCreatedAt,
-                    _id: {$lt: new Types.ObjectId(startAt)},
-                },
-            ];
+            query._id = {
+                ...query._id,
+                $lt: new Types.ObjectId(startAt),
+            };
         }
 
         const products = await Product.find(query, {
@@ -108,7 +93,7 @@ const queryUnsavedProduct = async (
             link: 1,
             imageLink: 1,
         })
-            .sort({createdAt: -1, _id: -1})
+            .sort({_id: -1})
             .limit(loadAmount);
 
         if (!products || !products.length) {
