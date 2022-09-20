@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
         marginTop: 25,
         alignSelf: 'center',
         alignItems: 'center',
+        zIndex: 1,
     },
     profileButtonText: {
         color: '#f3fcfa',

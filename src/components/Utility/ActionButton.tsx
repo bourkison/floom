@@ -30,6 +30,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
                     scale: scale.value,
                 },
             ],
+            zIndex: 1,
         };
     });
 
@@ -117,6 +118,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.2,
         backgroundColor: '#f3fcf0',
+        zIndex: 1,
     },
 });
 

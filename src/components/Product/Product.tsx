@@ -21,6 +21,8 @@ import * as Haptics from 'expo-haptics';
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 
+import * as loadingImage from '@/assets/loading.png';
+
 type ProductComponentProps = {
     product: ProductType;
     index: number;
@@ -345,7 +347,8 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 }}
                 source={{
                     uri: product.imageLink[imageIndex] || FALLBACK_IMAGE,
-                }}>
+                }}
+                loadingIndicatorSource={{uri: loadingImage}}>
                 <View style={styles.selectedImageContainer}>
                     {product.imageLink.map((s, index) => (
                         <View
