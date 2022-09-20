@@ -4,9 +4,10 @@ import {
     createSlice,
     PayloadAction,
 } from '@reduxjs/toolkit';
-import {Product as ProductType} from '@/types/product';
+import {Product as ProductType, QueryProductInit} from '@/types/product';
 import {createSaveOrDelete, deleteSaveOrDelete} from '@/api/save';
-import {getProduct, queryProduct} from '@/api/product';
+import {queryProduct} from '@/api/product';
+import {RootState} from '@/store';
 
 const productAdapter = createEntityAdapter();
 
@@ -16,9 +17,9 @@ const initialState = productAdapter.getInitialState({
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
 });
 
-export const SAVE_PRODUCT = createAsyncThunk(
+export const SAVE_PRODUCT = createAsyncThunk<void, string>(
     'product/SAVE_PRODUCT',
-    async (_id: string) => {
+    async _id => {
         await createSaveOrDelete({
             productId: _id,
             init: {queryStringParameters: {type: 'save'}},
@@ -26,9 +27,9 @@ export const SAVE_PRODUCT = createAsyncThunk(
     },
 );
 
-export const DELETE_PRODUCT = createAsyncThunk(
+export const DELETE_PRODUCT = createAsyncThunk<void, string>(
     'product/DELETE_PRODUCT',
-    async (_id: string) => {
+    async _id => {
         await createSaveOrDelete({
             productId: _id,
             init: {queryStringParameters: {type: 'delete'}},
@@ -36,33 +37,65 @@ export const DELETE_PRODUCT = createAsyncThunk(
     },
 );
 
-export const DELETE_SAVED_PRODUCT = createAsyncThunk(
-    'product/DELETE_SAVED_PRODUCT',
-    async (input: {_id: string; index: number}) => {
-        await deleteSaveOrDelete({
-            productId: input._id,
-            init: {queryStringParameters: {type: 'save'}},
+export const DELETE_SAVED_PRODUCT = createAsyncThunk<
+    void,
+    {_id: string; index: number}
+>('product/DELETE_SAVED_PRODUCT', async input => {
+    await deleteSaveOrDelete({
+        productId: input._id,
+        init: {queryStringParameters: {type: 'save'}},
+    });
+});
+
+export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
+    ProductType[],
+    QueryProductInit['queryStringParameters']
+>(
+    'product/LOAD_SAVED_PRODUCTS',
+    async (
+        input = {
+            loadAmount: 25,
+            type: 'saved',
+        },
+    ) => {
+        let init: QueryProductInit = {
+            queryStringParameters: input,
+        };
+
+        return await queryProduct({
+            init,
         });
     },
 );
 
-export const LOAD_SAVED_PRODUCTS = createAsyncThunk(
-    'product/LOAD_SAVED_PRODUCTS',
-    async (loadAmount: number = 10): Promise<ProductType[]> => {
-        const savedProductIds = await queryProduct('saved', {
-            init: {
-                queryStringParameters: {loadAmount: loadAmount, type: 'saved'},
-            },
-        });
+export const LOAD_MORE_SAVED_PRODUCTS = createAsyncThunk<
+    ProductType[],
+    QueryProductInit['queryStringParameters'],
+    {state: RootState}
+>(
+    'product/LOAD_MORE_SAVED_PRODUCTS',
+    async (
+        input = {
+            loadAmount: 25,
+            type: 'saved',
+        },
+        {getState},
+    ) => {
+        let init: QueryProductInit = {
+            queryStringParameters: input,
+        };
 
-        let promises = [];
-        for (let i = 0; i < savedProductIds.length; i++) {
-            promises.push(
-                getProduct({init: {}, productId: savedProductIds[i]}),
-            );
+        if (!input.startAt) {
+            const state = getState();
+            input.startAt =
+                state.product.savedProducts[
+                    state.product.savedProducts.length - 1
+                ]._id;
         }
 
-        return await Promise.all(promises);
+        return await queryProduct({
+            init,
+        });
     },
 );
 
@@ -104,6 +137,16 @@ const productSlice = createSlice({
             .addCase(LOAD_SAVED_PRODUCTS.rejected, () => {
                 // TODO: Handle rejections.
                 console.warn('Get product rejected');
+            })
+            .addCase(LOAD_MORE_SAVED_PRODUCTS.fulfilled, (state, action) => {
+                state.savedProducts = [
+                    ...state.savedProducts,
+                    ...action.payload,
+                ];
+            })
+            .addCase(LOAD_MORE_SAVED_PRODUCTS.rejected, () => {
+                // TODO: Handle rejections.
+                console.warn('Load more saved rejected');
             })
             .addCase(DELETE_SAVED_PRODUCT.pending, (state, action) => {
                 state.savedProducts = [

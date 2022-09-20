@@ -28,19 +28,17 @@ const ProductList = () => {
             if (startAt && init.queryStringParameters)
                 init.queryStringParameters.startAt = startAt;
 
-            const products = await queryProduct('unsaved', {
+            const products = await queryProduct({
                 init,
             });
             dispatch(PUSH_PRODUCTS(products));
             setIsLoading(false);
         };
 
-        if (
-            (!products.length && !isLoading) ||
-            (products.length <= NUM_SHOWN_PRODUCTS + 1 && !isLoading)
-        ) {
-            console.log('LOADING MORE');
+        if (!products.length && !isLoading) {
             loadProducts();
+        } else if (products.length <= NUM_SHOWN_PRODUCTS + 1 && !isLoading) {
+            loadProducts(products[products.length - 1]._id);
         }
     }, [products]);
 

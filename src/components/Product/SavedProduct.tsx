@@ -19,7 +19,7 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-type SavedProductProps = {
+export type SavedProductProps = {
     product: ProductType;
     index: number;
 };
@@ -63,14 +63,9 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
     };
 
     const navigateToProduct = () => {
-        navigation.push('ProductView', {
+        navigation.navigate('ProductView', {
             product: product,
         });
-    };
-
-    const haptic = () => {
-        console.log('HAPTIC');
-        Haptics.selectionAsync();
     };
 
     const panGesture = Gesture.Pan()

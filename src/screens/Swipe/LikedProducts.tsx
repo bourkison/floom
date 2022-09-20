@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
@@ -7,17 +7,25 @@ import {
     StyleSheet,
     ActivityIndicator,
     RefreshControl,
+    FlatList,
+    ListRenderItem,
 } from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
 
 import SavedProduct from '@/components/Product/SavedProduct';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
-import {LOAD_SAVED_PRODUCTS} from '@/store/slices/product';
+import {
+    LOAD_MORE_SAVED_PRODUCTS,
+    LOAD_SAVED_PRODUCTS,
+} from '@/store/slices/product';
+import {Product as ProductType} from '@/types/product';
+
+const ON_END_REACHED_THRESHOLD = 100;
 
 const SavedProducts = ({
     navigation,
 }: StackScreenProps<MainStackParamList, 'LikedProducts'>) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [refreshing, setRefereshing] = useState(false);
 
     const dispatch = useAppDispatch();
@@ -38,34 +46,48 @@ const SavedProducts = ({
     }, []);
 
     const refresh = async () => {
-        console.log('REFRESHING');
         setRefereshing(true);
         await dispatch(LOAD_SAVED_PRODUCTS());
         setRefereshing(false);
     };
 
+    const loadMore = async () => {
+        if (!isLoadingMore) {
+            setIsLoadingMore(true);
+            await dispatch(LOAD_MORE_SAVED_PRODUCTS());
+            setIsLoadingMore(false);
+        }
+    };
+
+    const ListItem: ListRenderItem<ProductType> = ({item, index}) => (
+        <SavedProduct product={item} index={index} />
+    );
+
     return (
         <SafeAreaView style={styles.safeContainer}>
-            <ScrollView
-                style={styles.container}
-                refreshControl={
-                    <RefreshControl
-                        onRefresh={refresh}
-                        refreshing={refreshing}
-                    />
-                }>
-                {isLoading ? (
-                    <ActivityIndicator />
-                ) : (
-                    savedProducts.map((product, index) => (
-                        <SavedProduct
-                            product={product}
-                            key={product._id}
-                            index={index}
+            {isLoading ? (
+                <ActivityIndicator />
+            ) : (
+                <FlatList
+                    style={styles.container}
+                    data={savedProducts}
+                    renderItem={ListItem}
+                    keyExtractor={item => item._id}
+                    onEndReached={loadMore}
+                    onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
+                    ListFooterComponent={
+                        isLoadingMore ? (
+                            <ActivityIndicator style={{marginTop: 5}} />
+                        ) : undefined
+                    }
+                    refreshControl={
+                        <RefreshControl
+                            onRefresh={refresh}
+                            refreshing={refreshing}
                         />
-                    ))
-                )}
-            </ScrollView>
+                    }
+                />
+            )}
         </SafeAreaView>
     );
 };

@@ -137,6 +137,9 @@ const querySavedProduct = async (
     const startAt = event.queryStringParameters.startAt || '';
 
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
+    const Product: Model<ProductType> = await MongooseModels().Product(
+        MONGODB_URI,
+    );
 
     let response: APIGatewayProxyResult = {
         statusCode: 500,
@@ -159,14 +162,38 @@ const querySavedProduct = async (
         return response;
     }
 
-    const products = (
-        await User.findOne(
-            {email: email},
-            {likedProducts: {$slice: -loadAmount}},
-        )
-    ).toObject().likedProducts;
+    let filter: FilterQuery<UserType> = {
+        likedProducts: {
+            $slice: loadAmount,
+        },
+    };
 
-    if (!products || !products.length) {
+    if (startAt) {
+        filter = {
+            likedProducts: {
+                $slice: [
+                    '$likedProducts',
+                    {
+                        $add: [
+                            {
+                                $indexOfArray: [
+                                    '$likedProducts',
+                                    new Types.ObjectId(startAt),
+                                ],
+                            },
+                            1,
+                        ],
+                    },
+                    loadAmount,
+                ],
+            },
+        };
+    }
+
+    const productIds = (await User.findOne({email: email}, filter)).toObject()
+        .likedProducts;
+
+    if (!productIds || !productIds.length) {
         response = {
             statusCode: 404,
             headers: {
@@ -178,6 +205,24 @@ const querySavedProduct = async (
                 message: 'No products found',
             }),
         };
+        return response;
+    }
+
+    const products = await Product.find({_id: {$in: productIds}});
+
+    if (!products || !products.length) {
+        response = {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: 'Error getting products',
+            }),
+        };
+
         return response;
     }
 

@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
         marginLeft: 3,
         marginRight: 3,
         borderRadius: 2,
-        backgroundColor: 'rgba(26, 31, 37, 0.2)',
+        backgroundColor: 'rgba(26, 31, 37, 0.3)',
         maxWidth: '33%',
     },
     imageOverlayContainer: {

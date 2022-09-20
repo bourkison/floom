@@ -7,17 +7,8 @@ import {
 } from '@/types/product';
 
 export async function queryProduct(
-    type: 'saved',
     input: QueryProductParams,
-): Promise<string[]>;
-export async function queryProduct(
-    type: 'unsaved',
-    input: QueryProductParams,
-): Promise<ProductType[]>;
-export async function queryProduct(
-    type: 'saved' | 'unsaved',
-    input: QueryProductParams,
-): Promise<string[] | ProductType[]> {
+): Promise<ProductType[]> {
     const path = '/product';
     let init = input.init;
     init.headers = init.headers || {};
@@ -27,32 +18,25 @@ export async function queryProduct(
     console.log(await fetchJwtToken());
 
     init.queryStringParameters = init.queryStringParameters || {};
-    init.queryStringParameters.type = type;
 
     const data = await API.get(API_NAME, path, init).catch(err => {
         console.error(err);
         throw err;
     });
 
-    if (type === 'unsaved') {
-        let response: ProductType[] = [];
+    let response: ProductType[] = [];
 
-        for (let i = 0; i < data.data.length; i++) {
-            response.push({
-                title: data.data[i].title,
-                imageLink: data.data[i].imageLink,
-                price: data.data[i].price,
-                link: data.data[i].link,
-                _id: data.data[i]._id,
-            });
-        }
-
-        return response;
-    } else {
-        let response: string[] = [];
-        response = data.data;
-        return response;
+    for (let i = 0; i < data.data.length; i++) {
+        response.push({
+            title: data.data[i].title,
+            imageLink: data.data[i].imageLink,
+            price: data.data[i].price,
+            link: data.data[i].link,
+            _id: data.data[i]._id,
+        });
     }
+
+    return response;
 }
 
 export async function getProduct(
