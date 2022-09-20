@@ -16,6 +16,7 @@ import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {useEffect} from 'react';
 import {SAVE_PRODUCT, DELETE_PRODUCT} from '@/store/slices/product';
 import {useNavigation} from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -35,6 +36,8 @@ const ACTION_VISIBILITY_THRESHOLD = 0.2;
 
 const ANIMATION_DURATION = 300;
 
+const ACTION_THRESHOLD = 150;
+
 const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
@@ -43,6 +46,8 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     const saveOpacity = useSharedValue(0);
     const deleteOpacity = useSharedValue(0);
     const ctx = useSharedValue({x: 0, y: 0});
+
+    const isActing = useSharedValue(false);
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
@@ -162,6 +167,16 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
 
             rotation.value = percentageToAction * MAX_ROTATION;
 
+            // If acting and we shouldn't be, OR if not acting and we should be
+            if (
+                (!isActing.value &&
+                    Math.abs(offsetX.value) > ACTION_THRESHOLD) ||
+                (isActing.value && Math.abs(offsetX.value) < ACTION_THRESHOLD)
+            ) {
+                isActing.value = !isActing.value;
+                runOnJS(Haptics.selectionAsync)();
+            }
+
             if (percentageToAction > ACTION_VISIBILITY_THRESHOLD) {
                 saveOpacity.value = percentageToAction;
                 deleteOpacity.value = 0;
@@ -174,8 +189,6 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
             }
         })
         .onFinalize(() => {
-            const ACTION_THRESHOLD = 150;
-
             if (offsetX.value > ACTION_THRESHOLD) {
                 // SAVE
                 tileOpacity.value = withTiming(0, {}, () => {
@@ -201,7 +214,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
         });
     };
 
-    const touchGesture = Gesture.Tap().onTouchesUp(e => {
+    const touchGesture = Gesture.Tap().onTouchesUp(() => {
         runOnJS(openProduct)();
     });
 

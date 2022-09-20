@@ -25,6 +25,8 @@ type SavedProductProps = {
 };
 
 const ITEM_HEIGHT = 72;
+const SNAP_ANIMATION_DURATION = 250;
+const SNAP_TO_DELETE_TRANSLATION = 7 / 8;
 
 const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
     const contextX = useSharedValue(0);
@@ -66,6 +68,11 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
         });
     };
 
+    const haptic = () => {
+        console.log('HAPTIC');
+        Haptics.selectionAsync();
+    };
+
     const panGesture = Gesture.Pan()
         .activeOffsetX(-10)
         .failOffsetY([-10, 10])
@@ -81,18 +88,25 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
                     // Snap to delete.
                     isDeleting.value = true;
                     isAnimating.value = true;
-                    offsetX.value = withTiming((-width / 8) * 7, {}, () => {
-                        isAnimating.value = false;
-                    });
+                    offsetX.value = withTiming(
+                        -width * SNAP_TO_DELETE_TRANSLATION,
+                        {duration: SNAP_ANIMATION_DURATION},
+                        () => {
+                            isAnimating.value = false;
+                        },
+                    );
                     runOnJS(Haptics.selectionAsync)();
                 } else if (v > -width / 2 + 1 && isDeleting.value) {
                     // Disable snap to delete.
                     isDeleting.value = false;
                     isAnimating.value = true;
-                    offsetX.value = withTiming(v, {}, () => {
-                        isDeleting.value = false;
-                        isAnimating.value = false;
-                    });
+                    offsetX.value = withTiming(
+                        v,
+                        {duration: SNAP_ANIMATION_DURATION},
+                        () => {
+                            isAnimating.value = false;
+                        },
+                    );
                     runOnJS(Haptics.selectionAsync)();
                 } else if (!isDeleting.value) {
                     // Run normally if not snapped.
