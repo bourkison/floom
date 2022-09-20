@@ -1,5 +1,5 @@
-import React from 'react';
-import {ImageBackground, StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {ImageBackground, StyleSheet, Text, View, ViewStyle} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import {LinearGradient} from 'expo-linear-gradient';
 import {useWindowDimensions} from 'react-native';
@@ -37,13 +37,17 @@ const ACTION_VISIBILITY_THRESHOLD = 0.2;
 const ANIMATION_DURATION = 300;
 
 const ACTION_THRESHOLD = 150;
-
 const SCALE_AMOUNT = 0.005;
+
+const FALLBACK_IMAGE =
+    'https://preview.redd.it/ishxhuztqlo91.jpg?width=640&crop=smart&auto=webp&s=e148af80aea3ad1ac17b54f4626852165acd193e';
 
 const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
     const rotation = useSharedValue(0);
+    const rotationX = useSharedValue(0);
+    const rotationY = useSharedValue(0);
     const tileOpacity = useSharedValue(1);
     const saveOpacity = useSharedValue(0);
     const deleteOpacity = useSharedValue(0);
@@ -57,6 +61,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
 
     const dispatch = useAppDispatch();
     const animationAction = useAppSelector(state => state.product.animation);
+    const [imageIndex, setImageIndex] = useState(0);
 
     useEffect(() => {
         if (index === 0 && animationAction !== 'idle') {
@@ -129,6 +134,12 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 },
                 {
                     rotateZ: `${rotation.value}deg`,
+                },
+                {
+                    rotateY: `${rotationY.value}deg`,
+                },
+                {
+                    rotateX: `${rotationX.value}deg`,
                 },
             ],
         };
@@ -211,18 +222,105 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         });
 
     const openProduct = () => {
-        navigation.push('ProductView', {
+        navigation.navigate('ProductView', {
             product: product,
         });
     };
 
-    const touchGesture = Gesture.Tap().onTouchesUp(() => {
-        runOnJS(openProduct)();
+    const touchGesture = Gesture.Tap().onTouchesUp(e => {
+        const TAP_PERCENTILE = 5; // If 4, first and last quarters of the image will change image.
+        const ANIMATION_DURATION = 150;
+        const ROTATION_Y = 12;
+        const ROTATION_X = 2;
+        const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
+
+        if (e.allTouches[0].x < (width - IMAGE_PADDING) / TAP_PERCENTILE) {
+            if (imageIndex > 0) {
+                // LEFT TAP
+
+                // Y ROTATION
+                rotationY.value = withTiming(
+                    -ROTATION_Y,
+                    {duration: ANIMATION_DURATION},
+                    () => {
+                        rotationY.value = withTiming(0, {
+                            duration: ANIMATION_DURATION,
+                        });
+                    },
+                );
+
+                // X ROTATION
+                const yPercentage = -((e.allTouches[0].y / height) * 2 - 1);
+                rotationX.value = withTiming(
+                    ROTATION_X * yPercentage,
+                    {duration: ANIMATION_DURATION},
+                    () => {
+                        rotationX.value = withTiming(0, {
+                            duration: ANIMATION_DURATION,
+                        });
+                    },
+                );
+                runOnJS(setImageIndex)(imageIndex - 1);
+            }
+        } else if (
+            e.allTouches[0].x >
+            ((width - IMAGE_PADDING) * (TAP_PERCENTILE - 1)) / TAP_PERCENTILE
+        ) {
+            if (imageIndex < product.imageLink.length - 1) {
+                // RIGHT TAP
+
+                // Y ROTATION
+                rotationY.value = withTiming(
+                    ROTATION_Y,
+                    {duration: ANIMATION_DURATION},
+                    () => {
+                        rotationY.value = withTiming(0, {
+                            duration: ANIMATION_DURATION,
+                        });
+                    },
+                );
+
+                // X ROTATION
+                const xPercentage = (e.allTouches[0].x / height) * 2 - 1;
+                rotationX.value = withTiming(
+                    ROTATION_X * xPercentage,
+                    {duration: ANIMATION_DURATION},
+                    () => {
+                        rotationX.value = withTiming(0, {
+                            duration: ANIMATION_DURATION,
+                        });
+                    },
+                );
+                runOnJS(setImageIndex)(imageIndex + 1);
+            }
+        } else {
+            runOnJS(openProduct)();
+        }
     });
 
     const calculateTranslateY = () => {
         const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
         return -Math.floor((height * SCALE_AMOUNT * index) / 4);
+    };
+
+    const calculateImageIndicator = (index: number) => {
+        let style: ViewStyle = JSON.parse(
+            JSON.stringify(styles.selectedImageIndicator),
+        );
+
+        if (imageIndex === index) {
+            style.backgroundColor = 'rgba(243, 252, 240, 0.8)';
+        }
+
+        if (index === 0) {
+            style.marginLeft = 0;
+        }
+
+        if (index === product.imageLink.length - 1) {
+            style.marginRight = 0;
+        }
+
+        return style;
     };
 
     let baseComponent = (
@@ -246,10 +344,16 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                     overflow: 'hidden',
                 }}
                 source={{
-                    uri:
-                        product.imageLink[0] ||
-                        'https://preview.redd.it/ishxhuztqlo91.jpg?width=640&crop=smart&auto=webp&s=e148af80aea3ad1ac17b54f4626852165acd193e',
+                    uri: product.imageLink[imageIndex] || FALLBACK_IMAGE,
                 }}>
+                <View style={styles.selectedImageContainer}>
+                    {product.imageLink.map((s, index) => (
+                        <View
+                            style={calculateImageIndicator(index)}
+                            key={index}
+                        />
+                    ))}
+                </View>
                 <View style={styles.imageOverlayContainer}>
                     <View style={styles.gradientContainer}>
                         <LinearGradient
@@ -324,6 +428,24 @@ const styles = StyleSheet.create({
             width: 1,
         },
         shadowOpacity: 0.2,
+    },
+    selectedImageContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        flex: 1,
+        height: 8,
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    selectedImageIndicator: {
+        flex: 1,
+        marginLeft: 3,
+        marginRight: 3,
+        borderRadius: 2,
+        backgroundColor: 'rgba(26, 31, 37, 0.2)',
+        maxWidth: '33%',
     },
     imageOverlayContainer: {
         position: 'absolute',

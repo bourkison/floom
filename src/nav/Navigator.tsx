@@ -77,7 +77,8 @@ const Navigator = () => {
                 name="ProductView"
                 component={ProductView}
                 options={{
-                    gestureDirection: 'horizontal',
+                    presentation: 'modal',
+                    gestureDirection: 'vertical',
                 }}
             />
         </MainStack.Navigator>
