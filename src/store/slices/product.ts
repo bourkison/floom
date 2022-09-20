@@ -84,7 +84,10 @@ const productSlice = createSlice({
         builder
             .addCase(SAVE_PRODUCT.pending, state => {
                 state.animation = 'idle';
-                state.products = state.products.slice(1, state.products.length);
+                state.products = state.products.slice(
+                    0,
+                    state.products.length - 1,
+                );
             })
             .addCase(SAVE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
@@ -92,7 +95,10 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_PRODUCT.pending, state => {
                 state.animation = 'idle';
-                state.products = state.products.slice(1, state.products.length);
+                state.products = state.products.slice(
+                    0,
+                    state.products.length - 1,
+                );
             })
             .addCase(DELETE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.

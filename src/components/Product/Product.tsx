@@ -23,7 +23,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 
 type ProductComponentProps = {
     product: ProductType;
-    animated: boolean;
+    index: number;
 };
 
 const IMAGE_RATIO = 0.9;
@@ -38,7 +38,9 @@ const ANIMATION_DURATION = 300;
 
 const ACTION_THRESHOLD = 150;
 
-const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
+const SCALE_AMOUNT = 0.005;
+
+const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
     const rotation = useSharedValue(0);
@@ -57,7 +59,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
     const animationAction = useAppSelector(state => state.product.animation);
 
     useEffect(() => {
-        if (animated && animationAction !== 'idle') {
+        if (index === 0 && animationAction !== 'idle') {
             runOnUI(commenceAnimation)(animationAction);
         }
     }, [animationAction]);
@@ -218,8 +220,24 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
         runOnJS(openProduct)();
     });
 
+    const calculateTranslateY = () => {
+        const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
+        return -Math.floor((height * SCALE_AMOUNT * index) / 4);
+    };
+
     let baseComponent = (
-        <View style={styles.container}>
+        <View
+            style={[
+                styles.container,
+                {
+                    transform: [
+                        {scale: 1 + index * SCALE_AMOUNT},
+                        {
+                            translateY: calculateTranslateY(),
+                        },
+                    ],
+                },
+            ]}>
             <ImageBackground
                 style={{
                     width: width - IMAGE_PADDING,
@@ -252,7 +270,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
                         </LinearGradient>
                     </View>
 
-                    {animated ? (
+                    {index === 0 ? (
                         <View>
                             <View style={styles.actionContainer}>
                                 <Animated.View
@@ -282,7 +300,7 @@ const Product: React.FC<ProductComponentProps> = ({product, animated}) => {
         </View>
     );
 
-    if (animated) {
+    if (index === 0) {
         return (
             <Animated.View style={rTileStyle}>
                 <GestureDetector gesture={touchGesture}>
