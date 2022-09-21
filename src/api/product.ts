@@ -25,6 +25,8 @@ export async function queryProduct(
 
     let response: ProductType[] = [];
 
+    console.log('RESPONSE:', data.data.length, data.__loaded);
+
     for (let i = 0; i < data.data.length; i++) {
         response.push({
             title: data.data[i].title,

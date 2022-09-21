@@ -30,6 +30,7 @@ const SavedProducts = ({
 
     const dispatch = useAppDispatch();
     const savedProducts = useAppSelector(state => state.product.savedProducts);
+    const moreToLoad = useAppSelector(state => state.product.moreSavedToLoad);
 
     useEffect(() => {
         const initFetch = async () => {
@@ -45,6 +46,10 @@ const SavedProducts = ({
         }
     }, []);
 
+    useEffect(() => {
+        console.log('LENGTH:', savedProducts.length);
+    }, [savedProducts]);
+
     const refresh = async () => {
         setIsRefereshing(true);
         await dispatch(LOAD_SAVED_PRODUCTS());
@@ -52,7 +57,7 @@ const SavedProducts = ({
     };
 
     const loadMore = async () => {
-        if (!isLoadingMore && !isLoading && !isRefreshing) {
+        if (!isLoadingMore && !isLoading && !isRefreshing && moreToLoad) {
             setIsLoadingMore(true);
             await dispatch(LOAD_MORE_SAVED_PRODUCTS());
             setIsLoadingMore(false);
@@ -73,7 +78,9 @@ const SavedProducts = ({
                     data={savedProducts}
                     renderItem={ListItem}
                     keyExtractor={item => item._id}
-                    onEndReached={loadMore}
+                    onEndReached={
+                        moreToLoad && !isLoadingMore ? loadMore : undefined
+                    }
                     onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
                     ListFooterComponent={
                         isLoadingMore ? (

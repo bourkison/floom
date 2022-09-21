@@ -232,8 +232,6 @@ const querySavedProduct = async (
             ])
         )[0];
 
-        console.log('MONGO RESPONSE:', mongoResponse);
-
         productIds = mongoResponse.likedProducts;
         arrLength = mongoResponse.__length;
         arrStartAtIndex = mongoResponse.__startAtIndex;

@@ -18,6 +18,7 @@ const productAdapter = createEntityAdapter();
 const initialState = productAdapter.getInitialState({
     products: [] as ProductType[],
     savedProducts: [] as ProductType[],
+    moreSavedToLoad: true,
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
 });
 
@@ -136,7 +137,13 @@ const productSlice = createSlice({
                 console.warn('Delete product rejected');
             })
             .addCase(LOAD_SAVED_PRODUCTS.fulfilled, (state, action) => {
+                console.log(
+                    'LOADING SAVED PRODUCTS:',
+                    action.payload.products.length,
+                    action.payload.__moreToLoad,
+                );
                 state.savedProducts = action.payload.products;
+                state.moreSavedToLoad = action.payload.__moreToLoad;
             })
             .addCase(LOAD_SAVED_PRODUCTS.rejected, () => {
                 // TODO: Handle rejections.
@@ -147,6 +154,7 @@ const productSlice = createSlice({
                     ...state.savedProducts,
                     ...action.payload.products,
                 ];
+                state.moreSavedToLoad = action.payload.__moreToLoad;
             })
             .addCase(LOAD_MORE_SAVED_PRODUCTS.rejected, () => {
                 // TODO: Handle rejections.

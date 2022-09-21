@@ -40,7 +40,7 @@ const ProductList = () => {
         } else if (products.length <= NUM_SHOWN_PRODUCTS + 1 && !isLoading) {
             loadProducts(products[products.length - 1]._id);
         }
-    }, [products]);
+    }, [products, isLoading]);
 
     return (
         <View style={styles.container}>
