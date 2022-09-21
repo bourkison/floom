@@ -19,14 +19,14 @@ import {
 } from '@/store/slices/product';
 import {Product as ProductType} from '@/types/product';
 
-const ON_END_REACHED_THRESHOLD = 100;
+const ON_END_REACHED_THRESHOLD = 0;
 
 const SavedProducts = ({
     navigation,
 }: StackScreenProps<MainStackParamList, 'LikedProducts'>) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [refreshing, setRefereshing] = useState(false);
+    const [isRefreshing, setIsRefereshing] = useState(false);
 
     const dispatch = useAppDispatch();
     const savedProducts = useAppSelector(state => state.product.savedProducts);
@@ -46,13 +46,13 @@ const SavedProducts = ({
     }, []);
 
     const refresh = async () => {
-        setRefereshing(true);
+        setIsRefereshing(true);
         await dispatch(LOAD_SAVED_PRODUCTS());
-        setRefereshing(false);
+        setIsRefereshing(false);
     };
 
     const loadMore = async () => {
-        if (!isLoadingMore) {
+        if (!isLoadingMore && !isLoading && !isRefreshing) {
             setIsLoadingMore(true);
             await dispatch(LOAD_MORE_SAVED_PRODUCTS());
             setIsLoadingMore(false);
@@ -83,7 +83,7 @@ const SavedProducts = ({
                     refreshControl={
                         <RefreshControl
                             onRefresh={refresh}
-                            refreshing={refreshing}
+                            refreshing={isRefreshing}
                         />
                     }
                 />

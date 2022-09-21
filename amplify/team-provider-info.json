@@ -36,12 +36,12 @@
         "teenderTestProducts": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderTestProducts-686744516d6d41583341-build.zip"
+          "s3Key": "amplify-builds/teenderTestProducts-4955537247456b544232-build.zip"
         },
         "teenderProductHandler": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",
           "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderProductHandler-374c61677956744e4630-build.zip"
+          "s3Key": "amplify-builds/teenderProductHandler-766b5447433150324636-build.zip"
         },
         "teenderSaveHandler": {
           "secretsPathAmplifyAppId": "dgclxwislld0g",

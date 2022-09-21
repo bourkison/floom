@@ -14,6 +14,8 @@ type ProductType = {
     imageLink: string[];
 };
 
+const NUM_TO_LOAD = 10;
+
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
@@ -31,7 +33,7 @@ exports.handler = async (event: ScheduledEvent) => {
 
     let payload: ProductType[] = [];
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < NUM_TO_LOAD; i++) {
         let product: ProductType = {
             title: faker.vehicle.vehicle(),
             price: Math.floor(Math.random() * 100000) / 100,

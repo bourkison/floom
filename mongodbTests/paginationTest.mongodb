@@ -5,15 +5,60 @@
 // ).sort({_id: -1})
 // .limit(3);
 
-db.users.findOne(
-    {email: 'harrisonbourke97@gmail.com'},
+const LOAD_AMOUNT = 5;
+const START_AT = "6328c35e87ab64e028e5d93d";
+
+db.users.aggregate([
+    {$match: {email: 'harrisonbourke97@gmail.com'}},
     {
-        likedProducts: {
-            $slice: [
-                '$likedProducts',
-                {$add: [{$indexOfArray: ['$likedProducts', ObjectId('632a14de11712281a7be3166')]}, 1]},
-                3
-            ]
+        $addFields: {
+            __length: {
+                $size: '$likedProducts'
+            },
+            __startAtIndex: {
+                $indexOfArray: [
+                    '$likedProducts',
+                    ObjectId(START_AT),
+                ]
+            }
+        }
+    },
+    {
+        $project: {
+            likedProducts: {
+                $slice: [
+                    '$likedProducts',
+                    {
+                        $add: ['$__startAtIndex', 1],
+                    },
+                    LOAD_AMOUNT,
+                ],
+            },
+            __length: 1,
+            __startAtIndex: 1
         }
     }
-)
+])
+
+// db.products.aggregate([
+//     {
+//         $match: {
+//             _id: {
+//                 $in: products.likedProducts
+//             }
+//         }
+//     },
+//     {
+//         $addFields: {
+//             "__order": {
+//                 $indexOfArray: [products.likedProducts, "$_id"]
+//             },
+//             "__moreToLoad": products.moreToLoad
+//         }
+//     },
+//     {
+//         $sort: {
+//             "__order": 1
+//         }
+//     },
+// ])

@@ -28,7 +28,7 @@ const ProductList = () => {
             if (startAt && init.queryStringParameters)
                 init.queryStringParameters.startAt = startAt;
 
-            const products = await queryProduct({
+            const {products} = await queryProduct({
                 init,
             });
             dispatch(PUSH_PRODUCTS(products));

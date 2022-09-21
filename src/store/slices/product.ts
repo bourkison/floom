@@ -4,7 +4,11 @@ import {
     createSlice,
     PayloadAction,
 } from '@reduxjs/toolkit';
-import {Product as ProductType, QueryProductInit} from '@/types/product';
+import {
+    Product as ProductType,
+    QueryProductInit,
+    QueryProductResponse,
+} from '@/types/product';
 import {createSaveOrDelete, deleteSaveOrDelete} from '@/api/save';
 import {queryProduct} from '@/api/product';
 import {RootState} from '@/store';
@@ -48,13 +52,13 @@ export const DELETE_SAVED_PRODUCT = createAsyncThunk<
 });
 
 export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
-    ProductType[],
+    QueryProductResponse,
     QueryProductInit['queryStringParameters']
 >(
     'product/LOAD_SAVED_PRODUCTS',
     async (
         input = {
-            loadAmount: 25,
+            loadAmount: 5,
             type: 'saved',
         },
     ) => {
@@ -69,14 +73,14 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
 );
 
 export const LOAD_MORE_SAVED_PRODUCTS = createAsyncThunk<
-    ProductType[],
+    QueryProductResponse,
     QueryProductInit['queryStringParameters'],
     {state: RootState}
 >(
     'product/LOAD_MORE_SAVED_PRODUCTS',
     async (
         input = {
-            loadAmount: 25,
+            loadAmount: 5,
             type: 'saved',
         },
         {getState},
@@ -132,7 +136,7 @@ const productSlice = createSlice({
                 console.warn('Delete product rejected');
             })
             .addCase(LOAD_SAVED_PRODUCTS.fulfilled, (state, action) => {
-                state.savedProducts = action.payload;
+                state.savedProducts = action.payload.products;
             })
             .addCase(LOAD_SAVED_PRODUCTS.rejected, () => {
                 // TODO: Handle rejections.
@@ -141,7 +145,7 @@ const productSlice = createSlice({
             .addCase(LOAD_MORE_SAVED_PRODUCTS.fulfilled, (state, action) => {
                 state.savedProducts = [
                     ...state.savedProducts,
-                    ...action.payload,
+                    ...action.payload.products,
                 ];
             })
             .addCase(LOAD_MORE_SAVED_PRODUCTS.rejected, () => {

@@ -22,6 +22,13 @@ export type QueryProductInit = {
     };
 };
 
+export type QueryProductResponse = {
+    products: Product[];
+    __moreToLoad: boolean;
+    __totalLength: number | 'unknown';
+    __loaded: number;
+};
+
 export type GetProductParams = {
     init: GetProductInit;
     productId: string;

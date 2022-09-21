@@ -87,12 +87,7 @@ const queryUnsavedProduct = async (
             };
         }
 
-        const products = await Product.find(query, {
-            title: 1,
-            price: 1,
-            link: 1,
-            imageLink: 1,
-        })
+        const products = await Product.find(query)
             .sort({_id: -1})
             .limit(loadAmount);
 
@@ -112,13 +107,23 @@ const queryUnsavedProduct = async (
             return response;
         }
 
+        // If we have loaded less than we wanted, we know that
+        // we have loaded everything and there is nothing more to load.
+        const moreToLoad = products.length < loadAmount;
+
         response = {
             statusCode: 200,
             headers: {
                 'Access-Control-Allow-Headers': '*',
                 'Access-Control-Allow-Origin': '*',
             },
-            body: JSON.stringify({success: true, data: products}),
+            body: JSON.stringify({
+                success: true,
+                data: products,
+                __totalLength: 'unknown',
+                __moreToLoad: moreToLoad,
+                __loaded: products.length,
+            }),
         };
 
         return response;
@@ -162,36 +167,77 @@ const querySavedProduct = async (
         return response;
     }
 
-    let filter: FilterQuery<UserType> = {
-        likedProducts: {
-            $slice: loadAmount,
-        },
-    };
+    let productIds: Types.ObjectId[];
+    let arrLength: number;
+    let arrStartAtIndex: number;
 
-    if (startAt) {
-        filter = {
-            likedProducts: {
-                $slice: [
-                    '$likedProducts',
-                    {
-                        $add: [
-                            {
-                                $indexOfArray: [
-                                    '$likedProducts',
-                                    new Types.ObjectId(startAt),
-                                ],
-                            },
-                            1,
-                        ],
+    if (!startAt) {
+        const {likedProducts, __length} = (
+            await User.findOne(
+                {email: email},
+                {
+                    likedProducts: {
+                        $slice: loadAmount,
                     },
-                    loadAmount,
-                ],
-            },
-        };
-    }
+                    __length: {
+                        $size: '$likedProducts',
+                    },
+                },
+            )
+        ).toObject<{
+            likedProducts: Types.ObjectId[];
+            __length: number;
+            __startAtIndex?: number;
+        }>();
 
-    const productIds = (await User.findOne({email: email}, filter)).toObject()
-        .likedProducts;
+        productIds = likedProducts;
+        arrLength = __length;
+        arrStartAtIndex = 0;
+    } else {
+        const mongoResponse = (
+            await User.aggregate<{
+                likedProducts: Types.ObjectId[];
+                __length: number;
+                __startAtIndex?: number;
+            }>([
+                {$match: {email: email}},
+                {
+                    $addFields: {
+                        __length: {
+                            $size: '$likedProducts',
+                        },
+                        __startAtIndex: {
+                            $indexOfArray: [
+                                '$likedProducts',
+                                new Types.ObjectId(startAt),
+                            ],
+                        },
+                    },
+                },
+                {
+                    $project: {
+                        likedProducts: {
+                            $slice: [
+                                '$likedProducts',
+                                {
+                                    $add: ['$__startAtIndex', 1],
+                                },
+                                loadAmount,
+                            ],
+                        },
+                        __length: 1,
+                        __startAtIndex: 1,
+                    },
+                },
+            ])
+        )[0];
+
+        console.log('MONGO RESPONSE:', mongoResponse);
+
+        productIds = mongoResponse.likedProducts;
+        arrLength = mongoResponse.__length;
+        arrStartAtIndex = mongoResponse.__startAtIndex;
+    }
 
     if (!productIds || !productIds.length) {
         response = {
@@ -208,7 +254,30 @@ const querySavedProduct = async (
         return response;
     }
 
-    const products = await Product.find({_id: {$in: productIds}});
+    // Have to sort the products in how they are retrieved from the User
+    // In order to allow for pagination.
+    // https://stackoverflow.com/questions/22797768/does-mongodbs-in-clause-guarantee-order
+    const products = await Product.aggregate<ProductType>([
+        {
+            $match: {
+                _id: {
+                    $in: productIds,
+                },
+            },
+        },
+        {
+            $addFields: {
+                __order: {
+                    $indexOfArray: [productIds, '$_id'],
+                },
+            },
+        },
+        {
+            $sort: {
+                __order: 1,
+            },
+        },
+    ]);
 
     if (!products || !products.length) {
         response = {
@@ -226,13 +295,23 @@ const querySavedProduct = async (
         return response;
     }
 
+    // If number of previously loaded (arrStartAt + 1) + number loaded
+    // is equal to total length, we know we have loaded everything, hence no more to load
+    const moreToLoad = !(arrStartAtIndex + 1 + products.length >= arrLength);
+
     response = {
         statusCode: 200,
         headers: {
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Origin': '*',
         },
-        body: JSON.stringify({success: true, data: products}),
+        body: JSON.stringify({
+            success: true,
+            data: products,
+            __totalLength: arrLength,
+            __moreToLoad: moreToLoad,
+            __loaded: products.length,
+        }),
     };
 
     return response;

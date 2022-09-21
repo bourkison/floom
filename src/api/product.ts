@@ -4,11 +4,12 @@ import {
     GetProductParams,
     Product as ProductType,
     QueryProductParams,
+    QueryProductResponse,
 } from '@/types/product';
 
 export async function queryProduct(
     input: QueryProductParams,
-): Promise<ProductType[]> {
+): Promise<QueryProductResponse> {
     const path = '/product';
     let init = input.init;
     init.headers = init.headers || {};
@@ -16,8 +17,6 @@ export async function queryProduct(
         init.headers.Authorization || (await fetchJwtToken());
 
     console.log(await fetchJwtToken());
-
-    init.queryStringParameters = init.queryStringParameters || {};
 
     const data = await API.get(API_NAME, path, init).catch(err => {
         console.error(err);
@@ -36,7 +35,12 @@ export async function queryProduct(
         });
     }
 
-    return response;
+    return {
+        products: response,
+        __loaded: data.__loaded,
+        __moreToLoad: data.__moreToLoad,
+        __totalLength: data.__totalLength,
+    };
 }
 
 export async function getProduct(
