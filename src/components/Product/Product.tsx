@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useMemo} from 'react';
 import {ImageBackground, StyleSheet, Text, View, ViewStyle} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import {LinearGradient} from 'expo-linear-gradient';
@@ -300,25 +300,25 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         }
     });
 
-    const calculateTranslateY = () => {
+    const translateY = useMemo(() => {
         const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
         return -Math.floor((height * SCALE_AMOUNT * index) / 4);
-    };
+    }, [index]);
 
-    const calculateImageIndicator = (index: number) => {
+    const calculateImageIndicator = (i: number) => {
         let style: ViewStyle = JSON.parse(
             JSON.stringify(styles.selectedImageIndicator),
         );
 
-        if (imageIndex === index) {
+        if (imageIndex === i) {
             style.backgroundColor = 'rgba(243, 252, 240, 0.8)';
         }
 
-        if (index === 0) {
+        if (i === 0) {
             style.marginLeft = 0;
         }
 
-        if (index === product.imageLink.length - 1) {
+        if (i === product.imageLink.length - 1) {
             style.marginRight = 0;
         }
 
@@ -333,7 +333,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                     transform: [
                         {scale: 1 + index * SCALE_AMOUNT},
                         {
-                            translateY: calculateTranslateY(),
+                            translateY: translateY,
                         },
                     ],
                 },

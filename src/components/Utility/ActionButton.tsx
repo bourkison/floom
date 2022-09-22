@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import Animated, {
     runOnJS,
     useAnimatedStyle,
@@ -54,33 +54,34 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
             });
         });
 
-    let icon: JSX.Element;
-
-    switch (type) {
-        case 'save':
-            icon = (
-                <Entypo
-                    name="heart"
-                    size={Math.floor(radius * 0.6)}
-                    color="green"
-                />
-            );
-            break;
-        case 'buy':
-            icon = (
-                <AntDesign
-                    name="shoppingcart"
-                    size={Math.floor(radius * 0.6)}
-                    color="blue"
-                />
-            );
-            break;
-        case 'delete':
-            icon = (
-                <Feather name="x" size={Math.floor(radius * 0.6)} color="red" />
-            );
-            break;
-    }
+    const icon = useMemo(() => {
+        switch (type) {
+            case 'save':
+                return (
+                    <Entypo
+                        name="heart"
+                        size={Math.floor(radius * 0.6)}
+                        color="green"
+                    />
+                );
+            case 'buy':
+                return (
+                    <AntDesign
+                        name="shoppingcart"
+                        size={Math.floor(radius * 0.6)}
+                        color="blue"
+                    />
+                );
+            case 'delete':
+                return (
+                    <Feather
+                        name="x"
+                        size={Math.floor(radius * 0.6)}
+                        color="red"
+                    />
+                );
+        }
+    }, [type]);
 
     return (
         <Animated.View

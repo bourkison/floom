@@ -22,18 +22,18 @@ const HomeAuth = ({
     // };
 
     const navigateToLogin = () => {
-        navigation.push('Login');
+        navigation.navigate('Login');
     };
 
     const navigateToSignUp = () => {
-        navigation.push('VerifyEmail', {
+        navigation.navigate('VerifyEmail', {
             username: 'harrisonbourke97@gmail.com',
             password: 'Barrison1',
         });
     };
 
     const navigateToGuest = () => {
-        navigation.push('GuestWelcome');
+        navigation.navigate('GuestWelcome');
     };
 
     return (
