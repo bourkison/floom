@@ -13,10 +13,7 @@ const HomeAuth = ({
     };
 
     const navigateToSignUp = () => {
-        navigation.navigate('VerifyEmail', {
-            username: 'harrisonbourke97@gmail.com',
-            password: 'Barrison1',
-        });
+        navigation.navigate('SignUp');
     };
 
     const navigateToGuest = () => {

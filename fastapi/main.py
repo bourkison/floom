@@ -1,6 +1,7 @@
 from fastapi import FastAPI, status
-from database import session, Product
+from database import session, Product, User
 from pydantic import BaseModel
+from datetime import datetime
 
 class ProductIn(BaseModel):
     title: str
@@ -20,6 +21,14 @@ async def root(first_name: str, last_name: str):
 @app.get("/user/{email}")
 async def get_user(email: str):
     return {"user": email}
+
+@app.post("/user")
+async def create_user(email: str, name: str, gender: str, dob: int, country: str):
+    user = User(email=email, name=name, gender=gender, dob=datetime.fromtimestamp(dob), country=country)
+    session.add(user)
+    session.commit()
+
+    return {"id": user.id}
 
 @app.get("/product/{product_id}")
 async def read_product(product_id: str):

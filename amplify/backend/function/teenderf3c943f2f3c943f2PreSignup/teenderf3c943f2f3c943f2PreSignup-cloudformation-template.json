@@ -249,6 +249,15 @@
                   }
                 ]
               }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface"
+              ],
+              "Resource": "*"
             }
           ]
         }
@@ -309,6 +318,16 @@
       },
       "DependsOn": [
         "LambdaExecutionRole"
+      ]
+    },
+    "VPCConfig": {
+      "SecurityGroupIds": [
+        "sg-0dbe1769e23086ba8"
+      ],
+      "SubnetIds": [
+        "subnet-846c55ed",
+        "subnet-c5bb3389",
+        "subnet-60e19b1a"
       ]
     }
   },

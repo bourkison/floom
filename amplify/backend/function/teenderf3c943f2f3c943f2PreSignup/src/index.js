@@ -16,14 +16,12 @@ exports.handler = async (event) => {
         .promise();
     const PGPASSWORD = Parameters[0].Value;
     if (!client) {
-        client = new pg_1.Client({
-            user: process.env['PGUSER'],
-            host: process.env['PGHOST'],
-            database: process.env['PGDATABASE'],
-            port: parseInt(process.env['PGPORT']),
-            password: PGPASSWORD,
-        });
-        client.connect();
+        const connectionString = 'postgresql://harrisonbourke:34lyxLQLBKjduWThQDE1@teender-dev.czsyxhqmrxa9.eu-west-2.rds.amazonaws.com/teender_dev_db';
+        console.log('Creating client with:', connectionString);
+        client = new pg_1.Client({ connectionString });
+        console.log('Connecting...');
+        await client.connect();
+        console.log('Connected');
     }
     const userObj = {
         name: event.request.userAttributes.name,
@@ -37,8 +35,10 @@ exports.handler = async (event) => {
     const queryString = `
         INSERT INTO users (email, name, gender, dob, country, created_at, updated_at)
         VALUES
-        (${userObj.email}, ${userObj.name}, ${userObj.gender}, to_timestamp(${userObj.dob.getTime() / 1000}), ${userObj.country}, ${userObj.created_at.getTime() / 1000}, ${userObj.updated_at.getTime() / 1000})
+        ('${userObj.email}', '${userObj.name}', '${userObj.gender}', to_timestamp(${userObj.dob.getTime() / 1000}), '${userObj.country}', to_timestamp(${userObj.created_at.getTime() / 1000}), to_timestamp(${userObj.updated_at.getTime() / 1000}))
     `;
+    console.log('Querying DB with', queryString);
     await client.query(queryString);
+    console.log('Queried.');
     return event;
 };

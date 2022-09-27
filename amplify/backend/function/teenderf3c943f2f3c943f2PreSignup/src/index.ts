@@ -35,7 +35,10 @@ exports.handler = async (
             port: parseInt(process.env['PGPORT']),
             password: PGPASSWORD,
         });
-        client.connect();
+
+        console.log('Connecting...');
+        await client.connect();
+        console.log('Connected');
     }
 
     const userObj: User = {
@@ -54,14 +57,20 @@ exports.handler = async (
     const queryString = `
         INSERT INTO users (email, name, gender, dob, country, created_at, updated_at)
         VALUES
-        (${userObj.email}, ${userObj.name}, ${userObj.gender}, to_timestamp(${
-        userObj.dob.getTime() / 1000
-    }), ${userObj.country}, ${userObj.created_at.getTime() / 1000}, ${
+        ('${userObj.email}', '${userObj.name}', '${
+        userObj.gender
+    }', to_timestamp(${userObj.dob.getTime() / 1000}), '${
+        userObj.country
+    }', to_timestamp(${userObj.created_at.getTime() / 1000}), to_timestamp(${
         userObj.updated_at.getTime() / 1000
-    })
+    }))
     `;
 
+    console.log('Querying DB with', queryString);
+
     await client.query(queryString);
+
+    console.log('Queried.');
 
     return event;
 };
