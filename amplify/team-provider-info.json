@@ -17,37 +17,6 @@
       "auth": {
         "teenderf3c943f2f3c943f2": {},
         "true": {}
-      },
-      "function": {
-        "teenderUserHandler": {
-          "secretsPathAmplifyAppId": "dgclxwislld0g",
-          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderUserHandler-64504749413841726b49-build.zip"
-        },
-        "teenderMongooseModels": {
-          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderMongooseModels-LambdaLayerVersion681ba396-build.zip"
-        },
-        "teenderf3c943f2f3c943f2PreSignup": {
-          "secretsPathAmplifyAppId": "dgclxwislld0g",
-          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderf3c943f2f3c943f2PreSignup-4e6a446a4346736e534b-build.zip"
-        },
-        "teenderTestProducts": {
-          "secretsPathAmplifyAppId": "dgclxwislld0g",
-          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderTestProducts-4955537247456b544232-build.zip"
-        },
-        "teenderProductHandler": {
-          "secretsPathAmplifyAppId": "dgclxwislld0g",
-          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderProductHandler-4e4f6879425134516d79-build.zip"
-        },
-        "teenderSaveHandler": {
-          "secretsPathAmplifyAppId": "dgclxwislld0g",
-          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
-          "s3Key": "amplify-builds/teenderSaveHandler-49385445582b63575239-build.zip"
-        }
       }
     }
   }

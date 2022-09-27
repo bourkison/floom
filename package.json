@@ -1,11 +1,5 @@
 {
     "name": "teender",
     "version": "1.0.0",
-    "scripts": {
-        "amplify:teenderUserHandler": "cd amplify/backend/function/teenderUserHandler/src && tsc",
-        "amplify:teenderProductHandler": "cd amplify/backend/function/teenderProductHandler/src && tsc",
-        "amplify:teenderSaveHandler": "cd amplify/backend/function/teenderSaveHandler/src && tsc",
-        "amplify:teenderf3c943f2f3c943f2PreSignup": "cd amplify/backend/function/teenderf3c943f2f3c943f2PreSignup/src && tsc",
-        "amplify:teenderTestProducts": "cd amplify/backend/function/teenderTestProducts/src && tsc"
-    }
+    "scripts": {}
 }

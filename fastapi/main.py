@@ -1,5 +1,4 @@
 from fastapi import FastAPI, status
-from typing import Union
 from database import session, Product
 from pydantic import BaseModel
 
@@ -18,8 +17,12 @@ app = FastAPI()
 async def root(first_name: str, last_name: str):
     return {"greeting": "Hello " + first_name + " " + last_name}
 
+@app.get("/user/{email}")
+async def get_user(email: str):
+    return {"user": email}
+
 @app.get("/product/{product_id}")
-async def read_product(product_id: str, type: Union[str, None]  = "test"):
+async def read_product(product_id: str):
     return {"id": product_id}
 
 @app.post("/product", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
