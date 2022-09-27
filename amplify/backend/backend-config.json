@@ -3,7 +3,17 @@
     "teenderf3c943f2f3c943f2": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "teenderf3c943f2f3c943f2PreSignup",
+          "triggerProvider": "Cognito",
+          "attributes": [
+            "Arn",
+            "Name"
+          ]
+        }
+      ],
       "customAuth": false,
       "frontendAuthConfig": {
         "socialProviders": [],
@@ -27,6 +37,12 @@
       }
     }
   },
-  "function": {},
+  "function": {
+    "teenderf3c943f2f3c943f2PreSignup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
   "api": {}
 }

@@ -17,6 +17,17 @@
       "auth": {
         "teenderf3c943f2f3c943f2": {},
         "true": {}
+      },
+      "function": {
+        "teenderf3c943f2f3c943f2PreSignup": {
+          "pguser": "harrisonbourke",
+          "pghost": "teender-dev.czsyxhqmrxa9.eu-west-2.rds.amazonaws.com",
+          "pgdatabase": "teender_dev_db",
+          "pgport": "5432",
+          "secretsPathAmplifyAppId": "dgclxwislld0g",
+          "deploymentBucketName": "amplify-teender-dev-222138-deployment",
+          "s3Key": "amplify-builds/teenderf3c943f2f3c943f2PreSignup-65417974556743794c35-build.zip"
+        }
       }
     }
   }

@@ -1,5 +1,7 @@
 {
     "name": "teender",
     "version": "1.0.0",
-    "scripts": {}
+    "scripts": {
+        "amplify:teenderf3c943f2f3c943f2PreSignup": "cd amplify/backend/function/teenderf3c943f2f3c943f2PreSignup/src && tsc"
+    }
 }

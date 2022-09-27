@@ -9,9 +9,6 @@ export type AmplifyDependentResourcesAttributes = {
         }
     },
     "function": {
-        "teenderMongooseModels": {
-            "Arn": "string"
-        },
         "teenderf3c943f2f3c943f2PreSignup": {
             "Name": "string",
             "Arn": "string",
