@@ -1,3 +1,7 @@
+/*
+    To allow this function to connect to RDS:
+    https://github.com/aws-amplify/amplify-cli/issues/32#issuecomment-656122079
+*/
 import aws from 'aws-sdk';
 import {PreSignUpTriggerEvent} from 'aws-lambda';
 import {Client} from 'pg';

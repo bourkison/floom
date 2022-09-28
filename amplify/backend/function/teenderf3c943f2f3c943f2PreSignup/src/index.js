@@ -3,6 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/*
+    To allow this function to connect to RDS:
+    https://github.com/aws-amplify/amplify-cli/issues/32#issuecomment-656122079
+*/
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const pg_1 = require("pg");
 let client;
@@ -16,9 +20,13 @@ exports.handler = async (event) => {
         .promise();
     const PGPASSWORD = Parameters[0].Value;
     if (!client) {
-        const connectionString = 'postgresql://harrisonbourke:34lyxLQLBKjduWThQDE1@teender-dev.czsyxhqmrxa9.eu-west-2.rds.amazonaws.com/teender_dev_db';
-        console.log('Creating client with:', connectionString);
-        client = new pg_1.Client({ connectionString });
+        client = new pg_1.Client({
+            user: process.env['PGUSER'],
+            host: process.env['PGHOST'],
+            database: process.env['PGDATABASE'],
+            port: parseInt(process.env['PGPORT']),
+            password: PGPASSWORD,
+        });
         console.log('Connecting...');
         await client.connect();
         console.log('Connected');

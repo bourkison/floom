@@ -76,6 +76,9 @@
   },
   "Resources": {
     "LambdaFunction": {
+      "DependsOn": [
+        "LambdaExecutionPolicyCustom"
+      ],
       "Type": "AWS::Lambda::Function",
       "Metadata": {
         "aws:asset:path": "./src",
@@ -99,6 +102,16 @@
                 ]
               ]
             }
+          ]
+        },
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            "sg-0dbe1769e23086ba8"
+          ],
+          "SubnetIds": [
+            "subnet-846c55ed",
+            "subnet-c5bb3389",
+            "subnet-60e19b1a"
           ]
         },
         "Environment": {
@@ -169,6 +182,31 @@
           "S3Key": {
             "Ref": "s3Key"
           }
+        }
+      }
+    },
+    "LambdaExecutionPolicyCustom": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy-custom",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface"
+              ],
+              "Resource": "*"
+            }
+          ]
         }
       }
     },
@@ -249,15 +287,6 @@
                   }
                 ]
               }
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "ec2:CreateNetworkInterface",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface"
-              ],
-              "Resource": "*"
             }
           ]
         }
@@ -318,16 +347,6 @@
       },
       "DependsOn": [
         "LambdaExecutionRole"
-      ]
-    },
-    "VPCConfig": {
-      "SecurityGroupIds": [
-        "sg-0dbe1769e23086ba8"
-      ],
-      "SubnetIds": [
-        "subnet-846c55ed",
-        "subnet-c5bb3389",
-        "subnet-60e19b1a"
       ]
     }
   },
