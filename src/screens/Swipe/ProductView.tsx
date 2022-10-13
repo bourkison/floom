@@ -65,7 +65,7 @@ const ProductView = ({
 
     const goBack = () => {
         Haptics.selectionAsync();
-        navigation.popToTop();
+        navigation.pop();
     };
 
     return (
