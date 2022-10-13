@@ -21,16 +21,14 @@ import * as Haptics from 'expo-haptics';
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 
+import {IMAGE_RATIO, IMAGE_PADDING, IMAGE_GRADIENT_HEIGHT} from '@/constants';
+
 import * as loadingImage from '@/assets/loading.png';
 
 type ProductComponentProps = {
     product: ProductType;
     index: number;
 };
-
-const IMAGE_RATIO = 0.9;
-const IMAGE_PADDING = 40;
-const GRADIENT_HEIGHT = 100;
 
 const MAX_ROTATION = 10;
 const ROTATION_WIDTH = 200;
@@ -464,7 +462,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         width: '100%',
-        height: GRADIENT_HEIGHT,
+        height: IMAGE_GRADIENT_HEIGHT,
     },
     linearGradient: {
         flex: 1,
