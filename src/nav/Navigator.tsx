@@ -80,6 +80,7 @@ const Navigator = () => {
                     presentation: 'modal',
                     gestureDirection: 'vertical',
                     headerShown: false,
+                    gestureEnabled: true,
                 }}
             />
         </MainStack.Navigator>

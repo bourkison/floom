@@ -8,8 +8,7 @@ import {MainStackParamList} from '@/nav/Navigator';
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 
-const IMAGE_RATIO = 0.9;
-const IMAGE_PADDING = 40;
+import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
 
 const Home = ({navigation}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();

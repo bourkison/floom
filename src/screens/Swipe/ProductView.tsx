@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
     View,
     Text,
@@ -7,19 +7,17 @@ import {
     ImageBackground,
     useWindowDimensions,
     ViewStyle,
-} from 'react-native';
-
-import {runOnJS} from 'react-native-reanimated';
-import {
-    Gesture,
-    GestureDetector,
     ScrollView,
-} from 'react-native-gesture-handler';
+} from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
+import * as Haptics from 'expo-haptics';
+
 import {IMAGE_RATIO} from '@/constants';
+import {FontAwesome5} from '@expo/vector-icons';
+import AnimatedButton from '@/components/Utility/AnimatedButton';
 
 const ProductView = ({
     route,
@@ -27,10 +25,6 @@ const ProductView = ({
 }: StackScreenProps<MainStackParamList, 'ProductView'>) => {
     const [imageIndex, setImageIndex] = useState(0);
     const {width} = useWindowDimensions();
-
-    useEffect(() => {
-        console.log(route.params.product);
-    }, []);
 
     const calculateImageIndicator = (i: number) => {
         let style: ViewStyle = JSON.parse(
@@ -55,6 +49,7 @@ const ProductView = ({
     const changeImage = (amount: number) => {
         if (amount < 0 && imageIndex + amount >= 0) {
             setImageIndex(imageIndex + amount);
+            Haptics.selectionAsync();
             return;
         }
 
@@ -63,8 +58,14 @@ const ProductView = ({
             imageIndex + amount <= route.params.product.imageLink.length - 1
         ) {
             setImageIndex(imageIndex + amount);
+            Haptics.selectionAsync();
             return;
         }
+    };
+
+    const goBack = () => {
+        Haptics.selectionAsync();
+        navigation.popToTop();
     };
 
     return (
@@ -110,9 +111,28 @@ const ProductView = ({
                     </ImageBackground>
                 </View>
                 <View style={styles.contentContainer}>
-                    <Text style={styles.title}>
-                        {route.params.product.title}
-                    </Text>
+                    <View
+                        style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                        }}>
+                        <View style={{flex: 1}}>
+                            <Text style={styles.title}>
+                                {route.params.product.title}
+                            </Text>
+                        </View>
+                        <View style={styles.downButtonContainer}>
+                            <AnimatedButton
+                                onPress={goBack}
+                                style={styles.downButton}>
+                                <FontAwesome5
+                                    name="long-arrow-alt-down"
+                                    size={36}
+                                    color="#f3fcfa"
+                                />
+                            </AnimatedButton>
+                        </View>
+                    </View>
                 </View>
             </ScrollView>
         </View>
@@ -156,6 +176,23 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: '500',
+    },
+    downButtonContainer: {
+        flex: 1,
+        flexBasis: 48,
+        flexGrow: 0,
+        flexShrink: 0,
+        marginTop: -24,
+        marginRight: 24,
+    },
+    downButton: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#1a1f25',
+        alignContent: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 
