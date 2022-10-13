@@ -7,8 +7,14 @@ import {
     ImageBackground,
     useWindowDimensions,
     ViewStyle,
-    ScrollView,
 } from 'react-native';
+
+import {runOnJS} from 'react-native-reanimated';
+import {
+    Gesture,
+    GestureDetector,
+    ScrollView,
+} from 'react-native-gesture-handler';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
@@ -46,6 +52,21 @@ const ProductView = ({
         return style;
     };
 
+    const changeImage = (amount: number) => {
+        if (amount < 0 && imageIndex + amount >= 0) {
+            setImageIndex(imageIndex + amount);
+            return;
+        }
+
+        if (
+            amount > 0 &&
+            imageIndex + amount <= route.params.product.imageLink.length - 1
+        ) {
+            setImageIndex(imageIndex + amount);
+            return;
+        }
+    };
+
     return (
         <View style={styles.container}>
             <ScrollView bounces={false} contentContainerStyle={{flex: 1}}>
@@ -66,6 +87,25 @@ const ProductView = ({
                                     key={index}
                                 />
                             ))}
+                        </View>
+                        <View style={{flex: 1, flexDirection: 'row'}}>
+                            <Pressable
+                                style={{flex: 1}}
+                                onPress={() => {
+                                    changeImage(-1);
+                                }}
+                            />
+                            <View
+                                style={{
+                                    flex: 3,
+                                }}
+                            />
+                            <Pressable
+                                style={{flex: 1}}
+                                onPress={() => {
+                                    changeImage(1);
+                                }}
+                            />
                         </View>
                     </ImageBackground>
                 </View>
