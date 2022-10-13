@@ -15,7 +15,6 @@ import VerifyEmail from '@/screens/Auth/VerifyEmail';
 import Login from '@/screens/Auth/Login';
 
 import {HomeHeader, OptionsHeader, LikedProductsHeader} from '@/nav/Headers';
-import {SafeAreaView} from 'react-native';
 
 export type AuthStackParamList = {
     HomeAuth: undefined;
@@ -60,43 +59,41 @@ const Navigator = () => {
     }
 
     return (
-        <SafeAreaView style={{flex: 1}}>
-            <MainStack.Navigator initialRouteName="Home">
-                <MainStack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{
-                        header: HomeHeader,
-                    }}
-                />
-                <MainStack.Screen
-                    name="Options"
-                    component={Options}
-                    options={{
-                        gestureDirection: 'horizontal-inverted',
-                        header: OptionsHeader,
-                    }}
-                />
-                <MainStack.Screen
-                    name="LikedProducts"
-                    component={LikedProducts}
-                    options={{
-                        gestureDirection: 'horizontal',
-                        header: LikedProductsHeader,
-                    }}
-                />
-                <MainStack.Screen
-                    name="ProductView"
-                    component={ProductView}
-                    options={{
-                        presentation: 'modal',
-                        gestureDirection: 'vertical',
-                        headerShown: false,
-                        gestureEnabled: true,
-                    }}
-                />
-            </MainStack.Navigator>
-        </SafeAreaView>
+        <MainStack.Navigator initialRouteName="Home">
+            <MainStack.Screen
+                name="Home"
+                component={Home}
+                options={{
+                    header: HomeHeader,
+                }}
+            />
+            <MainStack.Screen
+                name="Options"
+                component={Options}
+                options={{
+                    gestureDirection: 'horizontal-inverted',
+                    header: OptionsHeader,
+                }}
+            />
+            <MainStack.Screen
+                name="LikedProducts"
+                component={LikedProducts}
+                options={{
+                    gestureDirection: 'horizontal',
+                    header: LikedProductsHeader,
+                }}
+            />
+            <MainStack.Screen
+                name="ProductView"
+                component={ProductView}
+                options={{
+                    presentation: 'modal',
+                    gestureDirection: 'vertical',
+                    headerShown: false,
+                    gestureEnabled: true,
+                }}
+            />
+        </MainStack.Navigator>
     );
 };
 
