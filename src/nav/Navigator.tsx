@@ -79,6 +79,9 @@ const Navigator = () => {
                 options={{
                     presentation: 'modal',
                     gestureDirection: 'vertical',
+                    headerShown: false,
+                    gestureEnabled: true,
+                    detachPreviousScreen: false,
                 }}
             />
         </MainStack.Navigator>
