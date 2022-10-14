@@ -46,7 +46,11 @@ const Navigator = () => {
     if (!loggedIn) {
         return (
             <AuthStack.Navigator initialRouteName="HomeAuth">
-                <AuthStack.Screen name="HomeAuth" component={HomeAuth} />
+                <AuthStack.Screen
+                    name="HomeAuth"
+                    component={HomeAuth}
+                    options={{headerShown: false}}
+                />
                 <AuthStack.Screen
                     name="GuestWelcome"
                     component={GuestWelcome}
