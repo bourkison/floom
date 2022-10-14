@@ -6,6 +6,8 @@ import {
     createAsyncThunk,
 } from '@reduxjs/toolkit';
 import {Auth} from 'aws-amplify';
+import {TOGGLE_FILTER} from '@/store/slices/product';
+import {RootState} from '@/store';
 
 const userAdapter = createEntityAdapter();
 
@@ -18,12 +20,22 @@ const initialState = userAdapter.getInitialState({
 
 export const FETCH_USER = createAsyncThunk(
     'user/FETCH_USER',
-    async (): Promise<UserDocData> => {
+    async (_, {dispatch, getState}): Promise<UserDocData> => {
         // Call Auth.currentSession() so error is called if no user logged in.
         await Auth.currentSession();
         const username = (await Auth.currentUserInfo()).attributes.email;
 
-        return await getUser({username: username, init: {}});
+        const state = getState() as RootState;
+        const user = await getUser({username: username, init: {}});
+        if (!state.product.selectedGenderFilters.includes(user.gender)) {
+            if (user.gender === 'male') {
+                dispatch(TOGGLE_FILTER({item: 'Male', type: 'gender'}));
+            } else if (user.gender === 'female') {
+                dispatch(TOGGLE_FILTER({item: 'Female', type: 'gender'}));
+            }
+        }
+
+        return user;
     },
 );
 
