@@ -261,6 +261,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                     },
                 );
                 runOnJS(setImageIndex)(imageIndex - 1);
+                runOnJS(Haptics.selectionAsync)();
             }
         } else if (
             e.allTouches[0].x >
@@ -292,6 +293,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                     },
                 );
                 runOnJS(setImageIndex)(imageIndex + 1);
+                runOnJS(Haptics.selectionAsync)();
             }
         } else {
             runOnJS(openProduct)();

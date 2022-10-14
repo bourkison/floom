@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import {StackHeaderProps} from '@react-navigation/stack';
 import {Entypo, Ionicons, Feather} from '@expo/vector-icons';
 
-export const HomeHeader: React.FC<StackHeaderProps> = ({route, navigation}) => {
+export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => {
     return (
         <View
             style={[
@@ -45,10 +45,7 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({route, navigation}) => {
     );
 };
 
-export const OptionsHeader: React.FC<StackHeaderProps> = ({
-    route,
-    navigation,
-}) => {
+export const OptionsHeader: React.FC<StackHeaderProps> = ({navigation}) => {
     return (
         <View
             style={[
@@ -84,7 +81,6 @@ export const OptionsHeader: React.FC<StackHeaderProps> = ({
 };
 
 export const LikedProductsHeader: React.FC<StackHeaderProps> = ({
-    route,
     navigation,
 }) => {
     return (
@@ -125,7 +121,7 @@ const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingVertical: 5,
+        paddingBottom: 5,
         paddingHorizontal: 14,
     },
     headerRow: {

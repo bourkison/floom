@@ -6,6 +6,8 @@ import ActionButton from '@/components/Utility/ActionButton';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
+import {StatusBar} from 'expo-status-bar';
+
 import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
 
 const Home = ({navigation}: StackScreenProps<MainStackParamList, 'Home'>) => {
