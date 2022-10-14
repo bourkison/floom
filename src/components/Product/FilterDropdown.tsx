@@ -1,9 +1,54 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, View, Text, StyleSheet, Modal} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {GENDER_OPTIONS, CATEGORY_OPTIONS, COLOUR_OPTIONS} from '@/constants';
 
-const FilterDropdown = () => {
+type FilterItemProps = {
+    item: string;
+    options: string[];
+    type: 'gender' | 'category' | 'color';
+    toggleItem: (item: string, type: 'gender' | 'category' | 'color') => void;
+};
+
+type FilterDropdownProps = {
+    selectedGenders: string[];
+    selectedCategories: string[];
+    selectedColours: string[];
+    toggleItem: (item: string, type: 'gender' | 'category' | 'color') => void;
+};
+
+const FilterItem: React.FC<FilterItemProps> = ({
+    item,
+    options,
+    toggleItem,
+    type,
+}) => {
+    const [selected, setSelected] = useState(false);
+
+    useEffect(() => {
+        setSelected(options.includes(item));
+    }, [item, options]);
+
+    return (
+        <View>
+            <Pressable
+                onPress={() => {
+                    toggleItem(item, type);
+                }}>
+                <Text style={styles.option}>
+                    {item} {selected ? 'true' : 'false'}
+                </Text>
+            </Pressable>
+        </View>
+    );
+};
+
+const FilterDropdown: React.FC<FilterDropdownProps> = ({
+    toggleItem,
+    selectedCategories,
+    selectedColours,
+    selectedGenders,
+}) => {
     const [visible, setVisible] = useState(false);
     const [dropdownTop, setDropdownTop] = useState(0);
     const DropdownButton = useRef(null);
@@ -40,25 +85,37 @@ const FilterDropdown = () => {
                         <View style={styles.column}>
                             <Text style={styles.columnHeader}>Gender</Text>
                             {GENDER_OPTIONS.map(g => (
-                                <View>
-                                    <Text style={styles.option}>{g}</Text>
-                                </View>
+                                <FilterItem
+                                    item={g}
+                                    type="gender"
+                                    options={selectedGenders}
+                                    toggleItem={toggleItem}
+                                    key={g}
+                                />
                             ))}
                         </View>
                         <View style={styles.column}>
                             <Text style={styles.columnHeader}>Category</Text>
                             {CATEGORY_OPTIONS.map(c => (
-                                <View>
-                                    <Text style={styles.option}>{c}</Text>
-                                </View>
+                                <FilterItem
+                                    item={c}
+                                    type="category"
+                                    options={selectedCategories}
+                                    toggleItem={toggleItem}
+                                    key={c}
+                                />
                             ))}
                         </View>
                         <View style={styles.column}>
                             <Text style={styles.columnHeader}>Colour</Text>
                             {COLOUR_OPTIONS.map(c => (
-                                <View>
-                                    <Text style={styles.option}>{c}</Text>
-                                </View>
+                                <FilterItem
+                                    item={c}
+                                    type="color"
+                                    options={selectedColours}
+                                    toggleItem={toggleItem}
+                                    key={c}
+                                />
                             ))}
                         </View>
                     </View>

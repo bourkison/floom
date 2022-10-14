@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ProductList from '@/components/Product/ProductList';
 import {View, StyleSheet, useWindowDimensions} from 'react-native';
 import ActionButton from '@/components/Utility/ActionButton';
@@ -12,9 +12,43 @@ import FilterDropdown from '@/components/Product/FilterDropdown';
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();
 
+    const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedColours, setSelectedColours] = useState<string[]>([]);
+
+    const toggleFilter = (
+        item: string,
+        type: 'gender' | 'category' | 'color',
+    ) => {
+        if (type === 'gender') {
+            if (!selectedGenders.includes(item)) {
+                setSelectedGenders([...selectedGenders, item]);
+            } else {
+                setSelectedGenders(g => g.filter(i => i !== item));
+            }
+        } else if (type === 'category') {
+            if (!selectedCategories.includes(item)) {
+                setSelectedCategories([...selectedCategories, item]);
+            } else {
+                setSelectedCategories(c => c.filter(i => i !== item));
+            }
+        } else if (type === 'color') {
+            if (!selectedColours.includes(item)) {
+                setSelectedColours([...selectedColours, item]);
+            } else {
+                setSelectedColours(c => c.filter(i => i !== item));
+            }
+        }
+    };
+
     return (
-        <View style={{flex: 1}}>
-            <FilterDropdown />
+        <View style={styles.flexOne}>
+            <FilterDropdown
+                selectedGenders={selectedGenders}
+                selectedCategories={selectedCategories}
+                selectedColours={selectedColours}
+                toggleItem={toggleFilter}
+            />
             <View style={styles.container}>
                 <View
                     style={[
@@ -64,6 +98,7 @@ const styles = StyleSheet.create({
     button: {
         marginHorizontal: 10,
     },
+    flexOne: {flex: 1},
 });
 
 export default Home;
