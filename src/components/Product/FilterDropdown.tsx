@@ -1,5 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Pressable, View, Text, StyleSheet, Modal} from 'react-native';
+import {
+    Pressable,
+    View,
+    Text,
+    StyleSheet,
+    Modal,
+    TouchableOpacity,
+} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {GENDER_OPTIONS, CATEGORY_OPTIONS, COLOUR_OPTIONS} from '@/constants';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
@@ -10,8 +17,6 @@ type FilterItemProps = {
     options: string[];
     type: 'gender' | 'category' | 'color';
 };
-
-type FilterDropdownProps = {};
 
 const FilterItem: React.FC<FilterItemProps> = ({item, options, type}) => {
     const [selected, setSelected] = useState(false);
@@ -27,16 +32,17 @@ const FilterItem: React.FC<FilterItemProps> = ({item, options, type}) => {
 
     return (
         <View>
-            <Pressable onPress={toggleFilter}>
-                <Text style={styles.option}>
-                    {item} {selected ? 'true' : 'false'}
-                </Text>
-            </Pressable>
+            <TouchableOpacity onPress={toggleFilter} style={styles.filterItem}>
+                <Text style={styles.option}>{item}</Text>
+                {selected ? (
+                    <Ionicons name="checkmark" style={styles.filterItemCheck} />
+                ) : undefined}
+            </TouchableOpacity>
         </View>
     );
 };
 
-const FilterDropdown: React.FC<FilterDropdownProps> = () => {
+const FilterDropdown = () => {
     const [visible, setVisible] = useState(false);
     const [dropdownTop, setDropdownTop] = useState(0);
     const DropdownButton = useRef(null);
@@ -68,7 +74,10 @@ const FilterDropdown: React.FC<FilterDropdownProps> = () => {
 
     return (
         <View>
-            <Pressable ref={DropdownButton} onPress={toggleDropdown}>
+            <TouchableOpacity
+                ref={DropdownButton}
+                onPress={toggleDropdown}
+                activeOpacity={0.6}>
                 <View style={styles.buttonsContainer}>
                     <Text style={styles.buttonText}>Filters</Text>
                     <Ionicons
@@ -76,7 +85,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = () => {
                         style={styles.buttonIcon}
                     />
                 </View>
-            </Pressable>
+            </TouchableOpacity>
             <Modal visible={visible} transparent={true}>
                 <Pressable style={styles.flexOne} onPress={toggleDropdown}>
                     <View style={[styles.dropdown, {top: dropdownTop}]}>
@@ -169,6 +178,24 @@ const styles = StyleSheet.create({
     },
     option: {
         color: 'grey',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+    },
+    filterItem: {
+        flexDirection: 'row',
+    },
+    filterItemCheck: {
+        alignSelf: 'flex-end',
+        alignContent: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+        flexBasis: 12,
+        flexGrow: 0,
+        flexShrink: 0,
+        marginBottom: 3,
     },
 });
 
