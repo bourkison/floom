@@ -7,23 +7,39 @@ import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
 import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
+import FilterDropdown from '@/components/Product/FilterDropdown';
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();
 
     return (
-        <View style={styles.container}>
-            <View
-                style={[
-                    styles.productContainer,
-                    {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
-                ]}>
-                <ProductList />
-            </View>
-            <View style={styles.buttonsContainer}>
-                <ActionButton type="delete" radius={50} style={styles.button} />
-                <ActionButton type="buy" radius={50} style={styles.button} />
-                <ActionButton type="save" radius={50} style={styles.button} />
+        <View style={{flex: 1}}>
+            <FilterDropdown />
+            <View style={styles.container}>
+                <View
+                    style={[
+                        styles.productContainer,
+                        {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
+                    ]}>
+                    <ProductList />
+                </View>
+                <View style={styles.buttonsContainer}>
+                    <ActionButton
+                        type="delete"
+                        radius={50}
+                        style={styles.button}
+                    />
+                    <ActionButton
+                        type="buy"
+                        radius={50}
+                        style={styles.button}
+                    />
+                    <ActionButton
+                        type="save"
+                        radius={50}
+                        style={styles.button}
+                    />
+                </View>
             </View>
         </View>
     );
