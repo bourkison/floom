@@ -2,39 +2,32 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, View, Text, StyleSheet, Modal} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {GENDER_OPTIONS, CATEGORY_OPTIONS, COLOUR_OPTIONS} from '@/constants';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
+import {TOGGLE_FILTER} from '@/store/slices/product';
 
 type FilterItemProps = {
     item: string;
     options: string[];
     type: 'gender' | 'category' | 'color';
-    toggleItem: (item: string, type: 'gender' | 'category' | 'color') => void;
 };
 
-type FilterDropdownProps = {
-    selectedGenders: string[];
-    selectedCategories: string[];
-    selectedColours: string[];
-    toggleItem: (item: string, type: 'gender' | 'category' | 'color') => void;
-};
+type FilterDropdownProps = {};
 
-const FilterItem: React.FC<FilterItemProps> = ({
-    item,
-    options,
-    toggleItem,
-    type,
-}) => {
+const FilterItem: React.FC<FilterItemProps> = ({item, options, type}) => {
     const [selected, setSelected] = useState(false);
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         setSelected(options.includes(item));
     }, [item, options]);
 
+    const toggleFilter = () => {
+        dispatch(TOGGLE_FILTER({item, type}));
+    };
+
     return (
         <View>
-            <Pressable
-                onPress={() => {
-                    toggleItem(item, type);
-                }}>
+            <Pressable onPress={toggleFilter}>
                 <Text style={styles.option}>
                     {item} {selected ? 'true' : 'false'}
                 </Text>
@@ -43,15 +36,20 @@ const FilterItem: React.FC<FilterItemProps> = ({
     );
 };
 
-const FilterDropdown: React.FC<FilterDropdownProps> = ({
-    toggleItem,
-    selectedCategories,
-    selectedColours,
-    selectedGenders,
-}) => {
+const FilterDropdown: React.FC<FilterDropdownProps> = () => {
     const [visible, setVisible] = useState(false);
     const [dropdownTop, setDropdownTop] = useState(0);
     const DropdownButton = useRef(null);
+
+    const selectedGenders = useAppSelector(
+        state => state.product.selectedGenderFilters,
+    );
+    const selectedColours = useAppSelector(
+        state => state.product.selectedColourFilters,
+    );
+    const selectedCategories = useAppSelector(
+        state => state.product.selectedCategoryFilters,
+    );
 
     const toggleDropdown = () => {
         visible ? setVisible(false) : openDropdown();
@@ -89,7 +87,6 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                                     item={g}
                                     type="gender"
                                     options={selectedGenders}
-                                    toggleItem={toggleItem}
                                     key={g}
                                 />
                             ))}
@@ -101,7 +98,6 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                                     item={c}
                                     type="category"
                                     options={selectedCategories}
-                                    toggleItem={toggleItem}
                                     key={c}
                                 />
                             ))}
@@ -113,7 +109,6 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
                                     item={c}
                                     type="color"
                                     options={selectedColours}
-                                    toggleItem={toggleItem}
                                     key={c}
                                 />
                             ))}
@@ -139,6 +134,8 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.3,
         flexDirection: 'row',
+        zIndex: 99,
+        elevation: 99,
     },
     buttonText: {
         fontWeight: '500',

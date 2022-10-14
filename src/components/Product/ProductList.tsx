@@ -46,7 +46,7 @@ const ProductList = () => {
     return (
         <View style={styles.container}>
             {products.slice(0, NUM_SHOWN_PRODUCTS).map((product, index) => (
-                <View style={{zIndex: 100 - index}} key={product._id}>
+                <View style={{zIndex: 20 - index}} key={product._id}>
                     <Product product={product} index={index} />
                 </View>
             ))}
