@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "target": "es2017",
+      "noImplicitAny": false,
+      "allowJs": true,
+      "types": ["node"],
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "module": "CommonJS"
+    },
+    "include": ["."],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+}
