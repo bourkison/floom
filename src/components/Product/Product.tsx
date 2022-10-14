@@ -34,7 +34,7 @@ const MAX_ROTATION = 10;
 const ROTATION_WIDTH = 200;
 const ACTION_VISIBILITY_THRESHOLD = 0.2;
 
-const ANIMATION_DURATION = 300;
+const ANIMATION_DURATION = 150;
 
 const ACTION_THRESHOLD = 150;
 const SCALE_AMOUNT = 0.005;
@@ -67,6 +67,8 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         if (index === 0 && animationAction !== 'idle') {
             runOnUI(commenceAnimation)(animationAction);
         }
+        // TODO: Fix dependencies
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [animationAction]);
 
     const saveProduct = () => {
@@ -229,7 +231,6 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
 
     const touchGesture = Gesture.Tap().onTouchesUp(e => {
         const TAP_PERCENTILE = 5; // If 4, first and last quarters of the image will change image.
-        const ANIMATION_DURATION = 150;
         const ROTATION_Y = 12;
         const ROTATION_X = 2;
         const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
@@ -303,7 +304,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const translateY = useMemo(() => {
         const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
         return -Math.floor((height * SCALE_AMOUNT * index) / 4);
-    }, [index]);
+    }, [index, width]);
 
     const calculateImageIndicator = (i: number) => {
         let style: ViewStyle = JSON.parse(
@@ -339,22 +340,20 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 },
             ]}>
             <ImageBackground
-                style={{
-                    width: width - IMAGE_PADDING,
-                    height: (width - IMAGE_PADDING) / IMAGE_RATIO,
-                    borderRadius: 5,
-                    overflow: 'hidden',
-                }}
+                style={[
+                    styles.image,
+                    {
+                        width: width - IMAGE_PADDING,
+                        height: (width - IMAGE_PADDING) / IMAGE_RATIO,
+                    },
+                ]}
                 source={{
                     uri: product.imageLink[imageIndex] || FALLBACK_IMAGE,
                 }}
                 loadingIndicatorSource={{uri: loadingImage}}>
                 <View style={styles.selectedImageContainer}>
-                    {product.imageLink.map((s, index) => (
-                        <View
-                            style={calculateImageIndicator(index)}
-                            key={index}
-                        />
+                    {product.imageLink.map((s, i) => (
+                        <View style={calculateImageIndicator(i)} key={i} />
                     ))}
                 </View>
                 <View style={styles.imageOverlayContainer}>
@@ -363,12 +362,12 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                             colors={['#00000000', '#000000']}
                             style={styles.linearGradient}>
                             <View style={styles.textContainer}>
-                                <View style={{flex: 3}}>
+                                <View style={styles.titleContainer}>
                                     <Text style={styles.titleText}>
                                         {product.title}
                                     </Text>
                                 </View>
-                                <View style={{flex: 1}}>
+                                <View style={styles.priceContainer}>
                                     <Text style={styles.priceText}>
                                         ${product.price}
                                     </Text>
@@ -517,6 +516,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 24,
     },
+    image: {
+        borderRadius: 5,
+        overflow: 'hidden',
+    },
+    titleContainer: {flex: 3},
+    priceContainer: {flex: 1},
 });
 
 export default Product;

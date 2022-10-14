@@ -81,7 +81,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
                     />
                 );
         }
-    }, [type]);
+    }, [type, radius]);
 
     return (
         <Animated.View
@@ -96,15 +96,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, radius, style}) => {
                 rStyle,
             ]}>
             <GestureDetector gesture={touchGesture}>
-                <View
-                    style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        alignContent: 'center',
-                    }}>
-                    {icon}
-                </View>
+                <View style={styles.button}>{icon}</View>
             </GestureDetector>
         </Animated.View>
     );
@@ -120,6 +112,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         backgroundColor: '#f3fcf0',
         zIndex: 1,
+    },
+    button: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignContent: 'center',
     },
 });
 

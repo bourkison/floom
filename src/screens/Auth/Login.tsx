@@ -20,7 +20,7 @@ const Login = ({navigation}: StackScreenProps<AuthStackParamList, 'Login'>) => {
         try {
             setIsLoading(true);
             console.log('Logging in');
-            const user = await Auth.signIn({
+            await Auth.signIn({
                 username: email,
                 password: password,
             }).catch(err => {

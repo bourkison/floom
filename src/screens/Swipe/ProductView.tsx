@@ -70,7 +70,7 @@ const ProductView = ({
 
     return (
         <View style={styles.container}>
-            <ScrollView bounces={false} contentContainerStyle={{flex: 1}}>
+            <ScrollView bounces={false} contentContainerStyle={styles.flexOne}>
                 <View
                     style={
                         (styles.imageContainer,
@@ -89,20 +89,16 @@ const ProductView = ({
                                 />
                             ))}
                         </View>
-                        <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={styles.imagePressableContainer}>
                             <Pressable
-                                style={{flex: 1}}
+                                style={styles.flexOne}
                                 onPress={() => {
                                     changeImage(-1);
                                 }}
                             />
-                            <View
-                                style={{
-                                    flex: 3,
-                                }}
-                            />
+                            <View style={styles.imageNonPressable} />
                             <Pressable
-                                style={{flex: 1}}
+                                style={styles.flexOne}
                                 onPress={() => {
                                     changeImage(1);
                                 }}
@@ -111,12 +107,8 @@ const ProductView = ({
                     </ImageBackground>
                 </View>
                 <View style={styles.contentContainer}>
-                    <View
-                        style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                        }}>
-                        <View style={{flex: 1}}>
+                    <View style={styles.titleButtonContainer}>
+                        <View style={styles.flexOne}>
                             <Text style={styles.title}>
                                 {route.params.product.title}
                             </Text>
@@ -193,6 +185,15 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    imagePressableContainer: {flex: 1, flexDirection: 'row'},
+    imageNonPressable: {flex: 3},
+    flexOne: {
+        flex: 1,
+    },
+    titleButtonContainer: {
+        flex: 1,
+        flexDirection: 'row',
     },
 });
 

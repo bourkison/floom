@@ -6,11 +6,9 @@ import ActionButton from '@/components/Utility/ActionButton';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
-import {StatusBar} from 'expo-status-bar';
-
 import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
 
-const Home = ({navigation}: StackScreenProps<MainStackParamList, 'Home'>) => {
+const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();
 
     return (
@@ -23,21 +21,9 @@ const Home = ({navigation}: StackScreenProps<MainStackParamList, 'Home'>) => {
                 <ProductList />
             </View>
             <View style={styles.buttonsContainer}>
-                <ActionButton
-                    type="delete"
-                    radius={50}
-                    style={{marginHorizontal: 10}}
-                />
-                <ActionButton
-                    type="buy"
-                    radius={50}
-                    style={{marginHorizontal: 10}}
-                />
-                <ActionButton
-                    type="save"
-                    radius={50}
-                    style={{marginHorizontal: 10}}
-                />
+                <ActionButton type="delete" radius={50} style={styles.button} />
+                <ActionButton type="buy" radius={50} style={styles.button} />
+                <ActionButton type="save" radius={50} style={styles.button} />
             </View>
         </View>
     );
@@ -58,6 +44,9 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         marginTop: 40,
         flexDirection: 'row',
+    },
+    button: {
+        marginHorizontal: 10,
     },
 });
 

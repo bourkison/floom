@@ -8,19 +8,6 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 const HomeAuth = ({
     navigation,
 }: StackScreenProps<AuthStackParamList, 'HomeAuth'>) => {
-    // const signup = async () => {
-    //     console.log('Signing up with email', email, 'password', password);
-    //     const response = await Auth.signUp({
-    //         username: email,
-    //         password: password,
-    //         attributes: {
-    //             email: email,
-    //         },
-    //     });
-
-    //     console.log('Signed up!', response);
-    // };
-
     const navigateToLogin = () => {
         navigation.navigate('Login');
     };

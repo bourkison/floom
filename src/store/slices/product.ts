@@ -166,10 +166,10 @@ const productSlice = createSlice({
                     ...state.savedProducts.slice(action.meta.arg.index + 1),
                 ];
             })
-            .addCase(DELETE_SAVED_PRODUCT.fulfilled, state => {
+            .addCase(DELETE_SAVED_PRODUCT.fulfilled, () => {
                 console.log('Deleted saved product');
             })
-            .addCase(DELETE_SAVED_PRODUCT.rejected, state => {
+            .addCase(DELETE_SAVED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
                 console.log('Delete saved product rejected');
             });

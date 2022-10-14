@@ -25,13 +25,14 @@ const ProductList = () => {
                 },
             };
 
-            if (startAt && init.queryStringParameters)
+            if (startAt && init.queryStringParameters) {
                 init.queryStringParameters.startAt = startAt;
+            }
 
-            const {products} = await queryProduct({
+            const {products: p} = await queryProduct({
                 init,
             });
-            dispatch(PUSH_PRODUCTS(products));
+            dispatch(PUSH_PRODUCTS(p));
             setIsLoading(false);
         };
 
@@ -40,7 +41,7 @@ const ProductList = () => {
         } else if (products.length <= NUM_SHOWN_PRODUCTS + 1 && !isLoading) {
             loadProducts(products[products.length - 1]._id);
         }
-    }, [products, isLoading]);
+    }, [products, isLoading, dispatch]);
 
     return (
         <View style={styles.container}>

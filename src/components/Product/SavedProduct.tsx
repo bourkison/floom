@@ -78,8 +78,9 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
             if (!isAnimating.value) {
                 let v = e.translationX + contextX.value;
 
-                if (v > 0) return;
-                else if (v < -width / 2 && !isDeleting.value) {
+                if (v > 0) {
+                    return;
+                } else if (v < -width / 2 && !isDeleting.value) {
                     // Snap to delete.
                     isDeleting.value = true;
                     isAnimating.value = true;
@@ -139,14 +140,12 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
             <Animated.View
                 style={[
                     styles.animatedContainer,
-                    index === 0
-                        ? {borderTopColor: '#1a1f25', borderTopWidth: 1}
-                        : undefined,
+                    index === 0 ? styles.animatedZeroContainer : undefined,
                     rStyle,
                 ]}>
                 <GestureDetector gesture={panGesture}>
                     <GestureDetector gesture={touchGesture}>
-                        <View style={{flex: 1}}>
+                        <View style={styles.flexOne}>
                             <Text>{product.title}</Text>
                         </View>
                     </GestureDetector>
@@ -161,6 +160,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#00000011',
         justifyContent: 'flex-start',
         alignContent: 'flex-start',
+    },
+    flexOne: {
+        flex: 1,
     },
     animatedContainer: {
         borderBottomColor: '#1a1f25',
@@ -180,6 +182,10 @@ const styles = StyleSheet.create({
         marginRight: 10,
         fontWeight: 'bold',
         fontSize: 12,
+    },
+    animatedZeroContainer: {
+        borderTopColor: '#1a1f25',
+        borderTopWidth: 1,
     },
 });
 

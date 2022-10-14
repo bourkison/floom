@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 import {
-    SafeAreaView,
+    View,
     StyleSheet,
     ActivityIndicator,
     RefreshControl,
@@ -21,9 +21,10 @@ import {Product as ProductType} from '@/types/product';
 
 const ON_END_REACHED_THRESHOLD = 0;
 
-const SavedProducts = ({
-    navigation,
-}: StackScreenProps<MainStackParamList, 'LikedProducts'>) => {
+const SavedProducts = ({}: StackScreenProps<
+    MainStackParamList,
+    'LikedProducts'
+>) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isRefreshing, setIsRefereshing] = useState(false);
@@ -44,11 +45,7 @@ const SavedProducts = ({
         } else {
             setIsLoading(false);
         }
-    }, []);
-
-    useEffect(() => {
-        console.log('LENGTH:', savedProducts.length);
-    }, [savedProducts]);
+    }, [dispatch, savedProducts]);
 
     const refresh = async () => {
         setIsRefereshing(true);
@@ -69,7 +66,7 @@ const SavedProducts = ({
     );
 
     return (
-        <SafeAreaView style={styles.safeContainer}>
+        <View style={styles.safeContainer}>
             {isLoading ? (
                 <ActivityIndicator />
             ) : (
@@ -84,7 +81,9 @@ const SavedProducts = ({
                     onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
                     ListFooterComponent={
                         isLoadingMore ? (
-                            <ActivityIndicator style={{marginTop: 5}} />
+                            <ActivityIndicator
+                                style={styles.activityIndicator}
+                            />
                         ) : undefined
                     }
                     refreshControl={
@@ -95,7 +94,7 @@ const SavedProducts = ({
                     }
                 />
             )}
-        </SafeAreaView>
+        </View>
     );
 };
 
@@ -106,6 +105,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
+    },
+    activityIndicator: {
+        marginTop: 5,
     },
 });
 

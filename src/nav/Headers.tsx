@@ -14,14 +14,7 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => {
                         Constants.statusBarHeight + styles.headerRow.flexBasis,
                 },
             ]}>
-            <View
-                style={{
-                    flex: 1,
-                    flexBasis: Constants.statusBarHeight,
-                    flexGrow: 0,
-                    flexShrink: 0,
-                }}
-            />
+            <View style={styles.statusBarEmpty} />
             <View style={styles.headerRow}>
                 <Pressable
                     onPress={() => {
@@ -55,14 +48,7 @@ export const OptionsHeader: React.FC<StackHeaderProps> = ({navigation}) => {
                         Constants.statusBarHeight + styles.headerRow.flexBasis,
                 },
             ]}>
-            <View
-                style={{
-                    flex: 1,
-                    flexBasis: Constants.statusBarHeight,
-                    flexGrow: 0,
-                    flexShrink: 0,
-                }}
-            />
+            <View style={styles.statusBarEmpty} />
             <View style={styles.headerRow}>
                 <View style={styles.headerIcon} />
                 <View style={styles.headerTitleContainer}>
@@ -92,14 +78,7 @@ export const LikedProductsHeader: React.FC<StackHeaderProps> = ({
                         Constants.statusBarHeight + styles.headerRow.flexBasis,
                 },
             ]}>
-            <View
-                style={{
-                    flex: 1,
-                    flexBasis: Constants.statusBarHeight,
-                    flexGrow: 0,
-                    flexShrink: 0,
-                }}
-            />
+            <View style={styles.statusBarEmpty} />
             <View style={styles.headerRow}>
                 <Pressable
                     onPress={() => {
@@ -148,5 +127,11 @@ const styles = StyleSheet.create({
         flexGrow: 0,
         flexShrink: 0,
         flex: 1,
+    },
+    statusBarEmpty: {
+        flex: 1,
+        flexBasis: Constants.statusBarHeight,
+        flexGrow: 0,
+        flexShrink: 0,
     },
 });

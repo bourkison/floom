@@ -1,13 +1,13 @@
 import React from 'react';
-import {SafeAreaView, Text} from 'react-native';
+import {View, Text} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
 const Options = ({}: StackScreenProps<MainStackParamList, 'Options'>) => {
     return (
-        <SafeAreaView>
+        <View>
             <Text>Options</Text>
-        </SafeAreaView>
+        </View>
     );
 };
 
