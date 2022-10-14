@@ -3,7 +3,6 @@ import Animated, {
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
-    withTiming,
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {ViewStyle, Text, TextStyle, View} from 'react-native';

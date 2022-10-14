@@ -20,6 +20,9 @@ const initialState = productAdapter.getInitialState({
     savedProducts: [] as ProductType[],
     moreSavedToLoad: true,
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
+    selectedGenderFilters: [] as string[],
+    selectedCategoryFilters: [] as string[],
+    selectedColourFilters: [] as string[],
 });
 
 export const SAVE_PRODUCT = createAsyncThunk<void, string>(
@@ -59,7 +62,7 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
     'product/LOAD_SAVED_PRODUCTS',
     async (
         input = {
-            loadAmount: 5,
+            loadAmount: 25,
             type: 'saved',
         },
     ) => {
@@ -117,6 +120,58 @@ const productSlice = createSlice({
         ) {
             state.animation = action.payload;
         },
+        TOGGLE_FILTER(
+            state,
+            action: PayloadAction<{
+                item: string;
+                type: 'gender' | 'category' | 'color';
+            }>,
+        ) {
+            // Push to relevant filter if exists, other wise exclude it.
+            if (action.payload.type === 'gender') {
+                if (
+                    !state.selectedGenderFilters.includes(action.payload.item)
+                ) {
+                    state.selectedGenderFilters = [
+                        ...state.selectedGenderFilters,
+                        action.payload.item,
+                    ];
+                } else {
+                    state.selectedGenderFilters =
+                        state.selectedGenderFilters.filter(
+                            i => i !== action.payload.item,
+                        );
+                }
+            } else if (action.payload.type === 'category') {
+                if (
+                    !state.selectedCategoryFilters.includes(action.payload.item)
+                ) {
+                    state.selectedCategoryFilters = [
+                        ...state.selectedCategoryFilters,
+                        action.payload.item,
+                    ];
+                } else {
+                    state.selectedCategoryFilters =
+                        state.selectedCategoryFilters.filter(
+                            i => i !== action.payload.item,
+                        );
+                }
+            } else if (action.payload.type === 'color') {
+                if (
+                    !state.selectedColourFilters.includes(action.payload.item)
+                ) {
+                    state.selectedColourFilters = [
+                        ...state.selectedColourFilters,
+                        action.payload.item,
+                    ];
+                } else {
+                    state.selectedColourFilters =
+                        state.selectedColourFilters.filter(
+                            i => i !== action.payload.item,
+                        );
+                }
+            }
+        },
     },
     extraReducers: builder => {
         builder
@@ -166,15 +221,16 @@ const productSlice = createSlice({
                     ...state.savedProducts.slice(action.meta.arg.index + 1),
                 ];
             })
-            .addCase(DELETE_SAVED_PRODUCT.fulfilled, state => {
+            .addCase(DELETE_SAVED_PRODUCT.fulfilled, () => {
                 console.log('Deleted saved product');
             })
-            .addCase(DELETE_SAVED_PRODUCT.rejected, state => {
+            .addCase(DELETE_SAVED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
                 console.log('Delete saved product rejected');
             });
     },
 });
 
-export const {PUSH_PRODUCTS, COMMENCE_ANIMATE} = productSlice.actions;
+export const {PUSH_PRODUCTS, COMMENCE_ANIMATE, TOGGLE_FILTER} =
+    productSlice.actions;
 export default productSlice.reducer;

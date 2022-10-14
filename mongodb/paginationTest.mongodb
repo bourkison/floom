@@ -1,0 +1,64 @@
+// PAGINATION TEST:
+// db.products.find(
+//     {_id: { $nin: ['123'], $lt: ObjectId("632a14df11712281a7be319e") }}, 
+//     { _id: 1 }
+// ).sort({_id: -1})
+// .limit(3);
+
+const LOAD_AMOUNT = 5;
+const START_AT = "6328c35e87ab64e028e5d93d";
+
+db.users.aggregate([
+    {$match: {email: 'harrisonbourke97@gmail.com'}},
+    {
+        $addFields: {
+            __length: {
+                $size: '$likedProducts'
+            },
+            __startAtIndex: {
+                $indexOfArray: [
+                    '$likedProducts',
+                    ObjectId(START_AT),
+                ]
+            }
+        }
+    },
+    {
+        $project: {
+            likedProducts: {
+                $slice: [
+                    '$likedProducts',
+                    {
+                        $add: ['$__startAtIndex', 1],
+                    },
+                    LOAD_AMOUNT,
+                ],
+            },
+            __length: 1,
+            __startAtIndex: 1
+        }
+    }
+])
+
+// db.products.aggregate([
+//     {
+//         $match: {
+//             _id: {
+//                 $in: products.likedProducts
+//             }
+//         }
+//     },
+//     {
+//         $addFields: {
+//             "__order": {
+//                 $indexOfArray: [products.likedProducts, "$_id"]
+//             },
+//             "__moreToLoad": products.moreToLoad
+//         }
+//     },
+//     {
+//         $sort: {
+//             "__order": 1
+//         }
+//     },
+// ])

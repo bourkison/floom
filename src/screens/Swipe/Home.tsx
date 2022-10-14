@@ -6,59 +6,40 @@ import ActionButton from '@/components/Utility/ActionButton';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
-import AnimatedButton from '@/components/Utility/AnimatedButton';
+import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
+import FilterDropdown from '@/components/Product/FilterDropdown';
 
-const IMAGE_RATIO = 0.9;
-const IMAGE_PADDING = 40;
-
-const Home = ({navigation}: StackScreenProps<MainStackParamList, 'Home'>) => {
+const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();
 
     return (
-        <View style={styles.container}>
-            <View
-                style={[
-                    styles.productContainer,
-                    {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
-                ]}>
-                <ProductList />
-            </View>
-            <View style={styles.buttonsContainer}>
-                <ActionButton
-                    type="delete"
-                    radius={50}
-                    style={{marginHorizontal: 10}}
-                />
-                <ActionButton
-                    type="buy"
-                    radius={50}
-                    style={{marginHorizontal: 10}}
-                />
-                <ActionButton
-                    type="save"
-                    radius={50}
-                    style={{marginHorizontal: 10}}
-                />
-            </View>
-            <View>
-                <AnimatedButton
-                    style={styles.profileButton}
-                    textStyle={styles.profileButtonText}
-                    onPress={() => {
-                        navigation.push('Options');
-                    }}>
-                    Options
-                </AnimatedButton>
-            </View>
-            <View>
-                <AnimatedButton
-                    style={styles.profileButton}
-                    textStyle={styles.profileButtonText}
-                    onPress={() => {
-                        navigation.push('LikedProducts');
-                    }}>
-                    Liked Products
-                </AnimatedButton>
+        <View style={styles.flexOne}>
+            <FilterDropdown />
+            <View style={styles.container}>
+                <View
+                    style={[
+                        styles.productContainer,
+                        {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
+                    ]}>
+                    <ProductList />
+                </View>
+                <View style={styles.buttonsContainer}>
+                    <ActionButton
+                        type="delete"
+                        radius={50}
+                        style={styles.button}
+                    />
+                    <ActionButton
+                        type="buy"
+                        radius={50}
+                        style={styles.button}
+                    />
+                    <ActionButton
+                        type="save"
+                        radius={50}
+                        style={styles.button}
+                    />
+                </View>
             </View>
         </View>
     );
@@ -80,28 +61,10 @@ const styles = StyleSheet.create({
         marginTop: 40,
         flexDirection: 'row',
     },
-    profileButton: {
-        padding: 15,
-        backgroundColor: '#1a1f25',
-        justifyContent: 'center',
-        borderRadius: 25,
-        flexGrow: 0,
-        flexShrink: 0,
-        marginTop: 25,
-        alignSelf: 'center',
-        alignItems: 'center',
-        zIndex: 1,
+    button: {
+        marginHorizontal: 10,
     },
-    profileButtonText: {
-        color: '#f3fcfa',
-        fontSize: 14,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        textTransform: 'uppercase',
-        flexBasis: 14,
-        flexShrink: 0,
-        flexGrow: 0,
-    },
+    flexOne: {flex: 1},
 });
 
 export default Home;

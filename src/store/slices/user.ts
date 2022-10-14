@@ -19,14 +19,18 @@ const initialState = userAdapter.getInitialState({
 export const FETCH_USER = createAsyncThunk(
     'user/FETCH_USER',
     async (): Promise<UserDocData> => {
-        console.log('Current session.');
+        // Call Auth.currentSession() so error is called if no user logged in.
         await Auth.currentSession();
-
-        console.log('Username.');
         const username = (await Auth.currentUserInfo()).attributes.email;
 
-        console.log('getUser', username);
         return await getUser({username: username, init: {}});
+    },
+);
+
+export const LOGOUT = createAsyncThunk(
+    'user/LOGOUT',
+    async (): Promise<void> => {
+        await Auth.signOut();
     },
 );
 
@@ -56,6 +60,20 @@ const userSlice = createSlice({
                 console.log('Fetch user rejected, user logged out.');
                 state.loggedIn = false;
                 state.docData = null;
+                state.status = 'failed';
+            })
+            .addCase(LOGOUT.pending, state => {
+                state.status = 'loading';
+            })
+            .addCase(LOGOUT.fulfilled, state => {
+                state.loggedIn = false;
+                state.docData = null;
+                state.status = 'idle';
+
+                // TODO: Reset entire store
+            })
+            .addCase(LOGOUT.rejected, state => {
+                console.error('Logout rejected.');
                 state.status = 'failed';
             });
     },

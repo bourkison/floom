@@ -34,12 +34,14 @@ const VerifyEmail = ({
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        startTimer();
+        if (!countdownInterval && !resendTimer) {
+            startTimer();
+        }
 
         return () => {
             clearInterval(countdownInterval);
         };
-    }, []);
+    }, [countdownInterval, resendTimer]);
 
     const startTimer = () => {
         setCountdownInterval(
@@ -49,8 +51,8 @@ const VerifyEmail = ({
                 // intervals only remember the original
                 setResendTimer(n => {
                     if (n <= 0) {
-                        setCountdownInterval(n => {
-                            clearInterval(n);
+                        setCountdownInterval(interval => {
+                            clearInterval(interval);
                             return undefined;
                         });
                         return 0;

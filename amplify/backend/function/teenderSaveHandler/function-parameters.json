@@ -1,0 +1,14 @@
+{
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "teenderMongooseModels",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true,
+      "env": "teender"
+    }
+  ],
+  "secretNames": [
+    "MONGODB_URI"
+  ]
+}

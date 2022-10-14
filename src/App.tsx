@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useCallback} from 'react';
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
 import {NavigationContainer} from '@react-navigation/native';
 import Navigator from '@/nav/Navigator';
@@ -47,9 +47,9 @@ const App = () => {
     }
 
     return (
-        <View onLayout={onLayoutRootView} style={{flex: 1}}>
+        <View onLayout={onLayoutRootView} style={styles.flexOne}>
             <Provider store={store}>
-                <GestureHandlerRootView style={{flex: 1}}>
+                <GestureHandlerRootView style={styles.flexOne}>
                     <NavigationContainer>
                         <Navigator />
                     </NavigationContainer>
@@ -58,5 +58,11 @@ const App = () => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    flexOne: {
+        flex: 1,
+    },
+});
 
 export default App;
