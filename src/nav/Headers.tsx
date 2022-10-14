@@ -28,7 +28,7 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => {
                 </View>
                 <Pressable
                     onPress={() => {
-                        navigation.navigate('LikedProducts');
+                        navigation.navigate('SavedProducts');
                     }}
                     style={styles.headerIcon}>
                     <Ionicons name="heart-outline" size={24} />
@@ -66,7 +66,7 @@ export const OptionsHeader: React.FC<StackHeaderProps> = ({navigation}) => {
     );
 };
 
-export const LikedProductsHeader: React.FC<StackHeaderProps> = ({
+export const SavedProductsHeader: React.FC<StackHeaderProps> = ({
     navigation,
 }) => {
     return (

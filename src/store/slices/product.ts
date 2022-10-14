@@ -62,7 +62,7 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
     'product/LOAD_SAVED_PRODUCTS',
     async (
         input = {
-            loadAmount: 5,
+            loadAmount: 25,
             type: 'saved',
         },
     ) => {

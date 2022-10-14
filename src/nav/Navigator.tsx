@@ -5,7 +5,7 @@ import {Product as ProductType} from '@/types/product';
 
 import Home from '@/screens/Swipe/Home';
 import Options from '@/screens/Swipe/Options';
-import LikedProducts from '@/screens/Swipe/LikedProducts';
+import SavedProducts from '@/screens/Swipe/SavedProducts';
 import ProductView from '@/screens/Swipe/ProductView';
 
 import HomeAuth from '@/screens/Auth/HomeAuth';
@@ -14,7 +14,7 @@ import SignUp from '@/screens/Auth/SignUp';
 import VerifyEmail from '@/screens/Auth/VerifyEmail';
 import Login from '@/screens/Auth/Login';
 
-import {HomeHeader, OptionsHeader, LikedProductsHeader} from '@/nav/Headers';
+import {HomeHeader, OptionsHeader, SavedProductsHeader} from '@/nav/Headers';
 
 export type AuthStackParamList = {
     HomeAuth: undefined;
@@ -31,7 +31,7 @@ export type AuthStackParamList = {
 export type MainStackParamList = {
     Home: undefined;
     Options: undefined;
-    LikedProducts: undefined;
+    SavedProducts: undefined;
     ProductView: {
         product: ProductType;
     };
@@ -76,11 +76,11 @@ const Navigator = () => {
                 }}
             />
             <MainStack.Screen
-                name="LikedProducts"
-                component={LikedProducts}
+                name="SavedProducts"
+                component={SavedProducts}
                 options={{
                     gestureDirection: 'horizontal',
-                    header: LikedProductsHeader,
+                    header: SavedProductsHeader,
                 }}
             />
             <MainStack.Screen

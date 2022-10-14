@@ -23,7 +23,7 @@ const ON_END_REACHED_THRESHOLD = 0;
 
 const SavedProducts = ({}: StackScreenProps<
     MainStackParamList,
-    'LikedProducts'
+    'SavedProducts'
 >) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
