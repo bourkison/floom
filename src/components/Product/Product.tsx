@@ -21,7 +21,12 @@ import * as Haptics from 'expo-haptics';
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-import {IMAGE_RATIO, IMAGE_PADDING, IMAGE_GRADIENT_HEIGHT} from '@/constants';
+import {
+    IMAGE_RATIO,
+    IMAGE_PADDING,
+    IMAGE_GRADIENT_HEIGHT,
+    FALLBACK_IMAGE,
+} from '@/constants';
 
 import * as loadingImage from '@/assets/loading.png';
 
@@ -38,9 +43,6 @@ const ANIMATION_DURATION = 150;
 
 const ACTION_THRESHOLD = 150;
 const SCALE_AMOUNT = 0.005;
-
-const FALLBACK_IMAGE =
-    'https://preview.redd.it/ishxhuztqlo91.jpg?width=640&crop=smart&auto=webp&s=e148af80aea3ad1ac17b54f4626852165acd193e';
 
 const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const offsetX = useSharedValue(0);

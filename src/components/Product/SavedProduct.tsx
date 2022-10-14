@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, StyleSheet, useWindowDimensions} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, useWindowDimensions, Image} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import * as Haptics from 'expo-haptics';
 
@@ -38,6 +38,9 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
 
     const {width} = useWindowDimensions();
     const dispatch = useAppDispatch();
+
+    const [imageContSize, setImageContSize] = useState(1);
+    const [imageSize, setImageSize] = useState({width: 0, height: 0});
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
@@ -145,8 +148,39 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
                 ]}>
                 <GestureDetector gesture={panGesture}>
                     <GestureDetector gesture={touchGesture}>
-                        <View style={styles.flexOne}>
-                            <Text>{product.title}</Text>
+                        <View style={styles.listView}>
+                            <View
+                                style={[
+                                    styles.imageContainer,
+                                    {flexBasis: imageContSize},
+                                ]}
+                                onLayout={({
+                                    nativeEvent: {
+                                        layout: {height},
+                                    },
+                                }) => {
+                                    // Set width/height equal to lowest value of height/width
+                                    setImageSize({
+                                        width:
+                                            height -
+                                            styles.imageContainer.padding * 2,
+                                        height:
+                                            height -
+                                            styles.imageContainer.padding * 2,
+                                    });
+                                    setImageContSize(height);
+                                }}>
+                                <Image
+                                    style={[styles.image, imageSize]}
+                                    source={{uri: product.imageLink[0]}}
+                                />
+                            </View>
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.titleText}>
+                                    {product.title}
+                                </Text>
+                                <Text>${product.price}</Text>
+                            </View>
                         </View>
                     </GestureDetector>
                 </GestureDetector>
@@ -167,7 +201,7 @@ const styles = StyleSheet.create({
     animatedContainer: {
         borderBottomColor: '#1a1f25',
         borderBottomWidth: 1,
-        backgroundColor: '#f3fcf0',
+        backgroundColor: 'rgb(242, 242, 242)',
     },
     deleteContainer: {
         position: 'absolute',
@@ -186,6 +220,27 @@ const styles = StyleSheet.create({
     animatedZeroContainer: {
         borderTopColor: '#1a1f25',
         borderTopWidth: 1,
+    },
+    listView: {
+        flex: 1,
+        flexDirection: 'row',
+    },
+    imageContainer: {
+        flex: 1,
+        padding: 5,
+        flexGrow: 0,
+        flexShrink: 0,
+    },
+    image: {},
+    titleContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignContent: 'center',
+        marginLeft: 5,
+    },
+    titleText: {
+        fontWeight: '500',
+        fontSize: 15,
     },
 });
 
