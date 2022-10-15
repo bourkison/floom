@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useCallback} from 'react';
 import {ImageBackground, StyleSheet, Text, View, ViewStyle} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import {LinearGradient} from 'expo-linear-gradient';
@@ -65,66 +65,70 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const animationAction = useAppSelector(state => state.product.animation);
     const [imageIndex, setImageIndex] = useState(0);
 
+    const saveProduct = useCallback(() => {
+        dispatch(SAVE_PRODUCT(product._id));
+    }, [dispatch, product]);
+
+    const deleteProduct = useCallback(() => {
+        dispatch(DELETE_PRODUCT(product._id));
+    }, [dispatch, product]);
+
+    // Fade this product out and remove it from products array.
+    // Called post pan gesture and after like animation.
+    const fadeAndRemove = useCallback(
+        (type: typeof animationAction) => {
+            'worklet';
+            if (type === 'save') {
+                tileOpacity.value = withTiming(0, {}, runOnJS(saveProduct));
+            } else if (type === 'delete') {
+                tileOpacity.value = withTiming(0, {}, runOnJS(deleteProduct));
+            }
+        },
+        [deleteProduct, saveProduct, tileOpacity],
+    );
+
+    // Called when an action button is pressed (by watching store).
+    const commenceAnimation = useCallback(
+        (type: typeof animationAction) => {
+            'worklet';
+            if (type === 'save') {
+                offsetX.value = withTiming(width * 0.75, {
+                    duration: ANIMATION_DURATION,
+                });
+                saveOpacity.value = 1;
+                rotation.value = withTiming(
+                    MAX_ROTATION,
+                    {
+                        duration: ANIMATION_DURATION,
+                    },
+                    () => {
+                        fadeAndRemove(type);
+                    },
+                );
+            } else if (type === 'delete') {
+                offsetX.value = withTiming(-width * 0.75, {
+                    duration: ANIMATION_DURATION,
+                });
+                deleteOpacity.value = 1;
+                rotation.value = withTiming(
+                    -MAX_ROTATION,
+                    {
+                        duration: ANIMATION_DURATION,
+                    },
+                    () => {
+                        fadeAndRemove(type);
+                    },
+                );
+            }
+        },
+        [deleteOpacity, fadeAndRemove, offsetX, rotation, saveOpacity, width],
+    );
+
     useEffect(() => {
         if (index === 0 && animationAction !== 'idle') {
             runOnUI(commenceAnimation)(animationAction);
         }
-        // TODO: Fix dependencies
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [animationAction]);
-
-    const saveProduct = () => {
-        dispatch(SAVE_PRODUCT(product._id));
-    };
-
-    const deleteProduct = () => {
-        dispatch(DELETE_PRODUCT(product._id));
-    };
-
-    // Fade this product out and remove it from products array.
-    // Called post pan gesture and after like animation.
-    const fadeAndRemove = (type: typeof animationAction) => {
-        'worklet';
-        if (type === 'save') {
-            tileOpacity.value = withTiming(0, {}, runOnJS(saveProduct));
-        } else if (type === 'delete') {
-            tileOpacity.value = withTiming(0, {}, runOnJS(deleteProduct));
-        }
-    };
-
-    // Called when an action button is pressed (by watching store).
-    const commenceAnimation = (type: typeof animationAction) => {
-        'worklet';
-        if (type === 'save') {
-            offsetX.value = withTiming(width * 0.75, {
-                duration: ANIMATION_DURATION,
-            });
-            saveOpacity.value = 1;
-            rotation.value = withTiming(
-                MAX_ROTATION,
-                {
-                    duration: ANIMATION_DURATION,
-                },
-                () => {
-                    fadeAndRemove(type);
-                },
-            );
-        } else if (type === 'delete') {
-            offsetX.value = withTiming(-width * 0.75, {
-                duration: ANIMATION_DURATION,
-            });
-            deleteOpacity.value = 1;
-            rotation.value = withTiming(
-                -MAX_ROTATION,
-                {
-                    duration: ANIMATION_DURATION,
-                },
-                () => {
-                    fadeAndRemove(type);
-                },
-            );
-        }
-    };
+    }, [animationAction, commenceAnimation, index]);
 
     const rTileStyle = useAnimatedStyle(() => {
         return {
