@@ -315,6 +315,133 @@ const querySavedProduct = async (
     return response;
 };
 
+const queryDeletedProduct = async (
+    event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> => {
+    const email = event.requestContext?.authorizer?.claims?.email || undefined;
+    const loadAmount = parseInt(event.queryStringParameters.loadAmount) || 5;
+
+    const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
+    const Product: Model<ProductType> = await MongooseModels().Product(
+        MONGODB_URI,
+    );
+
+    let response: APIGatewayProxyResult = {
+        statusCode: 500,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: false}),
+    };
+
+    if (!email) {
+        response = {
+            statusCode: 403,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: false, message: 'Not logged in'}),
+        };
+        return response;
+    }
+
+    let productIds: Types.ObjectId[];
+    let arrLength: number;
+
+    const {deletedProducts, __length} = (
+        await User.findOne(
+            {email: email},
+            {
+                deletedProducts: {
+                    $slice: loadAmount,
+                },
+                __length: {
+                    $size: '$deletedProducts',
+                },
+            },
+        )
+    ).toObject<{
+        deletedProducts: Types.ObjectId[];
+        __length: number;
+        __startAtIndex?: number;
+    }>();
+
+    productIds = deletedProducts;
+    arrLength = __length;
+
+    if (!productIds || !productIds.length) {
+        response = {
+            statusCode: 404,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: 'No products found',
+            }),
+        };
+
+        return response;
+    }
+
+    const products = await Product.aggregate<ProductType>([
+        {
+            $match: {
+                _id: {
+                    $in: productIds,
+                },
+            },
+        },
+        {
+            $addFields: {
+                __order: {
+                    $indexOfArray: [productIds, '$_id'],
+                },
+            },
+        },
+        {
+            $sort: {
+                __order: 1,
+            },
+        },
+    ]);
+
+    if (!products || !products.length) {
+        response = {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: 'Error getting products',
+            }),
+        };
+
+        return response;
+    }
+
+    response = {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+            success: true,
+            data: products,
+            __totalLength: arrLength,
+            __loaded: products.length,
+        }),
+    };
+
+    return response;
+};
+
 const getProduct = async (
     event: APIGatewayEvent,
 ): Promise<APIGatewayProxyResult> => {
@@ -385,6 +512,8 @@ exports.handler = async (
                 const type = event.queryStringParameters.type || 'unsaved';
                 if (type === 'saved') {
                     response = await querySavedProduct(event);
+                } else if (type === 'deleted') {
+                    response = await queryDeletedProduct(event);
                 } else if (type === 'unsaved') {
                     response = await queryUnsavedProduct(event);
                 } else {
