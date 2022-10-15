@@ -4,7 +4,6 @@ import {useAppSelector} from '@/store/hooks';
 import {Product as ProductType} from '@/types/product';
 
 import Home from '@/screens/Swipe/Home';
-import Options from '@/screens/Swipe/Options';
 import SavedProducts from '@/screens/Swipe/SavedProducts';
 import ProductView from '@/screens/Swipe/ProductView';
 
@@ -14,7 +13,8 @@ import SignUp from '@/screens/Auth/SignUp';
 import VerifyEmail from '@/screens/Auth/VerifyEmail';
 import Login from '@/screens/Auth/Login';
 
-import {HomeHeader, OptionsHeader, SavedProductsHeader} from '@/nav/Headers';
+import {HomeHeader, SavedProductsHeader} from '@/nav/Headers';
+import OptionsNavigator from '@/nav/OptionsNavigator';
 
 export type AuthStackParamList = {
     HomeAuth: undefined;
@@ -73,10 +73,10 @@ const Navigator = () => {
             />
             <MainStack.Screen
                 name="Options"
-                component={Options}
+                component={OptionsNavigator}
                 options={{
                     gestureDirection: 'horizontal-inverted',
-                    header: OptionsHeader,
+                    headerShown: false,
                 }}
             />
             <MainStack.Screen
