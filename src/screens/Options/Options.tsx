@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {useAppDispatch} from '@/store/hooks';
@@ -14,7 +14,10 @@ type OptionItemProps = {
 };
 
 const OptionItem: React.FC<OptionItemProps> = ({children, onPress, color}) => (
-    <Pressable style={styles.optionLink} onPress={onPress}>
+    <TouchableOpacity
+        style={styles.optionLink}
+        onPress={onPress}
+        activeOpacity={0.5}>
         <View style={styles.optionTextContainer}>
             <Text style={{color: color || undefined}}>{children}</Text>
         </View>
@@ -25,7 +28,7 @@ const OptionItem: React.FC<OptionItemProps> = ({children, onPress, color}) => (
                 color={color || undefined}
             />
         </View>
-    </Pressable>
+    </TouchableOpacity>
 );
 
 const Options = ({

@@ -25,11 +25,11 @@ const HeaderTemplate: React.FC<HeaderProps> = ({
         ]}>
         <View style={styles.statusBarEmpty} />
         <View style={styles.headerRow}>
-            {leftIcon || <View style={styles.statusBarEmpty} />}
+            {leftIcon || <View style={styles.headerIcon} />}
             <View style={styles.headerTitleContainer}>
                 <Text style={styles.headerTitle}>{children}</Text>
             </View>
-            {rightIcon || <View style={styles.statusBarEmpty} />}
+            {rightIcon || <View style={styles.headerIcon} />}
         </View>
     </View>
 );
