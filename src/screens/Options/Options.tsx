@@ -5,42 +5,54 @@ import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {useAppDispatch} from '@/store/hooks';
 import {LOGOUT} from '@/store/slices/user';
 import {Feather} from '@expo/vector-icons';
+import {Color} from '@/types';
 
 type OptionItemProps = {
     children: string;
     onPress?: () => void;
+    color?: Color;
 };
 
-const Options = ({}: StackScreenProps<
-    OptionsStackParamList,
-    'OptionsHome'
->) => {
+const OptionItem: React.FC<OptionItemProps> = ({children, onPress, color}) => (
+    <Pressable style={styles.optionLink} onPress={onPress}>
+        <View style={styles.optionTextContainer}>
+            <Text style={{color: color || undefined}}>{children}</Text>
+        </View>
+        <View style={styles.optionIconContainer}>
+            <Feather
+                name="chevron-right"
+                size={18}
+                color={color || undefined}
+            />
+        </View>
+    </Pressable>
+);
+
+const Options = ({
+    navigation,
+}: StackScreenProps<OptionsStackParamList, 'OptionsHome'>) => {
     const dispatch = useAppDispatch();
 
     const logout = async () => {
         await dispatch(LOGOUT());
     };
 
-    const OptionItem: React.FC<OptionItemProps> = ({children, onPress}) => (
-        <Pressable style={styles.optionLink} onPress={onPress}>
-            <View style={styles.optionTextContainer}>
-                <Text>{children}</Text>
-            </View>
-            <View style={styles.optionIconContainer}>
-                <Feather name="chevron-right" size={18} />
-            </View>
-        </Pressable>
-    );
-
     return (
         <View>
             <View style={styles.optionsGroup}>
                 <OptionItem>Account</OptionItem>
-                <OptionItem>Deleted Products</OptionItem>
+                <OptionItem
+                    onPress={() => {
+                        navigation.navigate('DeletedProducts');
+                    }}>
+                    Deleted Products
+                </OptionItem>
             </View>
             <View style={styles.optionsGroup}>
                 <OptionItem>App Info</OptionItem>
-                <OptionItem onPress={logout}>Logout</OptionItem>
+                <OptionItem onPress={logout} color="#ce3b54">
+                    Logout
+                </OptionItem>
             </View>
         </View>
     );

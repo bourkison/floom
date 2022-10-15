@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Animated, {
     runOnJS,
     useAnimatedStyle,
@@ -6,13 +6,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {ViewStyle, Text, TextStyle, View} from 'react-native';
-import {useEffect} from 'react';
-
-type RGB = `rgb(${number}, ${number}, ${number})`;
-type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
-type HEX = `#${string}`;
-
-type Color = RGB | RGBA | HEX;
+import {Color} from '@/types';
 
 type AnimatedButtonProps = {
     onPress?: () => void;
