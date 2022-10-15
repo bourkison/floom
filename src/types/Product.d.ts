@@ -17,7 +17,7 @@ export type QueryProductInit = {
     };
     queryStringParameters?: {
         loadAmount?: number;
-        type?: 'saved' | 'unsaved';
+        type?: 'saved' | 'unsaved' | 'deleted';
         startAt?: string;
     };
 };

@@ -134,8 +134,9 @@ const queryUnsavedProduct = async (
     }
 };
 
-const querySavedProduct = async (
+const querySavedOrDeletedProduct = async (
     event: APIGatewayEvent,
+    type: 'saved' | 'deleted',
 ): Promise<APIGatewayProxyResult> => {
     const email = event.requestContext?.authorizer?.claims?.email || undefined;
     const loadAmount = parseInt(event.queryStringParameters.loadAmount) || 5;
@@ -172,67 +173,120 @@ const querySavedProduct = async (
     let arrStartAtIndex: number;
 
     if (!startAt) {
-        const {likedProducts, __length} = (
-            await User.findOne(
-                {email: email},
-                {
-                    likedProducts: {
-                        $slice: loadAmount,
-                    },
-                    __length: {
-                        $size: '$likedProducts',
-                    },
-                },
-            )
+        // Change aggregation to $likedProducts or $deletedProducts based on
+        // If we're palling saved or deleted.
+        let aggregation =
+            type === 'saved'
+                ? {
+                      likedProducts: {
+                          $slice: loadAmount,
+                      },
+                      __length: {
+                          $size: '$likedProducts',
+                      },
+                  }
+                : {
+                      deletedProducts: {
+                          $slice: loadAmount,
+                      },
+                      __length: {
+                          $size: '$deletedProducts',
+                      },
+                  };
+
+        const {likedProducts, __length, deletedProducts} = (
+            await User.findOne({email: email}, aggregation)
         ).toObject<{
-            likedProducts: Types.ObjectId[];
+            likedProducts?: Types.ObjectId[];
+            deletedProducts?: Types.ObjectId[];
             __length: number;
             __startAtIndex?: number;
         }>();
 
-        productIds = likedProducts;
+        productIds = type === 'saved' ? likedProducts : deletedProducts;
         arrLength = __length;
         arrStartAtIndex = 0;
     } else {
+        // Change aggregation to $likedProducts or $deletedProducts based on
+        // If we're palling saved or deleted.
+
+        // First aggregation is getting our startAtIndex, and the length of the entire array.
+        let firstAggregation =
+            type === 'saved'
+                ? {
+                      $addFields: {
+                          __length: {
+                              $size: '$likedProducts',
+                          },
+                          __startAtIndex: {
+                              $indexOfArray: [
+                                  '$likedProducts',
+                                  new Types.ObjectId(startAt),
+                              ],
+                          },
+                      },
+                  }
+                : {
+                      $addFields: {
+                          __length: {
+                              $size: '$deletedProducts',
+                          },
+                          __startAtIndex: {
+                              $indexOfArray: [
+                                  '$deletedProducts',
+                                  new Types.ObjectId(startAt),
+                              ],
+                          },
+                      },
+                  };
+
+        // Second aggregation is slicing the actual relevant data.
+        let secondAggregation =
+            type === 'saved'
+                ? {
+                      $project: {
+                          likedProducts: {
+                              $slice: [
+                                  '$likedProducts',
+                                  {
+                                      $add: ['$__startAtIndex', 1],
+                                  },
+                                  loadAmount,
+                              ],
+                          },
+                          __length: 1,
+                          __startAtIndex: 1,
+                      },
+                  }
+                : {
+                      $project: {
+                          deletedProducts: {
+                              $slice: [
+                                  '$deletedProducts',
+                                  {
+                                      $add: ['$__startAtIndex', 1],
+                                  },
+                                  loadAmount,
+                              ],
+                          },
+                          __length: 1,
+                          __startAtIndex: 1,
+                      },
+                  };
+
         const mongoResponse = (
             await User.aggregate<{
-                likedProducts: Types.ObjectId[];
+                likedProducts?: Types.ObjectId[];
+                deletedProducts?: Types.ObjectId[];
                 __length: number;
                 __startAtIndex?: number;
-            }>([
-                {$match: {email: email}},
-                {
-                    $addFields: {
-                        __length: {
-                            $size: '$likedProducts',
-                        },
-                        __startAtIndex: {
-                            $indexOfArray: [
-                                '$likedProducts',
-                                new Types.ObjectId(startAt),
-                            ],
-                        },
-                    },
-                },
-                {
-                    $project: {
-                        likedProducts: {
-                            $slice: [
-                                '$likedProducts',
-                                {
-                                    $add: ['$__startAtIndex', 1],
-                                },
-                                loadAmount,
-                            ],
-                        },
-                        __length: 1,
-                        __startAtIndex: 1,
-                    },
-                },
-            ])
+            }>([{$match: {email: email}}, firstAggregation, secondAggregation])
         )[0];
 
-        productIds = mongoResponse.likedProducts;
+        productIds =
+            type === 'saved'
+                ? mongoResponse.likedProducts
+                : mongoResponse.deletedProducts;
         arrLength = mongoResponse.__length;
         arrStartAtIndex = mongoResponse.__startAtIndex;
     }
@@ -253,7 +307,7 @@ const querySavedProduct = async (
     }
 
     // Have to sort the products in how they are retrieved from the User
-    // In order to allow for pagination.
+    // In order to maintain order.
     // https://stackoverflow.com/questions/22797768/does-mongodbs-in-clause-guarantee-order
     const products = await Product.aggregate<ProductType>([
         {
@@ -308,133 +362,6 @@ const querySavedProduct = async (
             data: products,
             __totalLength: arrLength,
             __moreToLoad: moreToLoad,
-            __loaded: products.length,
-        }),
-    };
-
-    return response;
-};
-
-const queryDeletedProduct = async (
-    event: APIGatewayEvent,
-): Promise<APIGatewayProxyResult> => {
-    const email = event.requestContext?.authorizer?.claims?.email || undefined;
-    const loadAmount = parseInt(event.queryStringParameters.loadAmount) || 5;
-
-    const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
-    const Product: Model<ProductType> = await MongooseModels().Product(
-        MONGODB_URI,
-    );
-
-    let response: APIGatewayProxyResult = {
-        statusCode: 500,
-        headers: {
-            'Access-Control-Allow-Headers': '*',
-            'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({success: false}),
-    };
-
-    if (!email) {
-        response = {
-            statusCode: 403,
-            headers: {
-                'Access-Control-Allow-Headers': '*',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({success: false, message: 'Not logged in'}),
-        };
-        return response;
-    }
-
-    let productIds: Types.ObjectId[];
-    let arrLength: number;
-
-    const {deletedProducts, __length} = (
-        await User.findOne(
-            {email: email},
-            {
-                deletedProducts: {
-                    $slice: loadAmount,
-                },
-                __length: {
-                    $size: '$deletedProducts',
-                },
-            },
-        )
-    ).toObject<{
-        deletedProducts: Types.ObjectId[];
-        __length: number;
-        __startAtIndex?: number;
-    }>();
-
-    productIds = deletedProducts;
-    arrLength = __length;
-
-    if (!productIds || !productIds.length) {
-        response = {
-            statusCode: 404,
-            headers: {
-                'Access-Control-Allow-Headers': '*',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({
-                success: false,
-                message: 'No products found',
-            }),
-        };
-
-        return response;
-    }
-
-    const products = await Product.aggregate<ProductType>([
-        {
-            $match: {
-                _id: {
-                    $in: productIds,
-                },
-            },
-        },
-        {
-            $addFields: {
-                __order: {
-                    $indexOfArray: [productIds, '$_id'],
-                },
-            },
-        },
-        {
-            $sort: {
-                __order: 1,
-            },
-        },
-    ]);
-
-    if (!products || !products.length) {
-        response = {
-            statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Headers': '*',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({
-                success: false,
-                message: 'Error getting products',
-            }),
-        };
-
-        return response;
-    }
-
-    response = {
-        statusCode: 200,
-        headers: {
-            'Access-Control-Allow-Headers': '*',
-            'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({
-            success: true,
-            data: products,
-            __totalLength: arrLength,
             __loaded: products.length,
         }),
     };
@@ -510,10 +437,8 @@ exports.handler = async (
                 response = await getProduct(event);
             } else {
                 const type = event.queryStringParameters.type || 'unsaved';
-                if (type === 'saved') {
-                    response = await querySavedProduct(event);
-                } else if (type === 'deleted') {
-                    response = await queryDeletedProduct(event);
+                if (type === 'saved' || type === 'deleted') {
+                    response = await querySavedOrDeletedProduct(event, type);
                 } else if (type === 'unsaved') {
                     response = await queryUnsavedProduct(event);
                 } else {
