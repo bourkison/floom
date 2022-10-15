@@ -1,25 +1,35 @@
 import {queryProduct} from '@/api/product';
-import React, {useEffect} from 'react';
-import {Text, View} from 'react-native';
+import {Product} from '@/types/product';
+import React, {useEffect, useState} from 'react';
+import {Text, View, ActivityIndicator} from 'react-native';
 
 const DeletedProducts = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [products, setProducts] = useState<Product[]>([]);
+
     useEffect(() => {
         const initFetch = async () => {
-            const products = await queryProduct({
+            const {products: p} = await queryProduct({
                 init: {
                     queryStringParameters: {loadAmount: 25, type: 'deleted'},
                 },
             });
 
-            console.log('DELETED PRODUCTS', products);
+            setProducts(p);
+            setIsLoading(false);
         };
 
+        setIsLoading(true);
         initFetch();
-    });
+    }, []);
 
     return (
         <View>
-            <Text>Deleted Products</Text>
+            {isLoading ? (
+                <ActivityIndicator />
+            ) : (
+                products.map(p => <Text key={p._id}>{p.title}</Text>)
+            )}
         </View>
     );
 };
