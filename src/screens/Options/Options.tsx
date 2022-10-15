@@ -40,7 +40,12 @@ const Options = ({
     return (
         <View>
             <View style={styles.optionsGroup}>
-                <OptionItem>Account</OptionItem>
+                <OptionItem
+                    onPress={() => {
+                        navigation.navigate('Account');
+                    }}>
+                    Account
+                </OptionItem>
                 <OptionItem
                     onPress={() => {
                         navigation.navigate('DeletedProducts');
@@ -49,7 +54,12 @@ const Options = ({
                 </OptionItem>
             </View>
             <View style={styles.optionsGroup}>
-                <OptionItem>App Info</OptionItem>
+                <OptionItem
+                    onPress={() => {
+                        navigation.navigate('AppInfo');
+                    }}>
+                    App Info
+                </OptionItem>
                 <OptionItem onPress={logout} color="#ce3b54">
                     Logout
                 </OptionItem>

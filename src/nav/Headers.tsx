@@ -107,6 +107,36 @@ export const DeletedProductsHeader: React.FC<StackHeaderProps> = ({
     </HeaderTemplate>
 );
 
+export const AccountHeader: React.FC<StackHeaderProps> = ({navigation}) => (
+    <HeaderTemplate
+        leftIcon={
+            <Pressable
+                onPress={() => {
+                    navigation.navigate('OptionsHome');
+                }}
+                style={styles.headerIcon}>
+                <Feather name="chevron-left" size={24} />
+            </Pressable>
+        }>
+        Account
+    </HeaderTemplate>
+);
+
+export const AppInfoHeader: React.FC<StackHeaderProps> = ({navigation}) => (
+    <HeaderTemplate
+        leftIcon={
+            <Pressable
+                onPress={() => {
+                    navigation.navigate('OptionsHome');
+                }}
+                style={styles.headerIcon}>
+                <Feather name="chevron-left" size={24} />
+            </Pressable>
+        }>
+        App Info
+    </HeaderTemplate>
+);
+
 const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,
