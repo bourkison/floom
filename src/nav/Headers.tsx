@@ -137,6 +137,36 @@ export const AppInfoHeader: React.FC<StackHeaderProps> = ({navigation}) => (
     </HeaderTemplate>
 );
 
+export const LoginHeader: React.FC<StackHeaderProps> = ({navigation}) => (
+    <HeaderTemplate
+        leftIcon={
+            <Pressable
+                onPress={() => {
+                    navigation.navigate('HomeAuth');
+                }}
+                style={styles.headerIcon}>
+                <Feather name="chevron-left" size={24} />
+            </Pressable>
+        }>
+        Login
+    </HeaderTemplate>
+);
+
+export const SignUpHeader: React.FC<StackHeaderProps> = ({navigation}) => (
+    <HeaderTemplate
+        leftIcon={
+            <Pressable
+                onPress={() => {
+                    navigation.navigate('HomeAuth');
+                }}
+                style={styles.headerIcon}>
+                <Feather name="chevron-left" size={24} />
+            </Pressable>
+        }>
+        Sign Up
+    </HeaderTemplate>
+);
+
 const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,

@@ -185,6 +185,7 @@ const styles = StyleSheet.create({
     },
     filterItem: {
         flexDirection: 'row',
+        paddingVertical: 1,
     },
     filterItemCheck: {
         alignSelf: 'flex-end',

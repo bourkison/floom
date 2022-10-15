@@ -13,7 +13,12 @@ import SignUp from '@/screens/Auth/SignUp';
 import VerifyEmail from '@/screens/Auth/VerifyEmail';
 import Login from '@/screens/Auth/Login';
 
-import {HomeHeader, SavedProductsHeader} from '@/nav/Headers';
+import {
+    HomeHeader,
+    LoginHeader,
+    SavedProductsHeader,
+    SignUpHeader,
+} from '@/nav/Headers';
 import OptionsNavigator from '@/nav/OptionsNavigator';
 
 export type AuthStackParamList = {
@@ -55,9 +60,17 @@ const Navigator = () => {
                     name="GuestWelcome"
                     component={GuestWelcome}
                 />
-                <AuthStack.Screen name="SignUp" component={SignUp} />
+                <AuthStack.Screen
+                    name="SignUp"
+                    component={SignUp}
+                    options={{header: SignUpHeader}}
+                />
                 <AuthStack.Screen name="VerifyEmail" component={VerifyEmail} />
-                <AuthStack.Screen name="Login" component={Login} />
+                <AuthStack.Screen
+                    name="Login"
+                    component={Login}
+                    options={{header: LoginHeader}}
+                />
             </AuthStack.Navigator>
         );
     }
