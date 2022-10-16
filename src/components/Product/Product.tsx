@@ -79,7 +79,19 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         buyOpacity.value = 0;
         deleteOpacity.value = 0;
         saveOpacity.value = 0;
-    }, [offsetX, offsetY, buyOpacity, deleteOpacity, saveOpacity]);
+        rotation.value = 0;
+        rotationX.value = 0;
+        rotationY.value = 0;
+    }, [
+        offsetX,
+        offsetY,
+        buyOpacity,
+        deleteOpacity,
+        saveOpacity,
+        rotation,
+        rotationX,
+        rotationY,
+    ]);
 
     const saveProduct = useCallback(() => {
         dispatch(SAVE_PRODUCT(product._id));

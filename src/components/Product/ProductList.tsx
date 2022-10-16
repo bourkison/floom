@@ -7,7 +7,7 @@ import {PUSH_PRODUCTS} from '@/store/slices/product';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {QueryProductInit} from '@/types/product';
 
-const NUM_SHOWN_PRODUCTS = 1;
+const NUM_SHOWN_PRODUCTS = 5;
 
 const ProductList = () => {
     const products = useAppSelector(state => state.product.products);
