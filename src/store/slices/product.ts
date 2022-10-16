@@ -16,7 +16,7 @@ const productAdapter = createEntityAdapter();
 
 type LoadProductsParams = {
     queryStringParameters: QueryProductInit['queryStringParameters'];
-    initialLoad: boolean;
+    loadType: 'initial' | 'refresh' | 'more';
 };
 
 const initialState = productAdapter.getInitialState({
@@ -54,12 +54,14 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                 loadAmount: 10,
                 type: 'unsaved',
             },
-            initialLoad: true,
+            loadType: 'initial',
         },
     ) => {
         let init: QueryProductInit = {
             queryStringParameters: input.queryStringParameters,
         };
+
+        console.log('QUERYING:', input.loadType);
 
         return await queryProduct({
             init,
@@ -108,7 +110,7 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
                 loadAmount: 25,
                 type: 'saved',
             },
-            initialLoad: true,
+            loadType: 'initial',
         },
     ) => {
         let init: QueryProductInit = {
@@ -204,33 +206,44 @@ const productSlice = createSlice({
                 console.warn('Delete product rejected');
             })
             .addCase(LOAD_UNSAVED_PRODUCTS.pending, (state, action) => {
-                if (action.meta.arg.initialLoad) {
+                if (action.meta.arg.loadType === 'initial') {
                     state.unsaved.isLoading = true;
-                } else {
+                } else if (action.meta.arg.loadType === 'more') {
                     state.unsaved.isLoadingMore = true;
                 }
             })
             .addCase(LOAD_UNSAVED_PRODUCTS.fulfilled, (state, action) => {
-                state.unsaved.products = [
-                    ...state.unsaved.products,
-                    ...action.payload.products,
-                ];
+                if (action.meta.arg.loadType === 'more') {
+                    state.unsaved.products = [
+                        ...state.unsaved.products,
+                        ...action.payload.products,
+                    ];
+                } else {
+                    state.unsaved.products = action.payload.products;
+                }
+
                 state.unsaved.isLoading = false;
                 state.unsaved.isLoadingMore = false;
                 state.unsaved.moreToLoad = action.payload.__moreToLoad;
+                console.log(state.unsaved.moreToLoad);
             })
             .addCase(LOAD_SAVED_PRODUCTS.pending, (state, action) => {
-                if (action.meta.arg.initialLoad) {
+                if (action.meta.arg.loadType === 'initial') {
                     state.saved.isLoading = true;
-                } else {
+                } else if (action.meta.arg.loadType === 'more') {
                     state.saved.isLoadingMore = true;
                 }
             })
             .addCase(LOAD_SAVED_PRODUCTS.fulfilled, (state, action) => {
-                state.saved.products = [
-                    ...state.saved.products,
-                    ...action.payload.products,
-                ];
+                if (action.meta.arg.loadType === 'more') {
+                    state.saved.products = [
+                        ...state.saved.products,
+                        ...action.payload.products,
+                    ];
+                } else {
+                    state.saved.products = action.payload.products;
+                }
+
                 state.saved.isLoading = false;
                 state.saved.isLoadingMore = false;
                 state.saved.moreToLoad = action.payload.__moreToLoad;

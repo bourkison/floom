@@ -21,7 +21,10 @@ const ProductList = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        const loadProducts = async (initialLoad: boolean, startAt?: string) => {
+        const loadProducts = async (
+            loadType: 'initial' | 'refresh' | 'more',
+            startAt?: string,
+        ) => {
             let init: QueryProductInit = {
                 queryStringParameters: {
                     loadAmount: 10,
@@ -36,7 +39,7 @@ const ProductList = () => {
             dispatch(
                 LOAD_UNSAVED_PRODUCTS({
                     queryStringParameters: init.queryStringParameters,
-                    initialLoad,
+                    loadType,
                 }),
             );
         };
@@ -44,14 +47,14 @@ const ProductList = () => {
         // If no products, and more to load, and not already loading
         // OR products is less than amount, more to load, and not already loading.
         if (!products.length && !isLoading && moreToLoad) {
-            loadProducts(true);
+            loadProducts('initial');
         } else if (
             products.length <= NUM_SHOWN_PRODUCTS + 1 &&
             !isLoading &&
             !isLoadingMore &&
             moreToLoad
         ) {
-            loadProducts(false, products[products.length - 1]._id);
+            loadProducts('more', products[products.length - 1]._id);
         }
     }, [products, isLoading, dispatch, isLoadingMore, moreToLoad]);
 

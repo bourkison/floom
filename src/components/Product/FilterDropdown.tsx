@@ -93,7 +93,7 @@ const FilterDropdown = () => {
                     loadAmount: 10,
                     type: 'unsaved',
                 },
-                initialLoad: true,
+                loadType: 'initial',
             }),
         );
     };

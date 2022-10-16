@@ -109,7 +109,7 @@ const queryUnsavedProduct = async (
 
         // If we have loaded less than we wanted, we know that
         // we have loaded everything and there is nothing more to load.
-        const moreToLoad = products.length < loadAmount;
+        const moreToLoad = !(products.length < loadAmount);
 
         response = {
             statusCode: 200,

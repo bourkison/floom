@@ -33,7 +33,7 @@ const SavedProducts = ({}: StackScreenProps<
     );
 
     const loadProducts = useCallback(
-        async (initialLoad: boolean, startAt?: string) => {
+        async (loadType: 'initial' | 'refresh' | 'more', startAt?: string) => {
             let init: QueryProductInit = {
                 queryStringParameters: {
                     loadAmount: 25,
@@ -48,7 +48,7 @@ const SavedProducts = ({}: StackScreenProps<
             await dispatch(
                 LOAD_SAVED_PRODUCTS({
                     queryStringParameters: init.queryStringParameters,
-                    initialLoad,
+                    loadType,
                 }),
             );
         },
@@ -58,19 +58,19 @@ const SavedProducts = ({}: StackScreenProps<
     useEffect(() => {
         // Call on initial load.
         if (!savedProducts.length && moreToLoad && !isLoading) {
-            loadProducts(true);
+            loadProducts('initial');
         }
     }, [loadProducts, savedProducts, moreToLoad, isLoading]);
 
     const refresh = async () => {
         setIsRefereshing(true);
-        await loadProducts(true);
+        await loadProducts('refresh');
         setIsRefereshing(false);
     };
 
     const loadMore = async () => {
         if (!isLoadingMore && !isLoading && !isRefreshing && moreToLoad) {
-            loadProducts(false, savedProducts[savedProducts.length - 1]._id);
+            loadProducts('more', savedProducts[savedProducts.length - 1]._id);
         }
     };
 
