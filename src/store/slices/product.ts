@@ -15,9 +15,19 @@ import {RootState} from '@/store';
 
 const productAdapter = createEntityAdapter();
 
+type LoadSavedProductsParams = {
+    queryStringParameters: QueryProductInit['queryStringParameters'];
+    initialLoad: boolean;
+};
+
 const initialState = productAdapter.getInitialState({
-    products: [] as ProductType[],
     savedProducts: [] as ProductType[],
+    unsaved: {
+        products: [] as ProductType[],
+        isLoading: false,
+        moreToLoad: true,
+        isLoadingMore: false,
+    },
     moreSavedToLoad: true,
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
     filters: {
@@ -29,6 +39,30 @@ const initialState = productAdapter.getInitialState({
         excludeSaved: true,
     },
 });
+
+export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
+    QueryProductResponse,
+    LoadSavedProductsParams
+>(
+    'product/LOAD_UNSAVED_PRODUCTS',
+    async (
+        input = {
+            queryStringParameters: {
+                loadAmount: 10,
+                type: 'unsaved',
+            },
+            initialLoad: true,
+        },
+    ) => {
+        let init: QueryProductInit = {
+            queryStringParameters: input.queryStringParameters,
+        };
+
+        return await queryProduct({
+            init,
+        });
+    },
+);
 
 export const SAVE_PRODUCT = createAsyncThunk<void, string>(
     'product/SAVE_PRODUCT',
@@ -116,9 +150,6 @@ const productSlice = createSlice({
     name: 'product',
     initialState,
     reducers: {
-        PUSH_PRODUCTS(state, action: PayloadAction<ProductType[]>) {
-            state.products = [...state.products, ...action.payload];
-        },
         COMMENCE_ANIMATE(
             state,
             action: PayloadAction<'idle' | 'save' | 'buy' | 'delete'>,
@@ -183,7 +214,7 @@ const productSlice = createSlice({
         builder
             .addCase(SAVE_PRODUCT.pending, state => {
                 state.animation = 'idle';
-                state.products = state.products.slice(1);
+                state.unsaved.products = state.unsaved.products.slice(1);
             })
             .addCase(SAVE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
@@ -191,11 +222,24 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_PRODUCT.pending, state => {
                 state.animation = 'idle';
-                state.products = state.products.slice(1);
+                state.unsaved.products = state.unsaved.products.slice(1);
             })
             .addCase(DELETE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
                 console.warn('Delete product rejected');
+            })
+            .addCase(LOAD_UNSAVED_PRODUCTS.pending, (state, action) => {
+                if (action.meta.arg.initialLoad) {
+                    state.unsaved.isLoading = true;
+                } else {
+                    state.unsaved.isLoadingMore = true;
+                }
+            })
+            .addCase(LOAD_UNSAVED_PRODUCTS.fulfilled, (state, action) => {
+                state.unsaved.products = [
+                    ...state.unsaved.products,
+                    ...action.payload.products,
+                ];
             })
             .addCase(LOAD_SAVED_PRODUCTS.fulfilled, (state, action) => {
                 console.log(
@@ -237,11 +281,6 @@ const productSlice = createSlice({
     },
 });
 
-export const {
-    PUSH_PRODUCTS,
-    COMMENCE_ANIMATE,
-    TOGGLE_FILTER,
-    TOGGLE_EXCLUDE,
-    BUY_PRODUCT,
-} = productSlice.actions;
+export const {COMMENCE_ANIMATE, TOGGLE_FILTER, TOGGLE_EXCLUDE, BUY_PRODUCT} =
+    productSlice.actions;
 export default productSlice.reducer;

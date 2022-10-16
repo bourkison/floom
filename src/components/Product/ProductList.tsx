@@ -1,23 +1,27 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {queryProduct} from '@/api/product';
 import Product from '@/components/Product/Product';
 
-import {PUSH_PRODUCTS} from '@/store/slices/product';
+import {LOAD_UNSAVED_PRODUCTS} from '@/store/slices/product';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {QueryProductInit} from '@/types/product';
 
 const NUM_SHOWN_PRODUCTS = 5;
 
 const ProductList = () => {
-    const products = useAppSelector(state => state.product.products);
+    const products = useAppSelector(state => state.product.unsaved.products);
+    const isLoading = useAppSelector(state => state.product.unsaved.isLoading);
+    const isLoadingMore = useAppSelector(
+        state => state.product.unsaved.isLoadingMore,
+    );
+    const moreToLoad = useAppSelector(
+        state => state.product.unsaved.moreToLoad,
+    );
+
     const dispatch = useAppDispatch();
 
-    const [isLoading, setIsLoading] = useState(false);
-
     useEffect(() => {
-        const loadProducts = async (startAt?: string) => {
-            setIsLoading(true);
+        const loadProducts = async (initialLoad: boolean, startAt?: string) => {
             let init: QueryProductInit = {
                 queryStringParameters: {
                     loadAmount: 10,
@@ -29,19 +33,25 @@ const ProductList = () => {
                 init.queryStringParameters.startAt = startAt;
             }
 
-            const {products: p} = await queryProduct({
-                init,
-            });
-            dispatch(PUSH_PRODUCTS(p));
-            setIsLoading(false);
+            dispatch(
+                LOAD_UNSAVED_PRODUCTS({
+                    queryStringParameters: init.queryStringParameters,
+                    initialLoad,
+                }),
+            );
         };
 
-        if (!products.length && !isLoading) {
-            loadProducts();
-        } else if (products.length <= NUM_SHOWN_PRODUCTS + 1 && !isLoading) {
-            loadProducts(products[products.length - 1]._id);
+        if (!products.length && !isLoading && moreToLoad) {
+            loadProducts(true);
+        } else if (
+            products.length <= NUM_SHOWN_PRODUCTS + 1 &&
+            !isLoading &&
+            !isLoadingMore &&
+            moreToLoad
+        ) {
+            loadProducts(false, products[products.length - 1]._id);
         }
-    }, [products, isLoading, dispatch]);
+    }, [products, isLoading, dispatch, isLoadingMore, moreToLoad]);
 
     return (
         <View style={styles.container}>
