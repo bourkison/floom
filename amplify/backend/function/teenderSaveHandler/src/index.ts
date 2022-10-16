@@ -93,12 +93,60 @@ const deleteSaveOrDelete = async (
             },
             body: JSON.stringify({success: true}),
         };
-
-        return response;
     } catch (err) {
         console.error(err);
-        return response;
+        response = {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: false, message: 'Update error'}),
+        };
     }
+
+    return response;
+};
+
+const deleteAllDeletes = async (
+    event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> => {
+    const email = event.requestContext.authorizer.claims.email;
+
+    const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
+
+    let response: APIGatewayProxyResult = {
+        statusCode: 500,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: false}),
+    };
+
+    try {
+        await User.findOneAndUpdate({email}, {deletedProducts: []});
+
+        response = {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: true}),
+        };
+    } catch (err) {
+        response = {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: false, message: 'Update error'}),
+        };
+    }
+
+    return response;
 };
 
 /**
@@ -122,7 +170,11 @@ exports.handler = async (
             response = await createSaveOrDelete(event);
             break;
         case 'DELETE':
-            response = await deleteSaveOrDelete(event);
+            const deleteAll =
+                event?.pathParameters?.deleteAll === 'true' || false;
+            response = deleteAll
+                ? await deleteAllDeletes(event)
+                : await deleteSaveOrDelete(event);
             break;
         default:
             response = {
