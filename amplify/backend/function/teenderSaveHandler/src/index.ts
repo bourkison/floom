@@ -171,7 +171,7 @@ exports.handler = async (
             break;
         case 'DELETE':
             const deleteAll =
-                event?.pathParameters?.deleteAll === 'true' || false;
+                event?.queryStringParameters?.deleteAll === 'true' || false;
             response = deleteAll
                 ? await deleteAllDeletes(event)
                 : await deleteSaveOrDelete(event);

@@ -44,9 +44,12 @@
         },
         "teenderSaveHandler": {
           "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/teenderSaveHandler-49385445582b63575239-build.zip",
+          "s3Key": "amplify-builds/teenderSaveHandler-6249646b67514f43574a-build.zip",
           "secretsPathAmplifyAppId": "d34lete8blzmed"
         }
+      },
+      "api": {
+        "teenderapi": {}
       }
     }
   }

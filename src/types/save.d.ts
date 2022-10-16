@@ -26,3 +26,16 @@ export type DeleteSaveInit = {
         type: 'save' | 'delete';
     };
 };
+
+export type DeleteAllDeletesParams = {
+    init: DeleteAllDeletesInit;
+};
+
+export type DeleteAllDeletesInit = {
+    headers?: {
+        Authorization?: string;
+    };
+    queryStringParameters: {
+        deleteAll: 'true';
+    };
+};

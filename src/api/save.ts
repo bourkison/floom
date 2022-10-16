@@ -1,5 +1,9 @@
 import {fetchJwtToken, API_NAME} from '@/api/utility';
-import {CreateSaveParams, DeleteSaveParams} from '@/types/save';
+import {
+    CreateSaveParams,
+    DeleteAllDeletesParams,
+    DeleteSaveParams,
+} from '@/types/save';
 import {API} from 'aws-amplify';
 
 export async function createSaveOrDelete(
@@ -26,6 +30,26 @@ export async function deleteSaveOrDelete(
     input: DeleteSaveParams,
 ): Promise<void> {
     const path = '/save/' + input.productId;
+
+    let init = input.init;
+    init.headers = init.headers || {};
+    init.headers.Authorization =
+        init.headers.Authorization || (await fetchJwtToken());
+
+    const data = await API.del(API_NAME, path, init).catch(err => {
+        console.error(err);
+        throw err;
+    });
+
+    if (!data.success) {
+        console.warn('Unsuccessful delete:', data.message);
+    }
+}
+
+export async function deleteAllDeletes(
+    input: DeleteAllDeletesParams,
+): Promise<void> {
+    const path = '/save';
 
     let init = input.init;
     init.headers = init.headers || {};
