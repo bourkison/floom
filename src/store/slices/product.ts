@@ -20,9 +20,14 @@ const initialState = productAdapter.getInitialState({
     savedProducts: [] as ProductType[],
     moreSavedToLoad: true,
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
-    selectedGenderFilters: [] as string[],
-    selectedCategoryFilters: [] as string[],
-    selectedColourFilters: [] as string[],
+    filters: {
+        gender: [] as string[],
+        category: [] as string[],
+        color: [] as string[],
+        searchText: '',
+        excludeDeleted: true,
+        excludeSaved: true,
+    },
 });
 
 export const SAVE_PRODUCT = createAsyncThunk<void, string>(
@@ -129,47 +134,45 @@ const productSlice = createSlice({
         ) {
             // Push to relevant filter if exists, other wise exclude it.
             if (action.payload.type === 'gender') {
-                if (
-                    !state.selectedGenderFilters.includes(action.payload.item)
-                ) {
-                    state.selectedGenderFilters = [
-                        ...state.selectedGenderFilters,
+                if (!state.filters.gender.includes(action.payload.item)) {
+                    state.filters.gender = [
+                        ...state.filters.gender,
                         action.payload.item,
                     ];
                 } else {
-                    state.selectedGenderFilters =
-                        state.selectedGenderFilters.filter(
-                            i => i !== action.payload.item,
-                        );
+                    state.filters.gender = state.filters.gender.filter(
+                        i => i !== action.payload.item,
+                    );
                 }
             } else if (action.payload.type === 'category') {
-                if (
-                    !state.selectedCategoryFilters.includes(action.payload.item)
-                ) {
-                    state.selectedCategoryFilters = [
-                        ...state.selectedCategoryFilters,
+                if (!state.filters.category.includes(action.payload.item)) {
+                    state.filters.category = [
+                        ...state.filters.category,
                         action.payload.item,
                     ];
                 } else {
-                    state.selectedCategoryFilters =
-                        state.selectedCategoryFilters.filter(
-                            i => i !== action.payload.item,
-                        );
+                    state.filters.category = state.filters.category.filter(
+                        i => i !== action.payload.item,
+                    );
                 }
             } else if (action.payload.type === 'color') {
-                if (
-                    !state.selectedColourFilters.includes(action.payload.item)
-                ) {
-                    state.selectedColourFilters = [
-                        ...state.selectedColourFilters,
+                if (!state.filters.color.includes(action.payload.item)) {
+                    state.filters.color = [
+                        ...state.filters.color,
                         action.payload.item,
                     ];
                 } else {
-                    state.selectedColourFilters =
-                        state.selectedColourFilters.filter(
-                            i => i !== action.payload.item,
-                        );
+                    state.filters.color = state.filters.color.filter(
+                        i => i !== action.payload.item,
+                    );
                 }
+            }
+        },
+        TOGGLE_EXCLUDE(state, action: PayloadAction<'deleted' | 'saved'>) {
+            if (action.payload === 'saved') {
+                state.filters.excludeSaved = !state.filters.excludeSaved;
+            } else if (action.payload === 'deleted') {
+                state.filters.excludeDeleted = !state.filters.excludeDeleted;
             }
         },
         BUY_PRODUCT(state) {
@@ -234,6 +237,11 @@ const productSlice = createSlice({
     },
 });
 
-export const {PUSH_PRODUCTS, COMMENCE_ANIMATE, TOGGLE_FILTER, BUY_PRODUCT} =
-    productSlice.actions;
+export const {
+    PUSH_PRODUCTS,
+    COMMENCE_ANIMATE,
+    TOGGLE_FILTER,
+    TOGGLE_EXCLUDE,
+    BUY_PRODUCT,
+} = productSlice.actions;
 export default productSlice.reducer;
