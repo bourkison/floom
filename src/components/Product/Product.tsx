@@ -444,6 +444,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         },
                     ],
                 },
+                {zIndex: 20 - index},
             ]}>
             <ImageBackground
                 style={[
@@ -452,6 +453,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         width: width - IMAGE_PADDING,
                         height: (width - IMAGE_PADDING) / IMAGE_RATIO,
                     },
+                    {zIndex: 20 - index},
                 ]}
                 source={{
                     uri: product.imageLink[imageIndex] || FALLBACK_IMAGE,
@@ -524,7 +526,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
 
     if (index === 0) {
         return (
-            <Animated.View style={rTileStyle}>
+            <Animated.View style={[rTileStyle, {zIndex: 20 - index}]}>
                 <GestureDetector gesture={touchGesture}>
                     <GestureDetector gesture={panGesture}>
                         {baseComponent}

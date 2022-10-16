@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         alignContent: 'center',
+        zIndex: 1,
     },
     productContainer: {
         flex: 1,
@@ -97,12 +98,14 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         marginTop: 40,
         flexDirection: 'row',
+        zIndex: -1,
     },
     button: {
         flex: 1,
         justifyContent: 'center',
         alignContent: 'center',
         alignItems: 'center',
+        zIndex: -1,
     },
     actionButton: {
         shadowColor: '#1a1f25',
@@ -112,7 +115,8 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.2,
         backgroundColor: '#f3fcf0',
-        zIndex: 1,
+        zIndex: -1,
+        elevation: 1,
         borderRadius: ACTION_BUTTON_SIZE / 2,
         width: ACTION_BUTTON_SIZE,
         height: ACTION_BUTTON_SIZE,

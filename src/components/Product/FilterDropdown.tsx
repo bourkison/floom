@@ -73,7 +73,7 @@ const FilterDropdown = () => {
     };
 
     return (
-        <View>
+        <View style={styles.container}>
             <TouchableOpacity
                 ref={DropdownButton}
                 onPress={toggleDropdown}
@@ -130,6 +130,9 @@ const FilterDropdown = () => {
 };
 
 const styles = StyleSheet.create({
+    container: {
+        zIndex: 999,
+    },
     flexOne: {flex: 1},
     buttonsContainer: {
         backgroundColor: '#fff',

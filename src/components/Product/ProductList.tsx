@@ -7,7 +7,7 @@ import {PUSH_PRODUCTS} from '@/store/slices/product';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {QueryProductInit} from '@/types/product';
 
-const NUM_SHOWN_PRODUCTS = 5;
+const NUM_SHOWN_PRODUCTS = 1;
 
 const ProductList = () => {
     const products = useAppSelector(state => state.product.products);
@@ -46,7 +46,9 @@ const ProductList = () => {
     return (
         <View style={styles.container}>
             {products.slice(0, NUM_SHOWN_PRODUCTS).map((product, index) => (
-                <View style={{zIndex: 20 - index}} key={product._id}>
+                <View
+                    style={{zIndex: 20 - index, elevation: 20 - index}}
+                    key={product._id}>
                     <Product product={product} index={index} />
                 </View>
             ))}
