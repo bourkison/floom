@@ -50,6 +50,8 @@ const ACTION_THRESHOLD = 150;
 const SCALE_AMOUNT = 0.005;
 const OPACITY_MINIMUM = 0.2;
 
+const SCALE_MULTIPLIER = 100;
+
 const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
@@ -60,6 +62,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const saveOpacity = useSharedValue(0);
     const deleteOpacity = useSharedValue(0);
     const buyOpacity = useSharedValue(0);
+    const scale = useSharedValue(SCALE_MULTIPLIER);
     const ctx = useSharedValue({x: 0, y: 0});
 
     const action = useSharedValue<'idle' | 'buy' | 'save' | 'delete'>('idle');
@@ -74,14 +77,15 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
 
     const resetProduct = useCallback(() => {
         'worklet';
-        offsetX.value = 0;
-        offsetY.value = 0;
+        offsetX.value = withSpring(0);
+        offsetY.value = withSpring(0);
         buyOpacity.value = 0;
         deleteOpacity.value = 0;
         saveOpacity.value = 0;
-        rotation.value = 0;
-        rotationX.value = 0;
-        rotationY.value = 0;
+        rotation.value = withTiming(0);
+        rotationX.value = withTiming(0);
+        rotationY.value = withTiming(0);
+        scale.value = withTiming(SCALE_MULTIPLIER);
     }, [
         offsetX,
         offsetY,
@@ -91,6 +95,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         rotation,
         rotationX,
         rotationY,
+        scale,
     ]);
 
     const saveProduct = useCallback(() => {
@@ -157,6 +162,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 offsetY.value = withTiming(-windowHeight * 0.25, {
                     duration: ANIMATION_DURATION,
                 });
+                scale.value = withSpring(1.05 * SCALE_MULTIPLIER);
                 buyOpacity.value = 1;
                 runOnJS(buyProduct)();
             }
@@ -172,6 +178,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             windowHeight,
             buyProduct,
             buyOpacity,
+            scale,
         ],
     );
 
@@ -199,6 +206,9 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 },
                 {
                     rotateX: `${rotationX.value}deg`,
+                },
+                {
+                    scale: scale.value / SCALE_MULTIPLIER,
                 },
             ],
         };
@@ -328,6 +338,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                     fadeAndRemove('delete');
                 });
             } else if (action.value === 'buy') {
+                scale.value = withSpring(1.05 * SCALE_MULTIPLIER);
                 runOnJS(buyProduct)();
             } else {
                 offsetX.value = withSpring(0);
