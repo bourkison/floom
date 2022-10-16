@@ -19,7 +19,7 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-export type SavedProductProps = {
+export type ProductListItemProps = {
     product: ProductType;
     index: number;
     type: 'saved' | 'deleted';
@@ -30,7 +30,7 @@ const ITEM_HEIGHT = 72;
 const SNAP_ANIMATION_DURATION = 250;
 const SNAP_TO_DELETE_TRANSLATION = 7 / 8;
 
-const SavedProduct: React.FC<SavedProductProps> = ({
+const ProductListItem: React.FC<ProductListItemProps> = ({
     product,
     index,
     type,
@@ -257,4 +257,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SavedProduct;
+export default ProductListItem;

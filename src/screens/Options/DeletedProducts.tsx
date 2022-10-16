@@ -8,29 +8,61 @@ import {
     FlatList,
     ListRenderItem,
     StyleSheet,
+    RefreshControl,
 } from 'react-native';
-import SavedProduct from '@/components/Product/SavedProduct';
+import ProductListItem from '@/components/Product/ProductListItem';
 import {deleteSaveOrDelete} from '@/api/save';
 
 const DeletedProducts = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [products, setProducts] = useState<Product[]>([]);
+    const [moreToLoad, setMoreToLoad] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         const initFetch = async () => {
-            const {products: p} = await queryProduct({
-                init: {
-                    queryStringParameters: {loadAmount: 25, type: 'deleted'},
-                },
-            });
-
-            setProducts(p);
+            await loadInit();
             setIsLoading(false);
         };
 
         setIsLoading(true);
         initFetch();
     }, []);
+
+    const refresh = async () => {
+        setIsRefreshing(true);
+        await loadInit();
+        setIsRefreshing(false);
+    };
+
+    const loadInit = async () => {
+        const {products: p, __moreToLoad} = await queryProduct({
+            init: {
+                queryStringParameters: {loadAmount: 25, type: 'deleted'},
+            },
+        });
+
+        setProducts(p);
+        setMoreToLoad(__moreToLoad);
+    };
+
+    const loadMore = async () => {
+        setIsLoadingMore(true);
+        const {products: p, __moreToLoad} = await queryProduct({
+            init: {
+                queryStringParameters: {
+                    loadAmount: 25,
+                    type: 'deleted',
+                    startAt: products[products.length - 1]._id,
+                },
+            },
+        });
+
+        setProducts([...products, ...p]);
+        setMoreToLoad(__moreToLoad);
+        setIsLoadingMore(false);
+    };
 
     if (isLoading) {
         return <ActivityIndicator />;
@@ -48,7 +80,7 @@ const DeletedProducts = () => {
     };
 
     const ListItem: ListRenderItem<Product> = ({item, index}) => (
-        <SavedProduct
+        <ProductListItem
             product={item}
             index={index}
             type="deleted"
@@ -62,6 +94,9 @@ const DeletedProducts = () => {
                 data={products}
                 keyExtractor={item => item._id}
                 renderItem={ListItem}
+                onEndReached={
+                    moreToLoad && !isLoadingMore ? loadMore : undefined
+                }
                 ListHeaderComponent={
                     <View style={styles.resetAllButtonContainer}>
                         <AnimatedButton
@@ -70,6 +105,15 @@ const DeletedProducts = () => {
                             Reset All
                         </AnimatedButton>
                     </View>
+                }
+                ListFooterComponent={
+                    isLoadingMore ? <ActivityIndicator /> : undefined
+                }
+                refreshControl={
+                    <RefreshControl
+                        onRefresh={refresh}
+                        refreshing={isRefreshing}
+                    />
                 }
             />
         </View>

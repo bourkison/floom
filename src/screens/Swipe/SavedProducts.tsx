@@ -11,7 +11,7 @@ import {
     ListRenderItem,
 } from 'react-native';
 
-import SavedProduct from '@/components/Product/SavedProduct';
+import ProductListItem from '@/components/Product/ProductListItem';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
 import {
     LOAD_MORE_SAVED_PRODUCTS,
@@ -62,7 +62,7 @@ const SavedProducts = ({}: StackScreenProps<
     };
 
     const ListItem: ListRenderItem<ProductType> = ({item, index}) => (
-        <SavedProduct product={item} index={index} type="saved" />
+        <ProductListItem product={item} index={index} type="saved" />
     );
 
     return (
