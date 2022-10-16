@@ -1,3 +1,5 @@
+import {Color} from '@/types';
+
 // PRODUCT IMAGE CONSTANTS
 export const IMAGE_RATIO = 0.7;
 export const IMAGE_PADDING = 20;
@@ -27,3 +29,7 @@ export const COLOUR_OPTIONS = [
     'Multicolour',
     'Beige',
 ];
+
+export const DELETE_COLOR: Color = '#cf3c48';
+export const SAVE_COLOR: Color = '#2a9d8f';
+export const BUY_COLOR: Color = '#264653';

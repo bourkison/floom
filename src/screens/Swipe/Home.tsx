@@ -5,7 +5,13 @@ import {View, StyleSheet, useWindowDimensions} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
-import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
+import {
+    IMAGE_RATIO,
+    IMAGE_PADDING,
+    DELETE_COLOR,
+    BUY_COLOR,
+    SAVE_COLOR,
+} from '@/constants';
 import FilterDropdown from '@/components/Product/FilterDropdown';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 
@@ -40,7 +46,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                             <Feather
                                 name="x"
                                 size={ACTION_BUTTON_SIZE / 2}
-                                color="#ce3b54"
+                                color={DELETE_COLOR}
                             />
                         </View>
                     </AnimatedButton>
@@ -53,7 +59,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                             <AntDesign
                                 name="shoppingcart"
                                 size={ACTION_BUTTON_SIZE / 2}
-                                color="#264653"
+                                color={BUY_COLOR}
                             />
                         </View>
                     </AnimatedButton>
@@ -66,7 +72,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                             <Ionicons
                                 name="heart"
                                 size={ACTION_BUTTON_SIZE / 2}
-                                color="#2a9d8f"
+                                color={SAVE_COLOR}
                             />
                         </View>
                     </AnimatedButton>

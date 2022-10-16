@@ -30,6 +30,9 @@ import {
     IMAGE_PADDING,
     IMAGE_GRADIENT_HEIGHT,
     FALLBACK_IMAGE,
+    DELETE_COLOR,
+    SAVE_COLOR,
+    BUY_COLOR,
 } from '@/constants';
 
 import * as loadingImage from '@/assets/loading.png';
@@ -247,7 +250,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             // else if we're not buying and we should be (i.e. offsetY value above 2x action threshold)
             else if (
                 action.value !== 'buy' &&
-                -offsetY.value >= ACTION_THRESHOLD * 2
+                -offsetY.value >= ACTION_THRESHOLD
             ) {
                 action.value = 'buy';
                 runOnJS(Haptics.selectionAsync)();
@@ -312,6 +315,8 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 tileOpacity.value = withTiming(0, {}, () => {
                     fadeAndRemove('delete');
                 });
+            } else if (action.value === 'buy') {
+                runOnJS(buyProduct)();
             } else {
                 offsetX.value = withSpring(0);
                 offsetY.value = withSpring(0);
@@ -604,38 +609,38 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     saveTextContainer: {
-        borderColor: '#2a9d8f',
+        borderColor: SAVE_COLOR,
         borderWidth: 3,
         borderRadius: 10,
         padding: 5,
         position: 'absolute',
     },
     saveText: {
-        color: '#2a9d8f',
+        color: SAVE_COLOR,
         fontWeight: 'bold',
         fontSize: 24,
     },
     deleteTextContainer: {
-        borderColor: '#ce3b54',
+        borderColor: DELETE_COLOR,
         borderWidth: 3,
         borderRadius: 10,
         padding: 5,
         position: 'absolute',
     },
     deleteText: {
-        color: '#ce3b54',
+        color: DELETE_COLOR,
         fontWeight: 'bold',
         fontSize: 24,
     },
     buyTextContainer: {
-        borderColor: '#264653',
+        borderColor: BUY_COLOR,
         borderWidth: 3,
         borderRadius: 10,
         padding: 5,
         position: 'absolute',
     },
     buyText: {
-        color: '#264653',
+        color: BUY_COLOR,
         fontWeight: 'bold',
         fontSize: 24,
     },
