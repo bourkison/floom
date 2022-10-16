@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
     View,
     Text,
@@ -75,7 +75,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         };
     });
 
-    const deleteProduct = () => {
+    const deleteProduct = useCallback(() => {
         if (type === 'saved') {
             dispatch(DELETE_SAVED_PRODUCT({_id: product._id, index}));
         }
@@ -83,13 +83,13 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         if (onDelete) {
             onDelete(product._id, index);
         }
-    };
+    }, [dispatch, index, onDelete, type, product]);
 
-    const navigateToProduct = () => {
+    const navigateToProduct = useCallback(() => {
         navigation.navigate('ProductView', {
             product: product,
         });
-    };
+    }, [navigation, product]);
 
     const panGesture = Gesture.Pan()
         .activeOffsetX(-10)
