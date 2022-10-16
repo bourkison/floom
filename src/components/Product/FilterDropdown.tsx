@@ -11,7 +11,11 @@ import {
 import {Ionicons} from '@expo/vector-icons';
 import {GENDER_OPTIONS, CATEGORY_OPTIONS, COLOUR_OPTIONS} from '@/constants';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
-import {TOGGLE_EXCLUDE, TOGGLE_FILTER} from '@/store/slices/product';
+import {
+    TOGGLE_EXCLUDE,
+    TOGGLE_FILTER,
+    LOAD_UNSAVED_PRODUCTS,
+} from '@/store/slices/product';
 import AnimatedButton from '../Utility/AnimatedButton';
 
 type FilterItemProps = {
@@ -88,7 +92,15 @@ const FilterDropdown = () => {
     };
 
     const search = () => {
-        console.log('Search');
+        dispatch(
+            LOAD_UNSAVED_PRODUCTS({
+                queryStringParameters: {
+                    loadAmount: 10,
+                    type: 'unsaved',
+                },
+                initialLoad: true,
+            }),
+        );
     };
 
     return (

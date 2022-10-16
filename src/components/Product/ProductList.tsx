@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import Product from '@/components/Product/Product';
 
 import {LOAD_UNSAVED_PRODUCTS} from '@/store/slices/product';
@@ -41,6 +41,8 @@ const ProductList = () => {
             );
         };
 
+        // If no products, and more to load, and not already loading
+        // OR products is less than amount, more to load, and not already loading.
         if (!products.length && !isLoading && moreToLoad) {
             loadProducts(true);
         } else if (
@@ -52,6 +54,14 @@ const ProductList = () => {
             loadProducts(false, products[products.length - 1]._id);
         }
     }, [products, isLoading, dispatch, isLoadingMore, moreToLoad]);
+
+    if (isLoading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -69,6 +79,11 @@ const ProductList = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

@@ -240,6 +240,9 @@ const productSlice = createSlice({
                     ...state.unsaved.products,
                     ...action.payload.products,
                 ];
+                state.unsaved.isLoading = false;
+                state.unsaved.isLoadingMore = false;
+                state.unsaved.moreToLoad = action.payload.__moreToLoad;
             })
             .addCase(LOAD_SAVED_PRODUCTS.fulfilled, (state, action) => {
                 console.log(
