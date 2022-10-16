@@ -90,6 +90,7 @@ const Navigator = () => {
                 options={{
                     gestureDirection: 'horizontal-inverted',
                     headerShown: false,
+                    gestureEnabled: true,
                 }}
             />
             <MainStack.Screen
@@ -98,6 +99,7 @@ const Navigator = () => {
                 options={{
                     gestureDirection: 'horizontal',
                     header: SavedProductsHeader,
+                    gestureEnabled: true,
                 }}
             />
             <MainStack.Screen

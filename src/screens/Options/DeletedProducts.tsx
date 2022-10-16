@@ -170,7 +170,8 @@ const DeletedProducts = () => {
                                     <AnimatedButton
                                         style={styles.deleteButton}
                                         textStyle={styles.deleteButtonText}
-                                        onPress={deleteAllProducts}>
+                                        onPress={deleteAllProducts}
+                                        disabled={isDeletingAll}>
                                         {isDeletingAll ? (
                                             <Spinner
                                                 diameter={15}

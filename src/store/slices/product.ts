@@ -11,6 +11,7 @@ import {
 } from '@/types/product';
 import {createSaveOrDelete, deleteSaveOrDelete} from '@/api/save';
 import {queryProduct} from '@/api/product';
+import {RootState} from '@/store';
 
 const productAdapter = createEntityAdapter();
 
@@ -34,7 +35,7 @@ const initialState = productAdapter.getInitialState({
     },
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
     filters: {
-        gender: [] as string[],
+        gender: ['Unisex'] as string[],
         category: [] as string[],
         color: [] as string[],
         searchText: '',
@@ -56,12 +57,20 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
             },
             loadType: 'initial',
         },
+        {getState},
     ) => {
         let init: QueryProductInit = {
             queryStringParameters: input.queryStringParameters,
         };
 
-        console.log('QUERYING:', input.loadType);
+        const state = getState() as RootState;
+
+        if (init.queryStringParameters) {
+            init.queryStringParameters.excludeDeleted =
+                state.product.filters.excludeDeleted;
+            init.queryStringParameters.excludeSaved =
+                state.product.filters.excludeSaved;
+        }
 
         return await queryProduct({
             init,

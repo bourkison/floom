@@ -36,6 +36,11 @@ const queryUnsavedProduct = async (
     const loadAmount = parseInt(event.queryStringParameters.loadAmount) || 5;
     const startAt = event.queryStringParameters.startAt || '';
 
+    const excludeDeleted =
+        event.queryStringParameters.excludeDeleted === 'true' || false;
+    const excludeSaved =
+        event.queryStringParameters.excludeSaved === 'true' || false;
+
     const Product: Model<ProductType> = await MongooseModels().Product(
         MONGODB_URI,
     );
@@ -69,10 +74,21 @@ const queryUnsavedProduct = async (
             };
         }
 
-        const excludedProductsArr = [
-            ...user.likedProducts,
-            ...user.deletedProducts,
-        ];
+        let excludedProductsArr: Types.ObjectId[] = [];
+        console.log('TEST');
+        if (excludeDeleted) {
+            excludedProductsArr = [
+                ...excludedProductsArr,
+                ...user.deletedProducts,
+            ];
+        }
+
+        if (excludeSaved) {
+            excludedProductsArr = [
+                ...excludedProductsArr,
+                ...user.likedProducts,
+            ];
+        }
 
         let query: FilterQuery<ProductType> = {
             _id: {

@@ -39,7 +39,7 @@
         },
         "teenderProductHandler": {
           "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/teenderProductHandler-4479484e4b5270355566-build.zip",
+          "s3Key": "amplify-builds/teenderProductHandler-716f6c556e6e54625773-build.zip",
           "secretsPathAmplifyAppId": "d34lete8blzmed"
         },
         "teenderSaveHandler": {

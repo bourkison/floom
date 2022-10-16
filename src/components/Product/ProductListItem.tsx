@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, useWindowDimensions, Image} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    useWindowDimensions,
+    Image,
+    TouchableOpacity,
+} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import * as Haptics from 'expo-haptics';
 
@@ -139,15 +146,6 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
             }
         });
 
-    const touchGesture = Gesture.Tap()
-        .maxDuration(250)
-        .onTouchesDown(() => {
-            // TODO: Change background color of item for user feedback
-        })
-        .onTouchesUp(() => {
-            runOnJS(navigateToProduct)();
-        });
-
     return (
         <View style={styles.container}>
             <Animated.View style={[styles.deleteContainer, rDelStyle]}>
@@ -160,42 +158,43 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                     rStyle,
                 ]}>
                 <GestureDetector gesture={panGesture}>
-                    <GestureDetector gesture={touchGesture}>
-                        <View style={styles.listView}>
-                            <View
-                                style={[
-                                    styles.imageContainer,
-                                    {flexBasis: imageContSize},
-                                ]}
-                                onLayout={({
-                                    nativeEvent: {
-                                        layout: {height},
-                                    },
-                                }) => {
-                                    // Set width/height equal to lowest value of height/width
-                                    setImageSize({
-                                        width:
-                                            height -
-                                            styles.imageContainer.padding * 2,
-                                        height:
-                                            height -
-                                            styles.imageContainer.padding * 2,
-                                    });
-                                    setImageContSize(height);
-                                }}>
-                                <Image
-                                    style={[styles.image, imageSize]}
-                                    source={{uri: product.imageLink[0]}}
-                                />
-                            </View>
-                            <View style={styles.titleContainer}>
-                                <Text style={styles.titleText}>
-                                    {product.title}
-                                </Text>
-                                <Text>${product.price}</Text>
-                            </View>
+                    <TouchableOpacity
+                        onPress={navigateToProduct}
+                        style={styles.listView}
+                        delayPressIn={50}>
+                        <View
+                            style={[
+                                styles.imageContainer,
+                                {flexBasis: imageContSize},
+                            ]}
+                            onLayout={({
+                                nativeEvent: {
+                                    layout: {height},
+                                },
+                            }) => {
+                                // Set width/height equal to lowest value of height/width
+                                setImageSize({
+                                    width:
+                                        height -
+                                        styles.imageContainer.padding * 2,
+                                    height:
+                                        height -
+                                        styles.imageContainer.padding * 2,
+                                });
+                                setImageContSize(height);
+                            }}>
+                            <Image
+                                style={[styles.image, imageSize]}
+                                source={{uri: product.imageLink[0]}}
+                            />
                         </View>
-                    </GestureDetector>
+                        <View style={styles.titleContainer}>
+                            <Text style={styles.titleText}>
+                                {product.title}
+                            </Text>
+                            <Text>${product.price}</Text>
+                        </View>
+                    </TouchableOpacity>
                 </GestureDetector>
             </Animated.View>
         </View>

@@ -7,6 +7,7 @@ import Navigator from '@/nav/Navigator';
 import {Provider} from 'react-redux';
 import store from '@/store';
 
+import 'react-native-gesture-handler';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 import {Amplify} from 'aws-amplify';

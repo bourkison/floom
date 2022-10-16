@@ -19,6 +19,8 @@ export type QueryProductInit = {
         loadAmount?: number;
         type?: 'saved' | 'unsaved' | 'deleted';
         startAt?: string;
+        excludeDeleted?: boolean;
+        excludeSaved?: boolean;
     };
 };
 

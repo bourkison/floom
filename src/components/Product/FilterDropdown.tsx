@@ -96,6 +96,7 @@ const FilterDropdown = () => {
                 loadType: 'initial',
             }),
         );
+        setVisible(false);
     };
 
     const measureDropdownTop = (): boolean => {

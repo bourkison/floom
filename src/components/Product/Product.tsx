@@ -353,7 +353,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         });
 
     const openProduct = () => {
-        navigation.navigate('ProductView', {
+        navigation.push('ProductView', {
             product: product,
         });
     };
