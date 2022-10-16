@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
@@ -13,11 +13,8 @@ import {
 
 import ProductListItem from '@/components/Product/ProductListItem';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
-import {
-    LOAD_MORE_SAVED_PRODUCTS,
-    LOAD_SAVED_PRODUCTS,
-} from '@/store/slices/product';
-import {Product as ProductType} from '@/types/product';
+import {LOAD_SAVED_PRODUCTS} from '@/store/slices/product';
+import {Product as ProductType, QueryProductInit} from '@/types/product';
 
 const ON_END_REACHED_THRESHOLD = 0;
 
@@ -25,39 +22,55 @@ const SavedProducts = ({}: StackScreenProps<
     MainStackParamList,
     'SavedProducts'
 >) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isRefreshing, setIsRefereshing] = useState(false);
 
     const dispatch = useAppDispatch();
-    const savedProducts = useAppSelector(state => state.product.savedProducts);
-    const moreToLoad = useAppSelector(state => state.product.moreSavedToLoad);
+    const savedProducts = useAppSelector(state => state.product.saved.products);
+    const moreToLoad = useAppSelector(state => state.product.saved.moreToLoad);
+    const isLoading = useAppSelector(state => state.product.saved.isLoading);
+    const isLoadingMore = useAppSelector(
+        state => state.product.saved.isLoadingMore,
+    );
+
+    const loadProducts = useCallback(
+        async (initialLoad: boolean, startAt?: string) => {
+            let init: QueryProductInit = {
+                queryStringParameters: {
+                    loadAmount: 25,
+                    type: 'saved',
+                },
+            };
+
+            if (startAt && init.queryStringParameters) {
+                init.queryStringParameters.startAt = startAt;
+            }
+
+            await dispatch(
+                LOAD_SAVED_PRODUCTS({
+                    queryStringParameters: init.queryStringParameters,
+                    initialLoad,
+                }),
+            );
+        },
+        [dispatch],
+    );
 
     useEffect(() => {
-        const initFetch = async () => {
-            setIsLoading(true);
-            await dispatch(LOAD_SAVED_PRODUCTS());
-            setIsLoading(false);
-        };
-
-        if (savedProducts.length === 0) {
-            initFetch();
-        } else {
-            setIsLoading(false);
+        // Call on initial load.
+        if (!savedProducts.length && moreToLoad && !isLoading) {
+            loadProducts(true);
         }
-    }, [dispatch, savedProducts]);
+    }, [loadProducts, savedProducts, moreToLoad, isLoading]);
 
     const refresh = async () => {
         setIsRefereshing(true);
-        await dispatch(LOAD_SAVED_PRODUCTS());
+        await loadProducts(true);
         setIsRefereshing(false);
     };
 
     const loadMore = async () => {
         if (!isLoadingMore && !isLoading && !isRefreshing && moreToLoad) {
-            setIsLoadingMore(true);
-            await dispatch(LOAD_MORE_SAVED_PRODUCTS());
-            setIsLoadingMore(false);
+            loadProducts(false, savedProducts[savedProducts.length - 1]._id);
         }
     };
 

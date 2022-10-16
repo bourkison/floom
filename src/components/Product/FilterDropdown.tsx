@@ -77,12 +77,7 @@ const FilterDropdown = () => {
     };
 
     const openDropdown = () => {
-        if (DropdownButton && DropdownButton.current) {
-            // @ts-ignore
-            DropdownButton.current.measure((_fx, _fy, _w, h, _px, py) => {
-                setDropdownTop(py + h);
-            });
-
+        if (measureDropdownTop()) {
             setVisible(true);
         }
     };
@@ -103,12 +98,26 @@ const FilterDropdown = () => {
         );
     };
 
+    const measureDropdownTop = (): boolean => {
+        if (DropdownButton && DropdownButton.current) {
+            // @ts-ignore
+            DropdownButton.current.measure((_fx, _fy, _w, h, _px, py) => {
+                setDropdownTop(py + h);
+            });
+
+            return true;
+        }
+
+        return false;
+    };
+
     return (
         <View style={styles.container}>
             <TouchableOpacity
                 ref={DropdownButton}
                 onPress={toggleDropdown}
-                activeOpacity={0.6}>
+                activeOpacity={0.6}
+                onLayout={measureDropdownTop}>
                 <View style={styles.buttonsContainer}>
                     <Text style={styles.buttonText}>Filters</Text>
                     <Ionicons
