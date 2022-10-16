@@ -64,10 +64,6 @@ const DeletedProducts = () => {
         setIsLoadingMore(false);
     };
 
-    if (isLoading) {
-        return <ActivityIndicator />;
-    }
-
     const removeProduct = (_id: string, index: number) => {
         setProducts([
             ...products.slice(0, index),
@@ -87,6 +83,10 @@ const DeletedProducts = () => {
             onDelete={removeProduct}
         />
     );
+
+    if (isLoading) {
+        return <ActivityIndicator />;
+    }
 
     return (
         <View style={styles.container}>

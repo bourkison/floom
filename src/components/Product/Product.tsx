@@ -14,7 +14,11 @@ import Animated, {
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {useEffect} from 'react';
-import {SAVE_PRODUCT, DELETE_PRODUCT} from '@/store/slices/product';
+import {
+    SAVE_PRODUCT,
+    DELETE_PRODUCT,
+    BUY_PRODUCT,
+} from '@/store/slices/product';
 import {useNavigation} from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 
@@ -29,6 +33,7 @@ import {
 } from '@/constants';
 
 import * as loadingImage from '@/assets/loading.png';
+import * as WebBrowser from 'expo-web-browser';
 
 type ProductComponentProps = {
     product: ProductType;
@@ -36,13 +41,11 @@ type ProductComponentProps = {
 };
 
 const MAX_ROTATION = 10;
-const ROTATION_WIDTH = 200;
-const ACTION_VISIBILITY_THRESHOLD = 0.2;
-
-const ANIMATION_DURATION = 150;
+const ANIMATION_DURATION = 300;
 
 const ACTION_THRESHOLD = 150;
 const SCALE_AMOUNT = 0.005;
+const OPACITY_MINIMUM = 0.2;
 
 const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const offsetX = useSharedValue(0);
@@ -53,17 +56,27 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const tileOpacity = useSharedValue(1);
     const saveOpacity = useSharedValue(0);
     const deleteOpacity = useSharedValue(0);
+    const buyOpacity = useSharedValue(0);
     const ctx = useSharedValue({x: 0, y: 0});
 
-    const isActing = useSharedValue(false);
+    const action = useSharedValue<'idle' | 'buy' | 'save' | 'delete'>('idle');
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
-    const {width} = useWindowDimensions();
+    const {width, height: windowHeight} = useWindowDimensions();
 
     const dispatch = useAppDispatch();
     const animationAction = useAppSelector(state => state.product.animation);
     const [imageIndex, setImageIndex] = useState(0);
+
+    const resetProduct = useCallback(() => {
+        'worklet';
+        offsetX.value = 0;
+        offsetY.value = 0;
+        buyOpacity.value = 0;
+        deleteOpacity.value = 0;
+        saveOpacity.value = 0;
+    }, [offsetX, offsetY, buyOpacity, deleteOpacity, saveOpacity]);
 
     const saveProduct = useCallback(() => {
         dispatch(SAVE_PRODUCT(product._id));
@@ -72,6 +85,12 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const deleteProduct = useCallback(() => {
         dispatch(DELETE_PRODUCT(product._id));
     }, [dispatch, product]);
+
+    const buyProduct = useCallback(async () => {
+        await WebBrowser.openBrowserAsync('https://www.google.com/');
+        dispatch(BUY_PRODUCT());
+        runOnUI(resetProduct)();
+    }, [dispatch, resetProduct]);
 
     // Fade this product out and remove it from products array.
     // Called post pan gesture and after like animation.
@@ -119,9 +138,26 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         fadeAndRemove(type);
                     },
                 );
+            } else if (type === 'buy') {
+                offsetY.value = withTiming(-windowHeight * 0.25, {
+                    duration: ANIMATION_DURATION,
+                });
+                buyOpacity.value = 1;
+                runOnJS(buyProduct)();
             }
         },
-        [deleteOpacity, fadeAndRemove, offsetX, rotation, saveOpacity, width],
+        [
+            deleteOpacity,
+            fadeAndRemove,
+            offsetX,
+            offsetY,
+            rotation,
+            saveOpacity,
+            width,
+            windowHeight,
+            buyProduct,
+            buyOpacity,
+        ],
     );
 
     useEffect(() => {
@@ -165,6 +201,12 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         };
     });
 
+    const rBuyStyle = useAnimatedStyle(() => {
+        return {
+            opacity: buyOpacity.value,
+        };
+    });
+
     const panGesture = Gesture.Pan()
         .activeOffsetX([-5, 5])
         .activeOffsetY([-5, 5])
@@ -179,44 +221,94 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             offsetY.value = e.translationY + ctx.value.y;
 
             // Calculate rotation
-            let percentageToAction = e.translationX / ROTATION_WIDTH;
-            if (percentageToAction > 1) {
-                percentageToAction = 1;
-            } else if (percentageToAction < -1) {
-                percentageToAction = -1;
+            let percentageToActionX = e.translationX / ACTION_THRESHOLD;
+            let percentageToActionY = -e.translationY / ACTION_THRESHOLD;
+            if (percentageToActionX > 1) {
+                percentageToActionX = 1;
+            } else if (percentageToActionX < -1) {
+                percentageToActionX = -1;
             }
 
-            rotation.value = percentageToAction * MAX_ROTATION;
+            if (percentageToActionY > 1) {
+                percentageToActionY = 1;
+            }
 
-            // If acting and we shouldn't be, OR if not acting and we should be
+            rotation.value = percentageToActionX * MAX_ROTATION;
+
+            // If we're not idle and we should be (i.e. within the action thresholds).
             if (
-                (!isActing.value &&
-                    Math.abs(offsetX.value) > ACTION_THRESHOLD) ||
-                (isActing.value && Math.abs(offsetX.value) < ACTION_THRESHOLD)
+                action.value !== 'idle' &&
+                Math.abs(offsetX.value) < ACTION_THRESHOLD &&
+                -offsetY.value < ACTION_THRESHOLD
             ) {
-                isActing.value = !isActing.value;
+                action.value = 'idle';
+                runOnJS(Haptics.selectionAsync)();
+            }
+            // else if we're not buying and we should be (i.e. offsetY value above 2x action threshold)
+            else if (
+                action.value !== 'buy' &&
+                -offsetY.value >= ACTION_THRESHOLD * 2
+            ) {
+                action.value = 'buy';
+                runOnJS(Haptics.selectionAsync)();
+            }
+            // else if we're not saving and we should be (i.e. offsetX value above action threshold)
+            else if (
+                action.value !== 'save' &&
+                offsetX.value >= ACTION_THRESHOLD
+            ) {
+                action.value = 'save';
+                runOnJS(Haptics.selectionAsync)();
+            }
+            // finally, if we're not deleting and we should be (i.e. offsetX value below action threshold)
+            else if (
+                action.value !== 'delete' &&
+                offsetX.value <= -ACTION_THRESHOLD
+            ) {
+                action.value = 'delete';
                 runOnJS(Haptics.selectionAsync)();
             }
 
-            if (percentageToAction > ACTION_VISIBILITY_THRESHOLD) {
-                saveOpacity.value = percentageToAction;
-                deleteOpacity.value = 0;
-            } else if (percentageToAction < -ACTION_VISIBILITY_THRESHOLD) {
+            // if (action.value !== 'buy' && -e.translationY > Math.abs(e.translationX))
+            if (
+                action.value === 'buy' ||
+                (action.value === 'idle' &&
+                    percentageToActionY > Math.abs(percentageToActionX) &&
+                    percentageToActionY > OPACITY_MINIMUM)
+            ) {
+                buyOpacity.value = percentageToActionY;
                 saveOpacity.value = 0;
-                deleteOpacity.value = -percentageToAction;
+                deleteOpacity.value = 0;
+            } else if (
+                action.value === 'save' ||
+                (action.value === 'idle' &&
+                    percentageToActionX > percentageToActionY &&
+                    percentageToActionX > OPACITY_MINIMUM)
+            ) {
+                saveOpacity.value = percentageToActionX;
+                deleteOpacity.value = 0;
+                buyOpacity.value = 0;
+            } else if (
+                action.value === 'delete' ||
+                (action.value === 'idle' &&
+                    percentageToActionX < -percentageToActionY &&
+                    percentageToActionX < -OPACITY_MINIMUM)
+            ) {
+                saveOpacity.value = 0;
+                deleteOpacity.value = -percentageToActionX;
+                buyOpacity.value = 0;
             } else {
                 saveOpacity.value = 0;
                 deleteOpacity.value = 0;
+                buyOpacity.value = 0;
             }
         })
         .onFinalize(() => {
-            if (offsetX.value > ACTION_THRESHOLD) {
-                // SAVE
+            if (action.value === 'save') {
                 tileOpacity.value = withTiming(0, {}, () => {
                     fadeAndRemove('save');
                 });
-            } else if (offsetX.value < -ACTION_THRESHOLD) {
-                // DELETE
+            } else if (action.value === 'delete') {
                 tileOpacity.value = withTiming(0, {}, () => {
                     fadeAndRemove('delete');
                 });
@@ -226,7 +318,10 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 rotation.value = withSpring(0);
                 saveOpacity.value = withTiming(0);
                 deleteOpacity.value = withTiming(0);
+                buyOpacity.value = withTiming(0);
             }
+
+            action.value = 'idle';
         });
 
     const openProduct = () => {
@@ -405,6 +500,16 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                                     </Text>
                                 </Animated.View>
                             </View>
+
+                            <View style={styles.actionContainer}>
+                                <Animated.View
+                                    style={[
+                                        rBuyStyle,
+                                        styles.buyTextContainer,
+                                    ]}>
+                                    <Text style={styles.buyText}>BUY</Text>
+                                </Animated.View>
+                            </View>
                         </View>
                     ) : undefined}
                 </View>
@@ -519,6 +624,18 @@ const styles = StyleSheet.create({
     },
     deleteText: {
         color: '#ce3b54',
+        fontWeight: 'bold',
+        fontSize: 24,
+    },
+    buyTextContainer: {
+        borderColor: '#264653',
+        borderWidth: 3,
+        borderRadius: 10,
+        padding: 5,
+        position: 'absolute',
+    },
+    buyText: {
+        color: '#264653',
         fontWeight: 'bold',
         fontSize: 24,
     },

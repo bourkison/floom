@@ -172,6 +172,9 @@ const productSlice = createSlice({
                 }
             }
         },
+        BUY_PRODUCT(state) {
+            state.animation = 'idle';
+        },
     },
     extraReducers: builder => {
         builder
@@ -231,6 +234,6 @@ const productSlice = createSlice({
     },
 });
 
-export const {PUSH_PRODUCTS, COMMENCE_ANIMATE, TOGGLE_FILTER} =
+export const {PUSH_PRODUCTS, COMMENCE_ANIMATE, TOGGLE_FILTER, BUY_PRODUCT} =
     productSlice.actions;
 export default productSlice.reducer;
