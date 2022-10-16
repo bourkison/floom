@@ -22,13 +22,20 @@ import {StackNavigationProp} from '@react-navigation/stack';
 export type SavedProductProps = {
     product: ProductType;
     index: number;
+    type: 'saved' | 'deleted';
+    onDelete?: (_id: string, index: number) => void;
 };
 
 const ITEM_HEIGHT = 72;
 const SNAP_ANIMATION_DURATION = 250;
 const SNAP_TO_DELETE_TRANSLATION = 7 / 8;
 
-const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
+const SavedProduct: React.FC<SavedProductProps> = ({
+    product,
+    index,
+    type,
+    onDelete,
+}) => {
     const contextX = useSharedValue(0);
     const offsetX = useSharedValue(0);
     const sHeight = useSharedValue(ITEM_HEIGHT);
@@ -62,7 +69,13 @@ const SavedProduct: React.FC<SavedProductProps> = ({product, index}) => {
     });
 
     const deleteProduct = () => {
-        dispatch(DELETE_SAVED_PRODUCT({_id: product._id, index}));
+        if (type === 'saved') {
+            dispatch(DELETE_SAVED_PRODUCT({_id: product._id, index}));
+        }
+
+        if (onDelete) {
+            onDelete(product._id, index);
+        }
     };
 
     const navigateToProduct = () => {

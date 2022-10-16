@@ -62,7 +62,7 @@ const SavedProducts = ({}: StackScreenProps<
     };
 
     const ListItem: ListRenderItem<ProductType> = ({item, index}) => (
-        <SavedProduct product={item} index={index} />
+        <SavedProduct product={item} index={index} type="saved" />
     );
 
     return (
