@@ -23,7 +23,7 @@ const ProductView = ({
     route,
     navigation,
 }: StackScreenProps<MainStackParamList, 'ProductView'>) => {
-    const [imageIndex, setImageIndex] = useState(0);
+    const [imageIndex, setImageIndex] = useState(route.params.imageIndex || 0);
     const {width} = useWindowDimensions();
 
     const calculateImageIndicator = (i: number) => {

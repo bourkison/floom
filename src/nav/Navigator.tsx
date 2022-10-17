@@ -39,6 +39,7 @@ export type MainStackParamList = {
     SavedProducts: undefined;
     ProductView: {
         product: ProductType;
+        imageIndex?: number;
     };
 };
 
