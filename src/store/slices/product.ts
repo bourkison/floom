@@ -108,9 +108,15 @@ export const DELETE_SAVED_PRODUCT = createAsyncThunk<
     });
 });
 
+type RejectWithValueType = {
+    message?: string;
+    code?: number;
+};
+
 export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
     QueryProductResponse,
-    LoadProductsParams
+    LoadProductsParams,
+    {rejectValue: RejectWithValueType}
 >(
     'product/LOAD_SAVED_PRODUCTS',
     async (
@@ -121,14 +127,22 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
             },
             loadType: 'initial',
         },
+        {rejectWithValue},
     ) => {
         let init: QueryProductInit = {
             queryStringParameters: input.queryStringParameters,
         };
 
-        return await queryProduct({
-            init,
-        });
+        try {
+            return await queryProduct({
+                init,
+            });
+        } catch (err: any) {
+            return rejectWithValue({
+                message: err.message || undefined,
+                code: err?.response?.status || undefined,
+            });
+        }
     },
 );
 
@@ -257,9 +271,23 @@ const productSlice = createSlice({
                 state.saved.isLoadingMore = false;
                 state.saved.moreToLoad = action.payload.__moreToLoad;
             })
-            .addCase(LOAD_SAVED_PRODUCTS.rejected, () => {
+            .addCase(LOAD_SAVED_PRODUCTS.rejected, (state, {meta, payload}) => {
                 // TODO: Handle rejections.
-                console.warn('Get product rejected');
+                // If initial load or refresh and 404
+                if (
+                    (meta.arg.loadType === 'initial' ||
+                        meta.arg.loadType === 'refresh') &&
+                    meta.rejectedWithValue &&
+                    payload &&
+                    payload.code &&
+                    payload.code === 404
+                ) {
+                    state.saved.products = [];
+                }
+
+                state.saved.isLoading = false;
+                state.saved.isLoadingMore = false;
+                state.saved.moreToLoad = false;
             })
             .addCase(DELETE_SAVED_PRODUCT.pending, (state, action) => {
                 state.saved.products = [

@@ -18,10 +18,7 @@ export async function queryProduct(
 
     console.log(await fetchJwtToken());
 
-    const data = await API.get(API_NAME, path, init).catch(err => {
-        console.error(err);
-        throw err;
-    });
+    const data = await API.get(API_NAME, path, init);
 
     let response: ProductType[] = [];
 
