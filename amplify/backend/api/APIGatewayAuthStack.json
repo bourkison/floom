@@ -11,7 +11,7 @@
     "env": {
       "Type": "String"
     },
-    "teenderapi": {
+    "floomapi": {
       "Type": "String"
     }
   },
@@ -52,127 +52,7 @@
                       },
                       ":",
                       {
-                        "Ref": "teenderapi"
-                      },
-                      "/",
-                      {
-                        "Fn::If": [
-                          "ShouldNotCreateEnvResources",
-                          "Prod",
-                          {
-                            "Ref": "env"
-                          }
-                        ]
-                      },
-                      "/*/user/*"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:execute-api:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":",
-                      {
-                        "Ref": "teenderapi"
-                      },
-                      "/",
-                      {
-                        "Fn::If": [
-                          "ShouldNotCreateEnvResources",
-                          "Prod",
-                          {
-                            "Ref": "env"
-                          }
-                        ]
-                      },
-                      "/*/user"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:execute-api:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":",
-                      {
-                        "Ref": "teenderapi"
-                      },
-                      "/",
-                      {
-                        "Fn::If": [
-                          "ShouldNotCreateEnvResources",
-                          "Prod",
-                          {
-                            "Ref": "env"
-                          }
-                        ]
-                      },
-                      "/GET/product/*"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:execute-api:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":",
-                      {
-                        "Ref": "teenderapi"
-                      },
-                      "/",
-                      {
-                        "Fn::If": [
-                          "ShouldNotCreateEnvResources",
-                          "Prod",
-                          {
-                            "Ref": "env"
-                          }
-                        ]
-                      },
-                      "/GET/product"
-                    ]
-                  ]
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:execute-api:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":",
-                      {
-                        "Ref": "teenderapi"
+                        "Ref": "floomapi"
                       },
                       "/",
                       {
@@ -202,7 +82,7 @@
                       },
                       ":",
                       {
-                        "Ref": "teenderapi"
+                        "Ref": "floomapi"
                       },
                       "/",
                       {
@@ -215,59 +95,6 @@
                         ]
                       },
                       "/*/save"
-                    ]
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "Roles": [
-          {
-            "Ref": "authRoleName"
-          }
-        ]
-      }
-    },
-    "PolicyAPIGWUnauth1": {
-      "Type": "AWS::IAM::ManagedPolicy",
-      "Properties": {
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "execute-api:Invoke"
-              ],
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:aws:execute-api:",
-                      {
-                        "Ref": "AWS::Region"
-                      },
-                      ":",
-                      {
-                        "Ref": "AWS::AccountId"
-                      },
-                      ":",
-                      {
-                        "Ref": "teenderapi"
-                      },
-                      "/",
-                      {
-                        "Fn::If": [
-                          "ShouldNotCreateEnvResources",
-                          "Prod",
-                          {
-                            "Ref": "env"
-                          }
-                        ]
-                      },
-                      "/GET/product/*"
                     ]
                   ]
                 },
@@ -285,7 +112,7 @@
                       },
                       ":",
                       {
-                        "Ref": "teenderapi"
+                        "Ref": "floomapi"
                       },
                       "/",
                       {
@@ -297,7 +124,97 @@
                           }
                         ]
                       },
-                      "/GET/product"
+                      "/*/product/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "floomapi"
+                      },
+                      "/",
+                      {
+                        "Fn::If": [
+                          "ShouldNotCreateEnvResources",
+                          "Prod",
+                          {
+                            "Ref": "env"
+                          }
+                        ]
+                      },
+                      "/*/product"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "floomapi"
+                      },
+                      "/",
+                      {
+                        "Fn::If": [
+                          "ShouldNotCreateEnvResources",
+                          "Prod",
+                          {
+                            "Ref": "env"
+                          }
+                        ]
+                      },
+                      "/*/user/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "floomapi"
+                      },
+                      "/",
+                      {
+                        "Fn::If": [
+                          "ShouldNotCreateEnvResources",
+                          "Prod",
+                          {
+                            "Ref": "env"
+                          }
+                        ]
+                      },
+                      "/*/user"
                     ]
                   ]
                 }
@@ -307,7 +224,7 @@
         },
         "Roles": [
           {
-            "Ref": "unauthRoleName"
+            "Ref": "authRoleName"
           }
         ]
       }

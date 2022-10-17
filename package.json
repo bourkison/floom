@@ -1,11 +1,10 @@
 {
-    "name": "teender",
+    "name": "floom",
     "version": "1.0.0",
     "scripts": {
-        "amplify:teenderUserHandler": "cd amplify/backend/function/teenderUserHandler/src && tsc",
-        "amplify:teenderProductHandler": "cd amplify/backend/function/teenderProductHandler/src && tsc",
-        "amplify:teenderSaveHandler": "cd amplify/backend/function/teenderSaveHandler/src && tsc",
-        "amplify:teenderf3c943f2f3c943f2PreSignup": "cd amplify/backend/function/teenderf3c943f2f3c943f2PreSignup/src && tsc",
-        "amplify:teenderTestProducts": "cd amplify/backend/function/teenderTestProducts/src && tsc"
+        "amplify:floomUserHandler": "cd amplify/backend/function/floomUserHandler/src && tsc",
+        "amplify:floomProductHandler": "cd amplify/backend/function/floomProductHandler/src && tsc",
+        "amplify:floomSaveHandler": "cd amplify/backend/function/floomSaveHandler/src && tsc",
+        "amplify:floomCognitoPostConfirmation": "cd amplify/backend/function/floomCognitoPostConfirmation/src && tsc"
     }
 }

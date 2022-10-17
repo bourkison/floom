@@ -1,6 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
     "auth": {
-        "teenderf3c943f2f3c943f2": {
+        "floomCognito": {
             "IdentityPoolId": "string",
             "IdentityPoolName": "string",
             "UserPoolId": "string",
@@ -11,35 +11,34 @@ export type AmplifyDependentResourcesAttributes = {
         }
     },
     "function": {
-        "teenderMongooseModels": {
-            "Arn": "string"
-        },
-        "teenderUserHandler": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
-        "teenderf3c943f2f3c943f2PreSignup": {
+        "floomCognitoPostConfirmation": {
             "Name": "string",
             "Arn": "string",
             "LambdaExecutionRole": "string",
             "Region": "string"
         },
-        "teenderTestProducts": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string",
-            "CloudWatchEventRule": "string"
-        },
-        "teenderProductHandler": {
+        "floomUserHandler": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
             "LambdaExecutionRole": "string"
         },
-        "teenderSaveHandler": {
+        "floomMongooseModels": {
+            "Arn": "string"
+        },
+        "floomSaveHandler": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string",
+            "LambdaExecutionRole": "string"
+        },
+        "floomProductHandler": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string",
+            "LambdaExecutionRole": "string"
+        },
+        "floomPublicHandler": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
@@ -47,7 +46,7 @@ export type AmplifyDependentResourcesAttributes = {
         }
     },
     "api": {
-        "teenderapi": {
+        "floomapi": {
             "RootUrl": "string",
             "ApiName": "string",
             "ApiId": "string"

@@ -54,7 +54,7 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
                 <Ionicons name="heart-outline" size={24} />
             </Pressable>
         }>
-        Teender
+        Floom
     </HeaderTemplate>
 );
 

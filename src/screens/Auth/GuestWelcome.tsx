@@ -24,7 +24,7 @@ const GuestWelcome = ({
     return (
         <View style={styles.container}>
             <View>
-                <Text>Welcome to Teender!</Text>
+                <Text>Welcome to Floom!</Text>
                 <Text>
                     We recommend you sign up in order to fully make use of our
                     service.

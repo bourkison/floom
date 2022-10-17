@@ -1,12 +1,12 @@
 {
   "auth": {
-    "teenderf3c943f2f3c943f2": {
+    "floomCognito": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "teenderf3c943f2f3c943f2PreSignup",
+          "resourceName": "floomCognitoPostConfirmation",
           "triggerProvider": "Cognito",
           "attributes": [
             "Arn",
@@ -21,7 +21,11 @@
           "EMAIL"
         ],
         "signupAttributes": [
-          "EMAIL"
+          "BIRTHDATE",
+          "EMAIL",
+          "GENDER",
+          "LOCALE",
+          "NAME"
         ],
         "passwordProtectionSettings": {
           "passwordPolicyMinLength": 8,
@@ -38,75 +42,66 @@
     }
   },
   "function": {
-    "teenderMongooseModels": {
+    "floomCognitoPostConfirmation": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "floomUserHandler": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "floomMongooseModels",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ]
+    },
+    "floomMongooseModels": {
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer",
       "build": true
     },
-    "teenderUserHandler": {
+    "floomSaveHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "teenderMongooseModels",
+          "resourceName": "floomMongooseModels",
           "attributes": [
             "Arn"
           ]
         }
       ]
     },
-    "teenderf3c943f2f3c943f2PreSignup": {
+    "floomProductHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "teenderMongooseModels",
+          "resourceName": "floomMongooseModels",
           "attributes": [
             "Arn"
           ]
         }
       ]
     },
-    "teenderTestProducts": {
+    "floomPublicHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "teenderMongooseModels",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
-    },
-    "teenderProductHandler": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "teenderMongooseModels",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
-    },
-    "teenderSaveHandler": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "teenderMongooseModels",
+          "resourceName": "floomMongooseModels",
           "attributes": [
             "Arn"
           ]
@@ -115,13 +110,13 @@
     }
   },
   "api": {
-    "teenderapi": {
+    "floomapi": {
       "service": "API Gateway",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "teenderUserHandler",
+          "resourceName": "floomSaveHandler",
           "attributes": [
             "Name",
             "Arn"
@@ -129,7 +124,7 @@
         },
         {
           "category": "function",
-          "resourceName": "teenderProductHandler",
+          "resourceName": "floomProductHandler",
           "attributes": [
             "Name",
             "Arn"
@@ -137,7 +132,15 @@
         },
         {
           "category": "function",
-          "resourceName": "teenderSaveHandler",
+          "resourceName": "floomUserHandler",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "floomPublicHandler",
           "attributes": [
             "Name",
             "Arn"
