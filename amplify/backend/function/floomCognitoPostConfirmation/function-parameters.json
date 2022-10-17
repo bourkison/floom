@@ -13,5 +13,17 @@
   "triggerEventPath": "PostConfirmation.event.json",
   "roleName": "floomCognitoPostConfirmation",
   "skipEdit": true,
-  "enableCors": false
+  "enableCors": false,
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "floomMongooseModels",
+      "env": "teender",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    }
+  ],
+  "secretNames": [
+    "MONGODB_URI"
+  ]
 }

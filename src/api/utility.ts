@@ -11,4 +11,4 @@ export async function fetchJwtToken(): Promise<string> {
     }
 }
 
-export const API_NAME = 'teenderapi';
+export const API_NAME = 'floomapi';

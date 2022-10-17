@@ -8,5 +8,7 @@
       "isLatestVersionSelected": true
     }
   ],
-  "secretNames": []
+  "secretNames": [
+    "MONGODB_URI"
+  ]
 }

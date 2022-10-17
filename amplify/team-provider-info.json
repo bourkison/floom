@@ -20,20 +20,22 @@
       "function": {
         "floomCognitoPostConfirmation": {
           "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomCognitoPostConfirmation-3934596c50374f4e5436-build.zip"
+          "s3Key": "amplify-builds/floomCognitoPostConfirmation-454f7770795272707843-build.zip",
+          "secretsPathAmplifyAppId": "d34lete8blzmed"
         },
         "floomUserHandler": {
           "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomUserHandler-6735417a344e794b477a-build.zip"
+          "s3Key": "amplify-builds/floomUserHandler-38677552475750734276-build.zip",
+          "secretsPathAmplifyAppId": "d34lete8blzmed"
         },
         "floomSaveHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomSaveHandler-4d6c4f672b61664e572b-build.zip"
+          "s3Key": "amplify-builds/floomSaveHandler-594f5945684362527063-build.zip"
         },
         "floomMongooseModels": {
           "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion06807667-build.zip"
+          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion3a6de1ef-build.zip"
         },
         "teenderf3c943f2f3c943f2PreSignup": {},
         "teenderProductHandler": {},
@@ -42,10 +44,14 @@
         "teenderUserHandler": {},
         "teenderTestProducts": {},
         "floomProductHandler": {
-          "secretsPathAmplifyAppId": "d34lete8blzmed"
+          "secretsPathAmplifyAppId": "d34lete8blzmed",
+          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
+          "s3Key": "amplify-builds/floomProductHandler-5a72473230304f517153-build.zip"
         },
         "floomPublicHandler": {
-          "secretsPathAmplifyAppId": "d34lete8blzmed"
+          "secretsPathAmplifyAppId": "d34lete8blzmed",
+          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
+          "s3Key": "amplify-builds/floomPublicHandler-3644564b376534724150-build.zip"
         }
       },
       "api": {

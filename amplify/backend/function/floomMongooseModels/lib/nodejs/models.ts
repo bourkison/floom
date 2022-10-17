@@ -1,11 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const mongoose_connection_1 = __importDefault(require("./mongoose-connection"));
-const userSchema = new mongoose_1.default.Schema({
+import mongoose from 'mongoose';
+import mongooseConnect from './mongoose-connection';
+
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -28,15 +24,16 @@ const userSchema = new mongoose_1.default.Schema({
         required: true,
     },
     likedProducts: {
-        type: [mongoose_1.default.Types.ObjectId],
+        type: [mongoose.Types.ObjectId],
         default: [],
     },
     deletedProducts: {
-        type: [mongoose_1.default.Types.ObjectId],
+        type: [mongoose.Types.ObjectId],
         default: [],
     },
 });
-const productSchema = new mongoose_1.default.Schema({
+
+const productSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -54,17 +51,21 @@ const productSchema = new mongoose_1.default.Schema({
         required: true,
     },
 });
+
 const output = () => {
-    const User = async (uri) => {
-        const connection = await (0, mongoose_connection_1.default)(uri);
+    const User = async (uri: string) => {
+        const connection = await mongooseConnect(uri);
         const response = connection.model('User', userSchema);
         return response;
     };
-    const Product = async (uri) => {
-        const connection = await (0, mongoose_connection_1.default)(uri);
+
+    const Product = async (uri: string) => {
+        const connection = await mongooseConnect(uri);
         const response = connection.model('Product', productSchema);
         return response;
     };
-    return { User, Product };
+
+    return {User, Product};
 };
+
 module.exports = output;
