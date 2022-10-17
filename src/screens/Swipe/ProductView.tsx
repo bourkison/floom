@@ -70,12 +70,8 @@ const ProductView = ({
 
     return (
         <View style={styles.container}>
-            <ScrollView bounces={false} contentContainerStyle={styles.flexOne}>
-                <View
-                    style={
-                        (styles.imageContainer,
-                        {flexBasis: width / IMAGE_RATIO})
-                    }>
+            <ScrollView bounces={false}>
+                <View style={[{height: width / IMAGE_RATIO}]}>
                     <ImageBackground
                         style={styles.imageContainerStyle}
                         source={{
@@ -125,6 +121,9 @@ const ProductView = ({
                             </AnimatedButton>
                         </View>
                     </View>
+                    <View>
+                        <Text>{JSON.stringify(route.params.product)}</Text>
+                    </View>
                 </View>
             </ScrollView>
         </View>
@@ -135,11 +134,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f3fcfa',
-    },
-    imageContainer: {
-        flex: 1,
-        flexGrow: 0,
-        flexShrink: 0,
     },
     imageContainerStyle: {
         flex: 1,
@@ -163,7 +157,8 @@ const styles = StyleSheet.create({
         maxWidth: '33%',
     },
     contentContainer: {
-        flex: 1,
+        paddingBottom: 20,
+        paddingHorizontal: 5,
     },
     title: {
         fontSize: 22,
@@ -175,7 +170,7 @@ const styles = StyleSheet.create({
         flexGrow: 0,
         flexShrink: 0,
         marginTop: -24,
-        marginRight: 24,
+        marginRight: 20,
     },
     downButton: {
         width: 48,
