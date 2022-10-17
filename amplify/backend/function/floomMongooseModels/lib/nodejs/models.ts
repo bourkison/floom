@@ -34,20 +34,54 @@ const userSchema = new mongoose.Schema({
 });
 
 const productSchema = new mongoose.Schema({
-    title: {
+    name: {
         type: String,
         required: true,
     },
     price: {
-        type: Number,
-        required: true,
+        amount: {
+            type: Number,
+            required: true,
+        },
+        saleAmount: {
+            type: Number,
+            required: true,
+        },
+        currency: {
+            type: String,
+            required: true,
+        },
     },
     link: {
         type: String,
         required: true,
     },
-    imageLink: {
+    images: {
         type: [String],
+        required: true,
+    },
+    colors: {
+        type: [String],
+        default: [],
+    },
+    categories: {
+        type: [String],
+        default: [],
+    },
+    gender: {
+        type: String,
+        required: true,
+    },
+    brand: {
+        type: String,
+        required: true,
+    },
+    inStock: {
+        type: Boolean,
+        default: true,
+    },
+    vendorProductId: {
+        type: String,
         required: true,
     },
 });

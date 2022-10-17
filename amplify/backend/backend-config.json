@@ -116,6 +116,20 @@
           ]
         }
       ]
+    },
+    "floomProductManager": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "floomMongooseModels",
+          "attributes": [
+            "Arn"
+          ]
+        }
+      ]
     }
   },
   "api": {

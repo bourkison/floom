@@ -1,9 +1,19 @@
 export type Product = {
     _id: string;
-    title: string;
-    price: number;
-    imageLink: string[];
+    name: string;
+    price: {
+        amount: number;
+        saleAmount: number;
+        currency: string;
+    };
     link: string;
+    images: string[];
+    colors: string[];
+    categories: string[];
+    gender: string;
+    brand: string;
+    vendorProductId: string;
+    inStock: boolean;
 };
 
 // API

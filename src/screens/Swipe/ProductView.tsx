@@ -39,7 +39,7 @@ const ProductView = ({
             style.marginLeft = 0;
         }
 
-        if (i === route.params.product.imageLink.length - 1) {
+        if (i === route.params.product.images.length - 1) {
             style.marginRight = 0;
         }
 
@@ -55,7 +55,7 @@ const ProductView = ({
 
         if (
             amount > 0 &&
-            imageIndex + amount <= route.params.product.imageLink.length - 1
+            imageIndex + amount <= route.params.product.images.length - 1
         ) {
             setImageIndex(imageIndex + amount);
             Haptics.selectionAsync();
@@ -79,10 +79,10 @@ const ProductView = ({
                     <ImageBackground
                         style={styles.imageContainerStyle}
                         source={{
-                            uri: route.params.product.imageLink[imageIndex],
+                            uri: route.params.product.images[imageIndex],
                         }}>
                         <View style={styles.selectedImageContainer}>
-                            {route.params.product.imageLink.map((s, index) => (
+                            {route.params.product.images.map((s, index) => (
                                 <View
                                     style={calculateImageIndicator(index)}
                                     key={index}
@@ -110,7 +110,7 @@ const ProductView = ({
                     <View style={styles.titleButtonContainer}>
                         <View style={styles.flexOne}>
                             <Text style={styles.title}>
-                                {route.params.product.title}
+                                {route.params.product.name}
                             </Text>
                         </View>
                         <View style={styles.downButtonContainer}>

@@ -6,6 +6,7 @@
         "amplify:floomProductHandler": "cd amplify/backend/function/floomProductHandler/src && tsc",
         "amplify:floomSaveHandler": "cd amplify/backend/function/floomSaveHandler/src && tsc",
         "amplify:floomCognitoPostConfirmation": "cd amplify/backend/function/floomCognitoPostConfirmation/src && tsc",
-        "amplify:floomMongooseModels": "cd amplify/backend/function/floomMongooseModels/lib/nodejs && tsc"
+        "amplify:floomMongooseModels": "cd amplify/backend/function/floomMongooseModels/lib/nodejs && tsc",
+        "amplify:floomProductManager": "cd amplify/backend/function/floomProductManager/src && tsc"
     }
 }

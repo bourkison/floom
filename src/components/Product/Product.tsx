@@ -107,10 +107,10 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     }, [dispatch, product]);
 
     const buyProduct = useCallback(async () => {
-        await WebBrowser.openBrowserAsync('https://www.google.com/');
+        await WebBrowser.openBrowserAsync(product.link);
         dispatch(BUY_PRODUCT());
         runOnUI(resetProduct)();
-    }, [dispatch, resetProduct]);
+    }, [dispatch, resetProduct, product]);
 
     // Fade this product out and remove it from products array.
     // Called post pan gesture and after like animation.
@@ -397,7 +397,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             e.allTouches[0].x >
             ((width - IMAGE_PADDING) * (TAP_PERCENTILE - 1)) / TAP_PERCENTILE
         ) {
-            if (imageIndex < product.imageLink.length - 1) {
+            if (imageIndex < product.images.length - 1) {
                 // RIGHT TAP
 
                 // Y ROTATION
@@ -448,7 +448,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             style.marginLeft = 0;
         }
 
-        if (i === product.imageLink.length - 1) {
+        if (i === product.images.length - 1) {
             style.marginRight = 0;
         }
 
@@ -479,11 +479,11 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                     {zIndex: 20 - index},
                 ]}
                 source={{
-                    uri: product.imageLink[imageIndex] || FALLBACK_IMAGE,
+                    uri: product.images[imageIndex] || FALLBACK_IMAGE,
                 }}
                 loadingIndicatorSource={{uri: loadingImage}}>
                 <View style={styles.selectedImageContainer}>
-                    {product.imageLink.map((s, i) => (
+                    {product.images.map((s, i) => (
                         <View style={calculateImageIndicator(i)} key={i} />
                     ))}
                 </View>
@@ -495,12 +495,12 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                             <View style={styles.textContainer}>
                                 <View style={styles.titleContainer}>
                                     <Text style={styles.titleText}>
-                                        {product.title}
+                                        {product.name}
                                     </Text>
                                 </View>
                                 <View style={styles.priceContainer}>
                                     <Text style={styles.priceText}>
-                                        ${product.price}
+                                        ${product.price.saleAmount}
                                     </Text>
                                 </View>
                             </View>

@@ -185,14 +185,12 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                             }}>
                             <Image
                                 style={[styles.image, imageSize]}
-                                source={{uri: product.imageLink[0]}}
+                                source={{uri: product.images[0]}}
                             />
                         </View>
                         <View style={styles.titleContainer}>
-                            <Text style={styles.titleText}>
-                                {product.title}
-                            </Text>
-                            <Text>${product.price}</Text>
+                            <Text style={styles.titleText}>{product.name}</Text>
+                            <Text>${product.price.saleAmount}</Text>
                         </View>
                     </TouchableOpacity>
                 </GestureDetector>

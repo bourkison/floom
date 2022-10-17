@@ -7,13 +7,20 @@ import {Model, Types, FilterQuery} from 'mongoose';
 let MONGODB_URI: string;
 
 type ProductType = {
-    _id: Types.ObjectId;
-    title: string;
-    price: number;
+    name: string;
+    price: {
+        amount: number;
+        saleAmount: number;
+        currency: string;
+    };
     link: string;
-    imageLink: string[];
-    createdAt: Date;
-    updatedAt: Date;
+    images: string[];
+    colors: string[];
+    categories: string[];
+    gender: string;
+    brand: string;
+    vendorProductId: string;
+    inStock: boolean;
 };
 
 type UserType = {

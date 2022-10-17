@@ -26,11 +26,21 @@ export async function queryProduct(
 
     for (let i = 0; i < data.data.length; i++) {
         response.push({
-            title: data.data[i].title,
-            imageLink: data.data[i].imageLink,
-            price: data.data[i].price,
+            name: data.data[i].name,
+            images: data.data[i].images,
+            price: {
+                amount: data.data[i].price.amount,
+                saleAmount: data.data[i].price.saleAmount,
+                currency: data.data[i].price.currency,
+            },
             link: data.data[i].link,
             _id: data.data[i]._id,
+            colors: data.data[i].colors,
+            categories: data.data[i].categories,
+            gender: data.data[i].gender,
+            brand: data.data[i].brand,
+            vendorProductId: data.data[i].vendorProductId,
+            inStock: data.data[i].inStock,
         });
     }
 
@@ -62,10 +72,20 @@ export async function getProduct(
     }
 
     return {
-        title: data.data.title,
-        imageLink: data.data.imageLink,
-        price: data.data.price,
+        name: data.data.name,
+        images: data.data.images,
+        price: {
+            amount: data.data.price.amount,
+            saleAmount: data.data.price.saleAmount,
+            currency: data.data.price.currency,
+        },
         link: data.data.link,
         _id: data.data._id,
+        colors: data.data.colors,
+        categories: data.data.categories,
+        gender: data.data.gender,
+        brand: data.data.brand,
+        vendorProductId: data.data.vendorProductId,
+        inStock: data.data.inStock,
     };
 }
