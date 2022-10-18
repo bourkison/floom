@@ -1,0 +1,4 @@
+db.products.aggregate([
+    {$match: {_id: {$nin: ['634dd63b0b189c25187bd470']}}},
+    {$sample: {size: 5}}
+])

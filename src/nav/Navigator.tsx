@@ -60,17 +60,21 @@ const Navigator = () => {
                 <AuthStack.Screen
                     name="GuestWelcome"
                     component={GuestWelcome}
+                    options={{gestureEnabled: true}}
                 />
                 <AuthStack.Screen
                     name="SignUp"
                     component={SignUp}
-                    options={{header: SignUpHeader}}
+                    options={{
+                        header: SignUpHeader,
+                        gestureEnabled: true,
+                    }}
                 />
                 <AuthStack.Screen name="VerifyEmail" component={VerifyEmail} />
                 <AuthStack.Screen
                     name="Login"
                     component={Login}
-                    options={{header: LoginHeader}}
+                    options={{header: LoginHeader, gestureEnabled: true}}
                 />
             </AuthStack.Navigator>
         );

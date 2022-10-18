@@ -47,6 +47,7 @@ const queryUnsavedProduct = async (
         event.queryStringParameters.excludeDeleted === 'true' || false;
     const excludeSaved =
         event.queryStringParameters.excludeSaved === 'true' || false;
+    const ordered = event.queryStringParameters.ordered === 'true' || false;
 
     const Product: Model<ProductType> = await MongooseModels().Product(
         MONGODB_URI,
@@ -103,16 +104,19 @@ const queryUnsavedProduct = async (
             },
         };
 
-        if (startAt) {
+        if (startAt && ordered) {
             query._id = {
                 ...query._id,
                 $lt: new Types.ObjectId(startAt),
             };
         }
 
-        const products = await Product.find(query)
-            .sort({_id: -1})
-            .limit(loadAmount);
+        const products = ordered
+            ? await Product.find(query).sort({_id: -1}).limit(loadAmount)
+            : await Product.aggregate([
+                  {$match: query},
+                  {$sample: {size: loadAmount}},
+              ]);
 
         if (!products || !products.length) {
             response = {

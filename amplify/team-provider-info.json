@@ -40,7 +40,7 @@
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomProductHandler-74546136356f39625549-build.zip"
+          "s3Key": "amplify-builds/floomProductHandler-6c7933546c3675786344-build.zip"
         },
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
