@@ -19,6 +19,7 @@ import {FontAwesome5} from '@expo/vector-icons';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
+    runOnUI,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
@@ -102,20 +103,8 @@ const ProductView = ({
 
             if (containerHeight && contentHeightParam) {
                 minY.value = -(contentHeightParam - containerHeight);
-                console.log(
-                    'CONTENT MIN Y SET:',
-                    minY.value,
-                    contentHeightParam,
-                    containerHeight,
-                );
             } else if (containerHeightParam && contentHeight) {
                 minY.value = -(contentHeight - containerHeightParam);
-                console.log(
-                    'CONTAINER MIN Y SET:',
-                    minY.value,
-                    contentHeight,
-                    containerHeightParam,
-                );
             }
         },
         [containerHeight, contentHeight, minY],
@@ -133,8 +122,6 @@ const ProductView = ({
             } else if (translateY.value < minY.value) {
                 translateY.value = minY.value;
             }
-
-            console.log(minY.value);
         });
 
     const resetTranslateY = () => {
@@ -175,7 +162,9 @@ const ProductView = ({
                         />
                         <Pressable
                             style={styles.imageNonPressable}
-                            onPress={resetTranslateY}
+                            onPress={() => {
+                                runOnUI(resetTranslateY)();
+                            }}
                         />
                         <Pressable
                             style={styles.flexOne}
@@ -274,6 +263,8 @@ const styles = StyleSheet.create({
             width: 1,
         },
         shadowOpacity: 0.1,
+        paddingBottom: 10,
+        paddingHorizontal: 10,
     },
     title: {
         fontSize: 22,
