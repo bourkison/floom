@@ -25,6 +25,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 
+// TODO: Fix shadow when content is smaller than remaining screen height.
 const ProductView = ({
     route,
     navigation,
@@ -93,6 +94,7 @@ const ProductView = ({
 
     // Called on onLayout on both container and content.
     // Save state of these heights then set the minY to contentHeight - containerHeight.
+    // If greater than 0 set to 0.
     const setMinY = useCallback(
         (containerHeightParam?: number, contentHeightParam?: number) => {
             if (containerHeightParam) {
@@ -102,9 +104,11 @@ const ProductView = ({
             }
 
             if (containerHeight && contentHeightParam) {
-                minY.value = -(contentHeightParam - containerHeight);
+                const min = -(contentHeightParam - containerHeight);
+                minY.value = min > 0 ? 0 : min;
             } else if (containerHeightParam && contentHeight) {
-                minY.value = -(contentHeight - containerHeightParam);
+                const min = -(contentHeight - containerHeightParam);
+                minY.value = min > 0 ? 0 : min;
             }
         },
         [containerHeight, contentHeight, minY],

@@ -1,17 +1,17 @@
 {
-  "teender": {
+  "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-teender-teender-202721-authRole",
-      "UnauthRoleArn": "arn:aws:iam::586865842618:role/amplify-teender-teender-202721-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::586865842618:role/amplify-teender-teender-202721-authRole",
+      "AuthRoleName": "amplify-floom-dev-20152-authRole",
+      "UnauthRoleArn": "arn:aws:iam::586865842618:role/amplify-floom-dev-20152-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::586865842618:role/amplify-floom-dev-20152-authRole",
       "Region": "eu-west-2",
-      "DeploymentBucketName": "amplify-teender-teender-202721-deployment",
-      "UnauthRoleName": "amplify-teender-teender-202721-unauthRole",
-      "StackName": "amplify-teender-teender-202721",
-      "StackId": "arn:aws:cloudformation:eu-west-2:586865842618:stack/amplify-teender-teender-202721/0fb4c4b0-4b2d-11ed-a350-0265dd96e7b2",
+      "DeploymentBucketName": "amplify-floom-dev-20152-deployment",
+      "UnauthRoleName": "amplify-floom-dev-20152-unauthRole",
+      "StackName": "amplify-floom-dev-20152",
+      "StackId": "arn:aws:cloudformation:eu-west-2:586865842618:stack/amplify-floom-dev-20152/9e7be500-4f49-11ed-a91b-02410cda8baa",
       "AmplifyAppId": "d34lete8blzmed",
-      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-teender-teender-202721-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json",
-      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-teender-teender-202721-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-floom-dev-20152-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-floom-dev-20152-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
     },
     "categories": {
       "auth": {
@@ -19,37 +19,37 @@
       },
       "function": {
         "floomCognitoPostConfirmation": {
-          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomCognitoPostConfirmation-454f7770795272707843-build.zip",
-          "secretsPathAmplifyAppId": "d34lete8blzmed"
+          "secretsPathAmplifyAppId": "d34lete8blzmed",
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
+          "s3Key": "amplify-builds/floomCognitoPostConfirmation-454f7770795272707843-build.zip"
         },
         "floomUserHandler": {
-          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomUserHandler-38677552475750734276-build.zip",
-          "secretsPathAmplifyAppId": "d34lete8blzmed"
+          "secretsPathAmplifyAppId": "d34lete8blzmed",
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
+          "s3Key": "amplify-builds/floomUserHandler-38677552475750734276-build.zip"
+        },
+        "floomMongooseModels": {
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
+          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion852c4867-build.zip"
         },
         "floomSaveHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
-          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
           "s3Key": "amplify-builds/floomSaveHandler-594f5945684362527063-build.zip"
-        },
-        "floomMongooseModels": {
-          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion704bd926-build.zip"
         },
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
-          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
-          "s3Key": "amplify-builds/floomProductHandler-6c7933546c3675786344-build.zip"
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
+          "s3Key": "amplify-builds/floomProductHandler-6259706b724641496567-build.zip"
         },
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
-          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
           "s3Key": "amplify-builds/floomPublicHandler-66372b734a6854556b45-build.zip"
         },
         "floomProductManager": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
-          "deploymentBucketName": "amplify-teender-teender-202721-deployment",
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
           "s3Key": "amplify-builds/floomProductManager-334f337746665045524e-build.zip"
         }
       },
