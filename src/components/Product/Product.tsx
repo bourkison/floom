@@ -19,7 +19,7 @@ import {
     DELETE_PRODUCT,
     BUY_PRODUCT,
 } from '@/store/slices/product';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 
 import {MainStackParamList} from '@/nav/Navigator';
@@ -68,12 +68,19 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const action = useSharedValue<'idle' | 'buy' | 'save' | 'delete'>('idle');
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+    const route = useRoute<RouteProp<MainStackParamList, 'Home'>>();
 
     const {width, height: windowHeight} = useWindowDimensions();
 
     const dispatch = useAppDispatch();
     const animationAction = useAppSelector(state => state.product.animation);
     const [imageIndex, setImageIndex] = useState(0);
+
+    useEffect(() => {
+        if (index === 0) {
+            setImageIndex(route.params?.imageIndex || 0);
+        }
+    }, [route, index]);
 
     const resetProduct = useCallback(() => {
         'worklet';

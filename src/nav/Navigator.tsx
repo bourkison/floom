@@ -34,7 +34,9 @@ export type AuthStackParamList = {
 };
 
 export type MainStackParamList = {
-    Home: undefined;
+    Home?: {
+        imageIndex?: number;
+    };
     Options: undefined;
     SavedProducts: undefined;
     ProductView: {

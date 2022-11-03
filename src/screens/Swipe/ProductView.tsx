@@ -89,7 +89,7 @@ const ProductView = ({
 
     const goBack = () => {
         Haptics.selectionAsync();
-        navigation.pop();
+        navigation.navigate('Home', {imageIndex});
     };
 
     // Called on onLayout on both container and content.
