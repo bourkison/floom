@@ -89,7 +89,15 @@ const ProductView = ({
 
     const goBack = () => {
         Haptics.selectionAsync();
-        navigation.navigate('Home', {imageIndex});
+        const routes = navigation.getState().routes;
+
+        // If last navigation was home, send the image index back
+        // Else just pop.
+        if (routes.length > 1 && routes[routes.length - 2].name === 'Home') {
+            navigation.navigate('Home', {imageIndex});
+        } else {
+            navigation.pop();
+        }
     };
 
     // Called on onLayout on both container and content.
