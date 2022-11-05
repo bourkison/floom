@@ -77,10 +77,16 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const [imageIndex, setImageIndex] = useState(0);
 
     useEffect(() => {
-        if (index === 0) {
-            setImageIndex(route.params?.imageIndex || 0);
+        if (
+            index === 0 &&
+            route.params &&
+            route.params.imageIndex &&
+            route.params.imageIndex !== imageIndex
+        ) {
+            setImageIndex(route.params.imageIndex);
+            navigation.setParams({imageIndex: undefined});
         }
-    }, [route, index]);
+    }, [route, index, imageIndex, navigation]);
 
     const resetProduct = useCallback(() => {
         'worklet';
