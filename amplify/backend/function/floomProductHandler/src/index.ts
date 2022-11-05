@@ -70,6 +70,7 @@ const queryUnsavedProduct = async (
               .map(c => c.toLowerCase())
         : [];
 
+    // TODO:  Implement search functionality
     // const searchText: string = event.queryStringParameters.query || '';
 
     const Product: Model<ProductType> = await MongooseModels().Product(

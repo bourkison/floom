@@ -11,9 +11,9 @@ export default async function (HM_API_KEY: string) {
 
     const formatGender = (input: string) => {
         if (input === 'Men') {
-            return 'Male';
+            return 'male';
         } else if (input === 'Ladies') {
-            return 'Female';
+            return 'female';
         }
 
         return null;
@@ -77,9 +77,13 @@ export default async function (HM_API_KEY: string) {
                         },
                         link: response.data.baseUrl + product.linkPdp,
                         images: product.galleryImages.map((i: any) => i.url),
-                        colors: product.articleColorNames,
+                        colors: product.articleColorNames.map((c: string) =>
+                            c.toLowerCase(),
+                        ),
                         gender: formatGender(product.categoryName),
-                        categories: product.categories,
+                        categories: product.categories.map((c: string) =>
+                            c.toLowerCase(),
+                        ),
                         brand: 'H&M',
                         vendorProductId: product.code,
                         inStock: product.stock.stockLevel >= 1,

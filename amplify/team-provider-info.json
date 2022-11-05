@@ -40,7 +40,7 @@
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomProductHandler-6259706b724641496567-build.zip"
+          "s3Key": "amplify-builds/floomProductHandler-4638516d3362336a3937-build.zip"
         },
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
@@ -50,7 +50,7 @@
         "floomProductManager": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomProductManager-334f337746665045524e-build.zip"
+          "s3Key": "amplify-builds/floomProductManager-727a74644131504b4739-build.zip"
         }
       },
       "api": {
