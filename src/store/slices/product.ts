@@ -199,6 +199,10 @@ const productSlice = createSlice({
                 }
             }
         },
+        UPDATE_SEARCH_FILTER(state, action: PayloadAction<string>) {
+            console.log('Slice:', action.payload);
+            state.filters.searchText = action.payload;
+        },
         TOGGLE_EXCLUDE(state, action: PayloadAction<'deleted' | 'saved'>) {
             if (action.payload === 'saved') {
                 state.filters.excludeSaved = !state.filters.excludeSaved;
@@ -302,6 +306,11 @@ const productSlice = createSlice({
     },
 });
 
-export const {COMMENCE_ANIMATE, TOGGLE_FILTER, TOGGLE_EXCLUDE, BUY_PRODUCT} =
-    productSlice.actions;
+export const {
+    COMMENCE_ANIMATE,
+    TOGGLE_FILTER,
+    TOGGLE_EXCLUDE,
+    UPDATE_SEARCH_FILTER,
+    BUY_PRODUCT,
+} = productSlice.actions;
 export default productSlice.reducer;

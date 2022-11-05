@@ -15,6 +15,7 @@ import {
     TOGGLE_EXCLUDE,
     TOGGLE_FILTER,
     LOAD_UNSAVED_PRODUCTS,
+    UPDATE_SEARCH_FILTER,
 } from '@/store/slices/product';
 import AnimatedButton from '../Utility/AnimatedButton';
 
@@ -54,6 +55,9 @@ const FilterDropdown = () => {
 
     const DropdownButton = useRef(null);
 
+    // TODO: Currently just getting state from store. Should potentially
+    // keep a local reference within this component then only dispatch to store
+    // on search button?
     const selectedGenders = useAppSelector(
         state => state.product.filters.gender,
     );
@@ -68,6 +72,9 @@ const FilterDropdown = () => {
     );
     const excludeSaved = useAppSelector(
         state => state.product.filters.excludeSaved,
+    );
+    const searchText = useAppSelector(
+        state => state.product.filters.searchText,
     );
 
     const dispatch = useAppDispatch();
@@ -84,6 +91,10 @@ const FilterDropdown = () => {
 
     const toggleExclude = (type: 'saved' | 'deleted') => {
         dispatch(TOGGLE_EXCLUDE(type));
+    };
+
+    const updateSearchText = (q: string) => {
+        dispatch(UPDATE_SEARCH_FILTER(q));
     };
 
     const search = () => {
@@ -171,6 +182,8 @@ const FilterDropdown = () => {
                             <TextInput
                                 style={styles.searchInput}
                                 placeholder="Search..."
+                                onChangeText={updateSearchText}
+                                value={searchText}
                             />
                         </View>
                         <View style={styles.columnsContainer}>
