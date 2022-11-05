@@ -49,6 +49,29 @@ const queryUnsavedProduct = async (
         event.queryStringParameters.excludeSaved === 'true' || false;
     const ordered = event.queryStringParameters.ordered === 'true' || false;
 
+    // Get relevant filters and convert to lower case.
+    const filteredGenders: string[] = event.queryStringParameters
+        .filteredGenders
+        ? event.queryStringParameters.filteredGenders
+              .split(',')
+              .map(g => g.toLowerCase())
+        : [];
+
+    const filteredCategories: string[] = event.queryStringParameters
+        .filteredCategories
+        ? event.queryStringParameters.filteredCategories
+              .split(',')
+              .map(c => c.toLowerCase())
+        : [];
+
+    const filteredColors: string[] = event.queryStringParameters.filteredColors
+        ? event.queryStringParameters.filteredColors
+              .split(',')
+              .map(c => c.toLowerCase())
+        : [];
+
+    // const searchText: string = event.queryStringParameters.query || '';
+
     const Product: Model<ProductType> = await MongooseModels().Product(
         MONGODB_URI,
     );
@@ -80,6 +103,8 @@ const queryUnsavedProduct = async (
                 },
                 body: JSON.stringify({success: false, message: 'Unknown user'}),
             };
+
+            return response;
         }
 
         let excludedProductsArr: Types.ObjectId[] = [];
@@ -98,6 +123,7 @@ const queryUnsavedProduct = async (
             ];
         }
 
+        // Build out filtered query.
         let query: FilterQuery<ProductType> = {
             _id: {
                 $nin: excludedProductsArr,
@@ -108,6 +134,34 @@ const queryUnsavedProduct = async (
             query._id = {
                 ...query._id,
                 $lt: new Types.ObjectId(startAt),
+            };
+        }
+
+        if (filteredGenders.length) {
+            const regex = new RegExp(filteredGenders.join('|'), 'gi');
+            query = {
+                ...query,
+                gender: {
+                    $regex: regex,
+                },
+            };
+        }
+
+        if (filteredCategories.length) {
+            query = {
+                ...query,
+                categories: {
+                    $in: filteredCategories,
+                },
+            };
+        }
+
+        if (filteredColors.length) {
+            query = {
+                ...query,
+                colors: {
+                    $in: filteredColors,
+                },
             };
         }
 
