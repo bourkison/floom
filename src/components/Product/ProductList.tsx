@@ -25,21 +25,21 @@ const ProductList = () => {
             loadType: 'initial' | 'refresh' | 'more',
             startAt?: string,
         ) => {
-            let init: QueryProductInit = {
-                queryStringParameters: {
+            let queryStringParameters: QueryProductInit['queryStringParameters'] =
+                {
                     loadAmount: 10,
                     type: 'unsaved',
-                },
-            };
+                };
 
-            if (startAt && init.queryStringParameters) {
-                init.queryStringParameters.startAt = startAt;
+            if (startAt && queryStringParameters) {
+                queryStringParameters.startAt = startAt;
             }
 
             dispatch(
                 LOAD_UNSAVED_PRODUCTS({
-                    queryStringParameters: init.queryStringParameters,
+                    queryStringParameters,
                     loadType,
+                    filtered: true,
                 }),
             );
         };

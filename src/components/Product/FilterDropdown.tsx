@@ -105,6 +105,7 @@ const FilterDropdown = () => {
                     type: 'unsaved',
                 },
                 loadType: 'initial',
+                filtered: true,
             }),
         );
         setVisible(false);

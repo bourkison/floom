@@ -31,6 +31,10 @@ export type QueryProductInit = {
         startAt?: string;
         excludeDeleted?: boolean;
         excludeSaved?: boolean;
+        filteredGenders?: string;
+        filteredCategories?: string;
+        filteredColors?: string;
+        query?: string;
     };
 };
 

@@ -18,6 +18,7 @@ const productAdapter = createEntityAdapter();
 type LoadProductsParams = {
     queryStringParameters: QueryProductInit['queryStringParameters'];
     loadType: 'initial' | 'refresh' | 'more';
+    filtered?: boolean;
 };
 
 const initialState = productAdapter.getInitialState({
@@ -56,6 +57,7 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                 type: 'unsaved',
             },
             loadType: 'initial',
+            filtered: true,
         },
         {getState},
     ) => {
@@ -63,13 +65,48 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
             queryStringParameters: input.queryStringParameters,
         };
 
-        const state = getState() as RootState;
+        // Set filters in the request.
+        if (input.filtered) {
+            const state = getState() as RootState;
 
-        if (init.queryStringParameters) {
+            init.queryStringParameters = init.queryStringParameters || {
+                loadAmount: 10,
+                type: 'unsaved',
+            };
+
             init.queryStringParameters.excludeDeleted =
                 state.product.filters.excludeDeleted;
             init.queryStringParameters.excludeSaved =
                 state.product.filters.excludeSaved;
+
+            if (state.product.filters.gender.length) {
+                init.queryStringParameters = {
+                    ...init.queryStringParameters,
+                    filteredGenders: state.product.filters.gender.join(','),
+                };
+            }
+
+            if (state.product.filters.color.length) {
+                init.queryStringParameters = {
+                    ...init.queryStringParameters,
+                    filteredColors: state.product.filters.color.join(','),
+                };
+            }
+
+            if (state.product.filters.category.length) {
+                init.queryStringParameters = {
+                    ...init.queryStringParameters,
+                    filteredCategories:
+                        state.product.filters.category.join(','),
+                };
+            }
+
+            if (state.product.filters.searchText) {
+                init.queryStringParameters = {
+                    ...init.queryStringParameters,
+                    query: state.product.filters.searchText,
+                };
+            }
         }
 
         return await queryProduct({
