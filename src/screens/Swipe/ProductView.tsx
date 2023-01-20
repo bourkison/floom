@@ -177,6 +177,24 @@ const ProductView = ({
         }
     };
 
+    const stringifyColors = (colors: string[]): string => {
+        const capitaliseFirstLetter = (s: string) => {
+            return s[0].toUpperCase() + s.substring(1).toLowerCase();
+        };
+
+        return colors
+            .map(color => {
+                return color
+                    .split(' ')
+                    .map(c => capitaliseFirstLetter(c))
+                    .join(' ')
+                    .split('/')
+                    .map(c => capitaliseFirstLetter(c))
+                    .join('/');
+            })
+            .join(', ');
+    };
+
     const ActionSection = () => {
         const deleteProduct = () => {
             goBack();
@@ -333,6 +351,11 @@ const ProductView = ({
                         <View style={styles.brandContainer}>
                             <BrandLogo brand={route.params.product.brand} />
                         </View>
+                        <View style={styles.colorsContainer}>
+                            <Text>
+                                {stringifyColors(route.params.product.colors)}
+                            </Text>
+                        </View>
                         <View style={styles.descriptionContainer}>
                             {route.params.product.description ? (
                                 <Text>{route.params.product.description}</Text>
@@ -432,6 +455,9 @@ const styles = StyleSheet.create({
     brandContainer: {
         maxHeight: 18,
         paddingLeft: 2,
+    },
+    colorsContainer: {
+        marginTop: 5,
     },
     descriptionContainer: {
         marginTop: 10,
