@@ -32,6 +32,8 @@ import {
     SAVE_COLOR,
     ACTION_BUTTON_SIZE,
 } from '@/constants';
+import {capitaliseString, stringifyColors} from '@/services';
+
 import {useAppDispatch} from '@/store/hooks';
 import {COMMENCE_ANIMATE} from '@/store/slices/product';
 
@@ -77,25 +79,28 @@ const ProductView = ({
         };
     });
 
-    const calculateImageIndicator = (i: number) => {
-        let style: ViewStyle = JSON.parse(
-            JSON.stringify(styles.selectedImageIndicator),
-        );
+    const calculateImageIndicator = useCallback(
+        (i: number) => {
+            let style: ViewStyle = JSON.parse(
+                JSON.stringify(styles.selectedImageIndicator),
+            );
 
-        if (imageIndex === i) {
-            style.backgroundColor = 'rgba(243, 252, 240, 0.8)';
-        }
+            if (imageIndex === i) {
+                style.backgroundColor = 'rgba(243, 252, 240, 0.8)';
+            }
 
-        if (i === 0) {
-            style.marginLeft = 0;
-        }
+            if (i === 0) {
+                style.marginLeft = 0;
+            }
 
-        if (i === route.params.product.images.length - 1) {
-            style.marginRight = 0;
-        }
+            if (i === route.params.product.images.length - 1) {
+                style.marginRight = 0;
+            }
 
-        return style;
-    };
+            return style;
+        },
+        [imageIndex, route.params.product],
+    );
 
     const changeImage = (amount: number) => {
         if (amount < 0 && imageIndex + amount >= 0) {
@@ -175,24 +180,6 @@ const ProductView = ({
         if (translateY.value !== 0) {
             translateY.value = withTiming(0);
         }
-    };
-
-    const stringifyColors = (colors: string[]): string => {
-        const capitaliseFirstLetter = (s: string) => {
-            return s[0].toUpperCase() + s.substring(1).toLowerCase();
-        };
-
-        return colors
-            .map(color => {
-                return color
-                    .split(' ')
-                    .map(c => capitaliseFirstLetter(c))
-                    .join(' ')
-                    .split('/')
-                    .map(c => capitaliseFirstLetter(c))
-                    .join('/');
-            })
-            .join(', ');
     };
 
     const ActionSection = () => {
@@ -333,7 +320,9 @@ const ProductView = ({
                         <View style={[styles.titleButtonContainer]}>
                             <View style={styles.flexOne}>
                                 <Text style={styles.title}>
-                                    {route.params.product.name}
+                                    {capitaliseString(
+                                        route.params.product.name,
+                                    )}
                                 </Text>
                             </View>
                             <View style={styles.downButtonContainer}>
@@ -348,12 +337,24 @@ const ProductView = ({
                                 </AnimatedButton>
                             </View>
                         </View>
-                        <View style={styles.brandContainer}>
-                            <BrandLogo brand={route.params.product.brand} />
+                        <View style={styles.priceBrandCont}>
+                            <View style={styles.priceContainer}>
+                                <Text style={styles.priceText}>
+                                    $
+                                    {route.params.product.price.amount.toString()}
+                                </Text>
+                            </View>
+
+                            <View style={styles.brandContainer}>
+                                <BrandLogo brand={route.params.product.brand} />
+                            </View>
                         </View>
                         <View style={styles.colorsContainer}>
                             <Text>
-                                {stringifyColors(route.params.product.colors)}
+                                {stringifyColors(route.params.product.colors)} |{' '}
+                                {route.params.product.inStock
+                                    ? 'In stock'
+                                    : 'Not in stock'}
                             </Text>
                         </View>
                         <View style={styles.descriptionContainer}>
@@ -415,7 +416,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.1,
         paddingBottom: 10,
-        paddingHorizontal: 10,
+        paddingHorizontal: 15,
         width: '100%',
     },
     title: {
@@ -428,8 +429,8 @@ const styles = StyleSheet.create({
         flexBasis: 48,
         flexGrow: 0,
         flexShrink: 0,
-        marginTop: -24,
-        marginRight: 20,
+        marginTop: -26,
+        marginRight: 15,
     },
     downButton: {
         width: 48,
@@ -449,18 +450,26 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexGrow: 0,
         flexShrink: 0,
-        paddingTop: 5,
-        paddingLeft: 5,
+        paddingTop: 7,
+    },
+    priceBrandCont: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    priceContainer: {},
+    priceText: {
+        fontSize: 16,
     },
     brandContainer: {
-        maxHeight: 18,
-        paddingLeft: 2,
+        maxHeight: 24,
+        paddingLeft: 10,
+        flex: 1,
     },
     colorsContainer: {
         marginTop: 5,
     },
     descriptionContainer: {
-        marginTop: 10,
+        marginTop: 25,
     },
     descriptionText: {},
     noDescriptionText: {
@@ -469,7 +478,7 @@ const styles = StyleSheet.create({
     actionButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginVertical: 20,
+        marginVertical: 33,
     },
     button: {
         flex: 1,

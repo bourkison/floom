@@ -34,6 +34,7 @@ import {
     SAVE_COLOR,
     BUY_COLOR,
 } from '@/constants';
+import {capitaliseString} from '@/services';
 
 import * as loadingImage from '@/assets/loading.png';
 import * as WebBrowser from 'expo-web-browser';
@@ -511,7 +512,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                                 <View style={styles.leftContainer}>
                                     <View style={styles.titleContainer}>
                                         <Text style={styles.titleText}>
-                                            {product.name}
+                                            {capitaliseString(product.name)}
                                         </Text>
                                     </View>
                                     <View style={styles.brandContainer}>
