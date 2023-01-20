@@ -36,10 +36,17 @@ const createSaveOrDelete = async (
     };
 
     try {
+        // TODO: Check that user hasn't already liked
         let update: UpdateQuery<UserType> =
             type === 'save'
-                ? {$addToSet: {likedProducts: _id}}
-                : {$addToSet: {deletedProducts: _id}};
+                ? {
+                      $addToSet: {likedProducts: _id},
+                      $pull: {deletedProducts: _id},
+                  }
+                : {
+                      $addToSet: {deletedProducts: _id},
+                      $pull: {likedProducts: _id},
+                  };
         await User.findOneAndUpdate({email: email}, update);
 
         response = {
