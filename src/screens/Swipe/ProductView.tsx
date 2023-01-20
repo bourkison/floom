@@ -37,6 +37,8 @@ import {COMMENCE_ANIMATE} from '@/store/slices/product';
 
 import * as WebBrowser from 'expo-web-browser';
 
+import BrandLogo from '@/components/Product/BrandLogo';
+
 const ProductView = ({
     route,
     navigation,
@@ -50,6 +52,7 @@ const ProductView = ({
 
     const [previousRoute, setPreviousRoute] =
         useState<keyof MainStackParamList>('Home');
+    const [isGoingBack, setIsGoingBack] = useState(false);
 
     const dispatch = useAppDispatch();
 
@@ -112,16 +115,22 @@ const ProductView = ({
     };
 
     const goBack = () => {
-        Haptics.selectionAsync();
+        if (!isGoingBack) {
+            setIsGoingBack(true);
+            Haptics.selectionAsync();
 
-        // If last navigation was home, send the image index back
-        // Else just pop.
-        const {routes} = navigation.getState();
+            // If last navigation was home, send the image index back
+            // Else just pop.
+            const {routes} = navigation.getState();
 
-        if (routes.length > 1 && routes[routes.length - 2].name === 'Home') {
-            navigation.navigate('Home', {imageIndex});
-        } else {
-            navigation.pop();
+            if (
+                routes.length > 1 &&
+                routes[routes.length - 2].name === 'Home'
+            ) {
+                navigation.navigate('Home', {imageIndex});
+            } else {
+                navigation.pop();
+            }
         }
     };
 
@@ -321,7 +330,10 @@ const ProductView = ({
                                 </AnimatedButton>
                             </View>
                         </View>
-                        <View>
+                        <View style={styles.brandContainer}>
+                            <BrandLogo brand={route.params.product.brand} />
+                        </View>
+                        <View style={styles.descriptionContainer}>
                             {route.params.product.description ? (
                                 <Text>{route.params.product.description}</Text>
                             ) : (
@@ -414,6 +426,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexGrow: 0,
         flexShrink: 0,
+        paddingTop: 5,
+        paddingLeft: 5,
+    },
+    brandContainer: {
+        maxHeight: 18,
+        paddingLeft: 2,
+    },
+    descriptionContainer: {
+        marginTop: 10,
     },
     descriptionText: {},
     noDescriptionText: {
@@ -422,7 +443,7 @@ const styles = StyleSheet.create({
     actionButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: 20,
+        marginVertical: 20,
     },
     button: {
         flex: 1,
