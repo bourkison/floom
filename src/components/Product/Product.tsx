@@ -37,6 +37,7 @@ import {
 
 import * as loadingImage from '@/assets/loading.png';
 import * as WebBrowser from 'expo-web-browser';
+import BrandLogo from '@/components/Product/BrandLogo';
 
 type ProductComponentProps = {
     product: ProductType;
@@ -507,10 +508,15 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                             colors={['#00000000', '#000000']}
                             style={styles.linearGradient}>
                             <View style={styles.textContainer}>
-                                <View style={styles.titleContainer}>
-                                    <Text style={styles.titleText}>
-                                        {product.name}
-                                    </Text>
+                                <View style={styles.leftContainer}>
+                                    <View style={styles.titleContainer}>
+                                        <Text style={styles.titleText}>
+                                            {product.name}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.brandContainer}>
+                                        <BrandLogo brand={product.brand} />
+                                    </View>
                                 </View>
                                 <View style={styles.priceContainer}>
                                     <Text style={styles.priceText}>
@@ -625,10 +631,15 @@ const styles = StyleSheet.create({
     },
     titleText: {
         color: '#f3fcf0',
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginBottom: 3,
     },
     priceText: {
         color: '#f3fcf0',
         textAlign: 'right',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     textContainer: {
         position: 'absolute',
@@ -636,6 +647,8 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     actionContainer: {
         position: 'absolute',
@@ -687,8 +700,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         overflow: 'hidden',
     },
-    titleContainer: {flex: 3},
+    leftContainer: {flex: 3},
+    titleContainer: {flex: 1},
     priceContainer: {flex: 1},
+    brandContainer: {height: 24},
 });
 
 export default Product;
