@@ -87,6 +87,7 @@ export default async function (HM_API_KEY: string) {
                         brand: 'H&M',
                         vendorProductId: product.code,
                         inStock: product.stock.stockLevel >= 1,
+                        description: 'This is a test description.',
                     };
                     products.push(p);
                     console.log('Product pushed:', p);

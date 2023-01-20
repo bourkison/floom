@@ -41,6 +41,7 @@ export async function queryProduct(
             brand: data.data[i].brand,
             vendorProductId: data.data[i].vendorProductId,
             inStock: data.data[i].inStock,
+            description: data.data[i].description || '',
         });
     }
 
@@ -87,5 +88,6 @@ export async function getProduct(
         brand: data.data.brand,
         vendorProductId: data.data.vendorProductId,
         inStock: data.data.inStock,
+        description: data.data.description,
     };
 }

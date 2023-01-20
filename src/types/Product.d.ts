@@ -14,6 +14,7 @@ export type Product = {
     brand: string;
     vendorProductId: string;
     inStock: boolean;
+    description: string;
 };
 
 // API

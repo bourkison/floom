@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -14,7 +14,6 @@ import {MainStackParamList} from '@/nav/Navigator';
 
 import * as Haptics from 'expo-haptics';
 
-import {IMAGE_RATIO} from '@/constants';
 import {FontAwesome5} from '@expo/vector-icons';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -25,7 +24,19 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 
-// TODO: Fix shadow when content is smaller than remaining screen height.
+import {Feather, AntDesign, Ionicons} from '@expo/vector-icons';
+import {
+    IMAGE_RATIO,
+    DELETE_COLOR,
+    BUY_COLOR,
+    SAVE_COLOR,
+    ACTION_BUTTON_SIZE,
+} from '@/constants';
+import {useAppDispatch} from '@/store/hooks';
+import {COMMENCE_ANIMATE} from '@/store/slices/product';
+
+import * as WebBrowser from 'expo-web-browser';
+
 const ProductView = ({
     route,
     navigation,
@@ -37,8 +48,21 @@ const ProductView = ({
     const translateY = useSharedValue(0);
     const minY = useSharedValue(0);
 
+    const [previousRoute, setPreviousRoute] =
+        useState<keyof MainStackParamList>('Home');
+
+    const dispatch = useAppDispatch();
+
     const [containerHeight, setContainerHeight] = useState(0);
     const [contentHeight, setContentHeight] = useState(0);
+
+    useEffect(() => {
+        const {routes} = navigation.getState();
+
+        if (routes.length > 1) {
+            setPreviousRoute(routes[routes.length - 2].name);
+        }
+    }, [navigation, setPreviousRoute]);
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -144,6 +168,78 @@ const ProductView = ({
         }
     };
 
+    const ActionSection = () => {
+        const deleteProduct = () => {
+            goBack();
+            dispatch(COMMENCE_ANIMATE('delete'));
+        };
+
+        const buyProduct = async () => {
+            await WebBrowser.openBrowserAsync(route.params.product.link);
+        };
+
+        const saveProduct = () => {
+            goBack();
+            dispatch(COMMENCE_ANIMATE('save'));
+        };
+
+        if (previousRoute === 'Home') {
+            return (
+                <View style={styles.actionButtonContainer}>
+                    <AnimatedButton
+                        style={styles.actionButton}
+                        onPress={deleteProduct}>
+                        <View style={styles.button}>
+                            <Feather
+                                name="x"
+                                size={ACTION_BUTTON_SIZE / 2}
+                                color={DELETE_COLOR}
+                            />
+                        </View>
+                    </AnimatedButton>
+                    <AnimatedButton
+                        style={styles.actionButton}
+                        onPress={buyProduct}>
+                        <View style={styles.button}>
+                            <AntDesign
+                                name="shoppingcart"
+                                size={ACTION_BUTTON_SIZE / 2}
+                                color={BUY_COLOR}
+                            />
+                        </View>
+                    </AnimatedButton>
+                    <AnimatedButton
+                        style={styles.actionButton}
+                        onPress={saveProduct}>
+                        <View style={styles.button}>
+                            <Ionicons
+                                name="heart"
+                                size={ACTION_BUTTON_SIZE / 2}
+                                color={SAVE_COLOR}
+                            />
+                        </View>
+                    </AnimatedButton>
+                </View>
+            );
+        } else {
+            return (
+                <View style={styles.actionButtonContainer}>
+                    <AnimatedButton
+                        style={styles.actionButton}
+                        onPress={buyProduct}>
+                        <View style={styles.button}>
+                            <AntDesign
+                                name="shoppingcart"
+                                size={ACTION_BUTTON_SIZE / 2}
+                                color={BUY_COLOR}
+                            />
+                        </View>
+                    </AnimatedButton>
+                </View>
+            );
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View
@@ -226,8 +322,15 @@ const ProductView = ({
                             </View>
                         </View>
                         <View>
-                            <Text>{JSON.stringify(route.params.product)}</Text>
+                            {route.params.product.description ? (
+                                <Text>{route.params.product.description}</Text>
+                            ) : (
+                                <Text style={styles.noDescriptionText}>
+                                    No description provided
+                                </Text>
+                            )}
                         </View>
+                        <ActionSection />
                     </Animated.View>
                 </GestureDetector>
             </View>
@@ -272,12 +375,13 @@ const styles = StyleSheet.create({
         position: 'absolute',
         shadowColor: '#1a1f25',
         shadowOffset: {
-            height: 1,
+            height: -4,
             width: 1,
         },
         shadowOpacity: 0.1,
         paddingBottom: 10,
         paddingHorizontal: 10,
+        width: '100%',
     },
     title: {
         fontSize: 22,
@@ -310,6 +414,37 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexGrow: 0,
         flexShrink: 0,
+    },
+    descriptionText: {},
+    noDescriptionText: {
+        fontStyle: 'italic',
+    },
+    actionButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 20,
+    },
+    button: {
+        flex: 1,
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+        zIndex: -1,
+    },
+    actionButton: {
+        shadowColor: '#1a1f25',
+        shadowOffset: {
+            height: 1,
+            width: 1,
+        },
+        shadowOpacity: 0.2,
+        backgroundColor: '#f3fcf0',
+        zIndex: -1,
+        elevation: 1,
+        borderRadius: ACTION_BUTTON_SIZE / 2,
+        width: ACTION_BUTTON_SIZE,
+        height: ACTION_BUTTON_SIZE,
+        marginHorizontal: 8,
     },
 });
 

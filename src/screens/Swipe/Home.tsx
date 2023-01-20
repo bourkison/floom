@@ -11,6 +11,7 @@ import {
     DELETE_COLOR,
     BUY_COLOR,
     SAVE_COLOR,
+    ACTION_BUTTON_SIZE,
 } from '@/constants';
 import FilterDropdown from '@/components/Product/FilterDropdown';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
@@ -18,8 +19,6 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {Feather, AntDesign, Ionicons} from '@expo/vector-icons';
 import {useAppDispatch} from '@/store/hooks';
 import {COMMENCE_ANIMATE} from '@/store/slices/product';
-
-const ACTION_BUTTON_SIZE = 50;
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();

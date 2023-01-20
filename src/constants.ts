@@ -30,6 +30,8 @@ export const COLOUR_OPTIONS = [
     'Beige',
 ];
 
+export const ACTION_BUTTON_SIZE = 50;
+
 export const DELETE_COLOR: Color = '#cf3c48';
 export const SAVE_COLOR: Color = '#2a9d8f';
 export const BUY_COLOR: Color = '#264653';
