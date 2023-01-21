@@ -52,13 +52,16 @@ const AccountDetailsWidget = () => {
                 value={user?.email || ''}
                 bottomBorder={true}
                 onPress={() => {
-                    navigation.navigate('UpdateDetail');
+                    navigation.navigate('UpdateDetail', {type: 'email'});
                 }}
             />
             <Option
                 header="Name"
                 value={user?.name || ''}
                 bottomBorder={true}
+                onPress={() => {
+                    navigation.navigate('UpdateDetail', {type: 'name'});
+                }}
             />
             <Option
                 header="Gender"

@@ -6,22 +6,8 @@ import {
 } from 'react-native';
 import {PALETTE} from '@/constants';
 
-interface TIProps extends TextInputProps {
-    bottomBorder: boolean;
-}
-
-const TextInput: React.FC<TIProps> = props => {
-    return (
-        <RNTextInput
-            {...props}
-            style={[
-                styles.textInput,
-                props.style,
-                // eslint-disable-next-line react-native/no-inline-styles
-                props.bottomBorder ? {borderBottomWidth: 1} : undefined,
-            ]}
-        />
-    );
+const TextInput: React.FC<TextInputProps> = props => {
+    return <RNTextInput {...props} style={[styles.textInput, props.style]} />;
 };
 
 const styles = StyleSheet.create({
