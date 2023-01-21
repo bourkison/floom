@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {DELETE_COLOR, PALETTE} from '@/constants';
+import {PALETTE} from '@/constants';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import Spinner from '@/components/Utility/Spinner';
 import {LOGOUT} from '@/store/slices/user';
@@ -26,8 +26,8 @@ const LogoutWidget = () => {
                     <Spinner
                         diameter={14}
                         spinnerWidth={2}
-                        backgroundColor="#1a1f25"
-                        spinnerColor={DELETE_COLOR}
+                        backgroundColor={PALETTE.neutral[1]}
+                        spinnerColor={PALETTE.neutral[8]}
                     />
                 ) : (
                     'Logout'
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
     },
     updatePasswordButton: {
         padding: 7,
-        backgroundColor: DELETE_COLOR,
-        borderColor: DELETE_COLOR,
+        backgroundColor: PALETTE.neutral[1],
+        borderColor: PALETTE.neutral[8],
         borderWidth: 1,
         flex: 1,
         justifyContent: 'center',
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     updatePasswordButtonText: {
-        color: PALETTE.neutral[1],
+        color: PALETTE.neutral[8],
         fontSize: 12,
         fontWeight: 'bold',
         textAlign: 'center',

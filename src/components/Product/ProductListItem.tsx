@@ -26,6 +26,7 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {PALETTE} from '@/constants';
+import {capitaliseString} from '@/services';
 
 export type ProductListItemProps = {
     product: ProductType;
@@ -190,7 +191,9 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                             />
                         </View>
                         <View style={styles.titleContainer}>
-                            <Text style={styles.titleText}>{product.name}</Text>
+                            <Text style={styles.titleText}>
+                                {capitaliseString(product.name)}
+                            </Text>
                             <Text>${product.price.saleAmount}</Text>
                         </View>
                     </TouchableOpacity>

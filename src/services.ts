@@ -10,7 +10,7 @@ export const capitaliseString = (str: string): string => {
     let output = capitaliseFirstLetter(str.toLowerCase());
 
     const delimiters = [' ', '/', '-'];
-    const excludedWords = ['the', 'a', 'and'];
+    const excludedWords = ['the', 'a', 'and', 'with'];
 
     delimiters.forEach(d => {
         output = output

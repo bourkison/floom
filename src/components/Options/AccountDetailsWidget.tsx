@@ -41,57 +41,56 @@ const AccountDetailsWidget = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.box}>
-                <Option
-                    header="Email"
-                    value={user?.email || ''}
-                    bottomBorder={true}
-                />
-                <Option
-                    header="Name"
-                    value={user?.name || ''}
-                    bottomBorder={true}
-                />
-                <Option
-                    header="Gender"
-                    value={capitaliseString(user?.gender || '')}
-                    bottomBorder={true}
-                />
-                <Option
-                    header="Country"
-                    value={user?.country || ''}
-                    bottomBorder={true}
-                />
-                <Option
-                    header="DOB"
-                    value={dayjs(user?.dob).format('YYYY/MM/DD') || ''}
-                    bottomBorder={false}
-                />
-            </View>
+        <View style={styles.box}>
+            <Option
+                header="Email"
+                value={user?.email || ''}
+                bottomBorder={true}
+            />
+            <Option
+                header="Name"
+                value={user?.name || ''}
+                bottomBorder={true}
+            />
+            <Option
+                header="Gender"
+                value={capitaliseString(user?.gender || '')}
+                bottomBorder={true}
+            />
+            <Option
+                header="Country"
+                value={user?.country || ''}
+                bottomBorder={true}
+            />
+            <Option
+                header="DOB"
+                value={dayjs(user?.dob).format('YYYY/MM/DD') || ''}
+                bottomBorder={false}
+            />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        paddingHorizontal: 5,
-    },
     box: {
-        borderWidth: 1,
-        borderColor: PALETTE.neutral[5],
-        borderRadius: 4,
+        marginTop: 10,
+        shadowColor: PALETTE.neutral[5],
+        shadowOpacity: 0.3,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
         backgroundColor: PALETTE.neutral[0],
     },
     optionLink: {
         flexDirection: 'row',
         paddingVertical: 10,
         paddingHorizontal: 5,
-        borderColor: PALETTE.neutral[3],
+        borderColor: PALETTE.neutral[2],
     },
     optionHeaderContainer: {},
     optionHeader: {
-        fontWeight: 'bold',
+        fontWeight: '500',
     },
     optionValueContainer: {
         flex: 1,
@@ -99,6 +98,7 @@ const styles = StyleSheet.create({
     },
     optionValue: {
         textAlign: 'right',
+        color: PALETTE.neutral[4],
     },
 });
 
