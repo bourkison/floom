@@ -54,7 +54,8 @@ export const COLOUR_OPTIONS = [
     'Beige',
 ];
 
-export const ACTION_BUTTON_SIZE = 50;
+export const ACTION_BUTTON_SIZE_ACTIVE = 50;
+export const ACTION_BUTTON_SIZE_INACTIVE = 55;
 
 export const PALETTE = {
     amber: COLOR_PALETTE_AMBER,
@@ -81,6 +82,6 @@ export const PALETTE = {
     zinc: COLOR_PALETTE_ZINC,
 };
 
-export const DELETE_COLOR: Color = PALETTE.red[7];
-export const SAVE_COLOR: Color = PALETTE.green[7];
-export const BUY_COLOR: Color = PALETTE.slate[7];
+export const DELETE_COLOR: Color = PALETTE.red[6];
+export const SAVE_COLOR: Color = PALETTE.emerald[6];
+export const BUY_COLOR: Color = PALETTE.blue[6];

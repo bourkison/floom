@@ -35,6 +35,7 @@ const initialState = productAdapter.getInitialState({
         isLoadingMore: false,
     },
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
+    action: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
     filters: {
         gender: ['Unisex'] as string[],
         category: [] as string[],
@@ -192,6 +193,7 @@ const productSlice = createSlice({
             action: PayloadAction<'idle' | 'save' | 'buy' | 'delete'>,
         ) {
             state.animation = action.payload;
+            state.action = action.payload;
         },
         TOGGLE_FILTER(
             state,
@@ -249,6 +251,12 @@ const productSlice = createSlice({
         },
         BUY_PRODUCT(state) {
             state.animation = 'idle';
+        },
+        SET_ACTION(
+            state,
+            action: PayloadAction<'idle' | 'save' | 'buy' | 'delete'>,
+        ) {
+            state.action = action.payload;
         },
     },
     extraReducers: builder => {
@@ -349,5 +357,6 @@ export const {
     TOGGLE_EXCLUDE,
     UPDATE_SEARCH_FILTER,
     BUY_PRODUCT,
+    SET_ACTION,
 } = productSlice.actions;
 export default productSlice.reducer;

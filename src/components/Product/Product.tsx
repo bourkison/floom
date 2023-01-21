@@ -18,6 +18,7 @@ import {
     SAVE_PRODUCT,
     DELETE_PRODUCT,
     BUY_PRODUCT,
+    SET_ACTION,
 } from '@/store/slices/product';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
@@ -113,6 +114,13 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         scale,
     ]);
 
+    const setAction = useCallback(
+        (a: 'idle' | 'save' | 'buy' | 'delete') => {
+            dispatch(SET_ACTION(a));
+        },
+        [dispatch],
+    );
+
     const saveProduct = useCallback(() => {
         dispatch(SAVE_PRODUCT(product._id));
     }, [dispatch, product]);
@@ -124,8 +132,9 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const buyProduct = useCallback(async () => {
         await WebBrowser.openBrowserAsync(product.link);
         dispatch(BUY_PRODUCT());
+        setAction('idle');
         runOnUI(resetProduct)();
-    }, [dispatch, resetProduct, product]);
+    }, [dispatch, resetProduct, product, setAction]);
 
     // Fade this product out and remove it from products array.
     // Called post pan gesture and after like animation.
@@ -156,6 +165,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         duration: ANIMATION_DURATION,
                     },
                     () => {
+                        runOnJS(setAction)('idle');
                         fadeAndRemove(type);
                     },
                 );
@@ -170,6 +180,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         duration: ANIMATION_DURATION,
                     },
                     () => {
+                        runOnJS(setAction)('idle');
                         fadeAndRemove(type);
                     },
                 );
@@ -194,6 +205,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             buyProduct,
             buyOpacity,
             scale,
+            setAction,
         ],
     );
 
@@ -282,6 +294,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 -offsetY.value < ACTION_THRESHOLD
             ) {
                 action.value = 'idle';
+                runOnJS(setAction)('idle');
                 runOnJS(Haptics.selectionAsync)();
             }
             // else if we're not buying and we should be (i.e. offsetY value above 2x action threshold)
@@ -290,6 +303,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 -offsetY.value >= ACTION_THRESHOLD
             ) {
                 action.value = 'buy';
+                runOnJS(setAction)('buy');
                 runOnJS(Haptics.selectionAsync)();
             }
             // else if we're not saving and we should be (i.e. offsetX value above action threshold)
@@ -298,6 +312,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 offsetX.value >= ACTION_THRESHOLD
             ) {
                 action.value = 'save';
+                runOnJS(setAction)('save');
                 runOnJS(Haptics.selectionAsync)();
             }
             // finally, if we're not deleting and we should be (i.e. offsetX value below action threshold)
@@ -306,6 +321,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 offsetX.value <= -ACTION_THRESHOLD
             ) {
                 action.value = 'delete';
+                runOnJS(setAction)('delete');
                 runOnJS(Haptics.selectionAsync)();
             }
 
@@ -365,6 +381,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             }
 
             action.value = 'idle';
+            runOnJS(setAction)('idle');
         });
 
     const openProduct = () => {

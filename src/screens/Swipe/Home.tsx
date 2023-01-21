@@ -5,24 +5,13 @@ import {View, StyleSheet, useWindowDimensions} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
-import {
-    IMAGE_RATIO,
-    IMAGE_PADDING,
-    DELETE_COLOR,
-    BUY_COLOR,
-    SAVE_COLOR,
-    ACTION_BUTTON_SIZE,
-} from '@/constants';
+import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
 import FilterDropdown from '@/components/Product/FilterDropdown';
-import AnimatedButton from '@/components/Utility/AnimatedButton';
 
-import {Feather, AntDesign, Ionicons} from '@expo/vector-icons';
-import {useAppDispatch} from '@/store/hooks';
-import {COMMENCE_ANIMATE} from '@/store/slices/product';
+import ActionButton from '@/components/Utility/ActionButton';
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();
-    const dispatch = useAppDispatch();
 
     return (
         <View style={styles.flexOne}>
@@ -36,45 +25,9 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     <ProductList />
                 </View>
                 <View style={styles.buttonsContainer}>
-                    <AnimatedButton
-                        style={styles.actionButton}
-                        onPress={() => {
-                            dispatch(COMMENCE_ANIMATE('delete'));
-                        }}>
-                        <View style={styles.button}>
-                            <Feather
-                                name="x"
-                                size={ACTION_BUTTON_SIZE / 2}
-                                color={DELETE_COLOR}
-                            />
-                        </View>
-                    </AnimatedButton>
-                    <AnimatedButton
-                        style={styles.actionButton}
-                        onPress={() => {
-                            dispatch(COMMENCE_ANIMATE('buy'));
-                        }}>
-                        <View style={styles.button}>
-                            <AntDesign
-                                name="shoppingcart"
-                                size={ACTION_BUTTON_SIZE / 2}
-                                color={BUY_COLOR}
-                            />
-                        </View>
-                    </AnimatedButton>
-                    <AnimatedButton
-                        style={styles.actionButton}
-                        onPress={() => {
-                            dispatch(COMMENCE_ANIMATE('save'));
-                        }}>
-                        <View style={styles.button}>
-                            <Ionicons
-                                name="heart"
-                                size={ACTION_BUTTON_SIZE / 2}
-                                color={SAVE_COLOR}
-                            />
-                        </View>
-                    </AnimatedButton>
+                    <ActionButton type="delete" />
+                    <ActionButton type="buy" />
+                    <ActionButton type="save" />
                 </View>
             </View>
         </View>
@@ -97,29 +50,8 @@ const styles = StyleSheet.create({
     buttonsContainer: {
         marginTop: 40,
         flexDirection: 'row',
-        zIndex: -1,
-    },
-    button: {
-        flex: 1,
-        justifyContent: 'center',
-        alignContent: 'center',
         alignItems: 'center',
         zIndex: -1,
-    },
-    actionButton: {
-        shadowColor: '#1a1f25',
-        shadowOffset: {
-            height: 1,
-            width: 1,
-        },
-        shadowOpacity: 0.2,
-        backgroundColor: '#f3fcf0',
-        zIndex: -1,
-        elevation: 1,
-        borderRadius: ACTION_BUTTON_SIZE / 2,
-        width: ACTION_BUTTON_SIZE,
-        height: ACTION_BUTTON_SIZE,
-        marginHorizontal: 8,
     },
     flexOne: {flex: 1},
 });
