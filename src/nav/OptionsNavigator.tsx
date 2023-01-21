@@ -6,14 +6,17 @@ import {
     AppInfoHeader,
     DeletedProductsHeader,
     OptionsHeader,
+    UpdateDetailHeader,
 } from '@/nav/Headers';
 import DeletedProducts from '@/screens/Options/DeletedProducts';
 import AppInfo from '@/screens/Options/AppInfo';
+import UpdateDetail from '@/screens/Options/UpdateDetail';
 
 export type OptionsStackParamList = {
     OptionsHome: undefined;
     DeletedProducts: undefined;
     AppInfo: undefined;
+    UpdateDetail: undefined;
 };
 
 const OptionsStack = createStackNavigator<OptionsStackParamList>();
@@ -41,6 +44,13 @@ const OptionsNavigator = () => {
                 component={AppInfo}
                 options={{
                     header: AppInfoHeader,
+                }}
+            />
+            <OptionsStack.Screen
+                name="UpdateDetail"
+                component={UpdateDetail}
+                options={{
+                    header: UpdateDetailHeader,
                 }}
             />
         </OptionsStack.Navigator>

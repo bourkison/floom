@@ -4,6 +4,9 @@ import {useAppSelector} from '@/store/hooks';
 import {PALETTE} from '@/constants';
 import {capitaliseString} from '@/services';
 import dayjs from 'dayjs';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {OptionsStackParamList} from '@/nav/OptionsNavigator';
+import {useNavigation} from '@react-navigation/native';
 
 type OptionProps = {
     header: string;
@@ -14,6 +17,8 @@ type OptionProps = {
 
 const AccountDetailsWidget = () => {
     const user = useAppSelector(state => state.user.docData);
+    const navigation =
+        useNavigation<StackNavigationProp<OptionsStackParamList>>();
 
     const Option: React.FC<OptionProps> = ({
         header,
@@ -46,6 +51,9 @@ const AccountDetailsWidget = () => {
                 header="Email"
                 value={user?.email || ''}
                 bottomBorder={true}
+                onPress={() => {
+                    navigation.navigate('UpdateDetail');
+                }}
             />
             <Option
                 header="Name"
