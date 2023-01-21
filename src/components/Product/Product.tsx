@@ -55,6 +55,8 @@ const OPACITY_MINIMUM = 0.2;
 
 const SCALE_MULTIPLIER = 100;
 
+const OVERLAY_PERCENTAGE = 0.4;
+
 const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
@@ -552,6 +554,11 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                                     style={[
                                         rSaveStyle,
                                         styles.saveTextContainer,
+                                        {
+                                            width:
+                                                (width - IMAGE_PADDING) *
+                                                OVERLAY_PERCENTAGE,
+                                        },
                                     ]}>
                                     <Text style={styles.saveText}>SAVE</Text>
                                 </Animated.View>
@@ -562,6 +569,11 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                                     style={[
                                         rDeleteStyle,
                                         styles.deleteTextContainer,
+                                        {
+                                            width:
+                                                (width - IMAGE_PADDING) *
+                                                OVERLAY_PERCENTAGE,
+                                        },
                                     ]}>
                                     <Text style={styles.deleteText}>
                                         DELETE
@@ -574,6 +586,11 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                                     style={[
                                         rBuyStyle,
                                         styles.buyTextContainer,
+                                        {
+                                            width:
+                                                (width - IMAGE_PADDING) *
+                                                OVERLAY_PERCENTAGE,
+                                        },
                                     ]}>
                                     <Text style={styles.buyText}>BUY</Text>
                                 </Animated.View>
@@ -680,39 +697,42 @@ const styles = StyleSheet.create({
     },
     saveTextContainer: {
         borderColor: SAVE_COLOR,
-        borderWidth: 3,
+        borderWidth: 2,
         borderRadius: 10,
-        padding: 5,
+        padding: 10,
         position: 'absolute',
     },
     saveText: {
         color: SAVE_COLOR,
         fontWeight: 'bold',
         fontSize: 24,
+        textAlign: 'center',
     },
     deleteTextContainer: {
         borderColor: DELETE_COLOR,
-        borderWidth: 3,
+        borderWidth: 2,
         borderRadius: 10,
-        padding: 5,
+        padding: 10,
         position: 'absolute',
     },
     deleteText: {
         color: DELETE_COLOR,
         fontWeight: 'bold',
         fontSize: 24,
+        textAlign: 'center',
     },
     buyTextContainer: {
         borderColor: BUY_COLOR,
-        borderWidth: 3,
+        borderWidth: 2,
         borderRadius: 10,
-        padding: 5,
+        paddingVertical: 10,
         position: 'absolute',
     },
     buyText: {
         color: BUY_COLOR,
         fontWeight: 'bold',
         fontSize: 24,
+        textAlign: 'center',
     },
     image: {
         borderRadius: 5,

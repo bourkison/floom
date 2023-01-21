@@ -16,6 +16,7 @@ import {
 import Spinner from '@/components/Utility/Spinner';
 import ProductListItem from '@/components/Product/ProductListItem';
 import {deleteAllDeletes, deleteSaveOrDelete} from '@/api/save';
+import {DELETE_COLOR} from '@/constants';
 
 const DeletedProducts = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -177,7 +178,7 @@ const DeletedProducts = () => {
                                                 diameter={15}
                                                 spinnerWidth={2}
                                                 spinnerColor="#f3fcfa"
-                                                backgroundColor="#ce3b54"
+                                                backgroundColor={DELETE_COLOR}
                                             />
                                         ) : (
                                             'Delete'
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
     },
     resetAllButton: {
         flex: 1,
-        backgroundColor: '#ce3b54',
+        backgroundColor: DELETE_COLOR,
         borderRadius: 5,
         paddingVertical: 8,
     },
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     deleteButton: {
-        backgroundColor: '#ce3b54',
+        backgroundColor: DELETE_COLOR,
         padding: 5,
         paddingVertical: 7,
         borderRadius: 3,

@@ -15,9 +15,10 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 
 type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
+    onPress?: () => void;
 };
 
-const ActionButton: React.FC<ActionButtonProps> = ({type}) => {
+const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
     const dispatch = useAppDispatch();
     const action = useAppSelector(state => state.product.action);
 
@@ -45,7 +46,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({type}) => {
                             action === type ? SAVE_COLOR : PALETTE.slate[0],
                     }}
                     onPress={() => {
-                        dispatch(COMMENCE_ANIMATE(type));
+                        if (onPress) {
+                            onPress();
+                        } else {
+                            dispatch(COMMENCE_ANIMATE(type));
+                        }
                     }}>
                     <View style={styles.button}>
                         <Ionicons
