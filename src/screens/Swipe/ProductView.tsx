@@ -31,6 +31,7 @@ import {
     BUY_COLOR,
     SAVE_COLOR,
     ACTION_BUTTON_SIZE,
+    PALETTE,
 } from '@/constants';
 import {capitaliseString, stringifyColors} from '@/services';
 
@@ -436,7 +437,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: '#1a1f25',
+        backgroundColor: PALETTE.rose[9],
         alignContent: 'center',
         justifyContent: 'center',
         alignItems: 'center',

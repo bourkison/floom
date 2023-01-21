@@ -2,14 +2,10 @@ import React, {useState} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {AuthStackParamList} from '@/nav/Navigator';
-import {
-    SafeAreaView,
-    StyleSheet,
-    TextInput,
-    View,
-    ScrollView,
-} from 'react-native';
+import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
 import {Auth} from 'aws-amplify';
+
+import TextInput from '@/components/Utility/TextInput';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-picker/picker';
@@ -84,7 +80,6 @@ const SignUp = ({
                         autoComplete="email"
                         autoCorrect={false}
                         autoCapitalize="none"
-                        style={styles.textInput}
                         selectionColor="#000"
                         keyboardType="email-address"
                         returnKeyType="next"
@@ -96,7 +91,6 @@ const SignUp = ({
                         autoCapitalize="none"
                         autoComplete="off"
                         autoCorrect={false}
-                        style={styles.textInput}
                         secureTextEntry={secureText}
                         onFocus={() => {
                             // Hacky way due to the below issue:
@@ -112,7 +106,6 @@ const SignUp = ({
                         autoComplete="off"
                         autoCorrect={false}
                         secureTextEntry={true}
-                        style={styles.textInput}
                     />
                     <TextInput
                         placeholder="Name"
@@ -121,7 +114,6 @@ const SignUp = ({
                         autoCapitalize="sentences"
                         autoComplete="name"
                         autoCorrect={false}
-                        style={styles.textInput}
                     />
                     <View style={styles.dobInput}>
                         <DateTimePicker
@@ -173,19 +165,6 @@ const styles = StyleSheet.create({
     },
     container: {
         paddingHorizontal: 10,
-    },
-    textInput: {
-        flex: 1,
-        marginTop: 25,
-        color: '#1a1f25',
-        borderColor: '#1a1f25',
-        backgroundColor: '#f3fcfa',
-        borderRadius: 5,
-        borderWidth: 2,
-        fontSize: 14,
-        flexShrink: 0,
-        flexGrow: 0,
-        padding: 10,
     },
     dobInput: {
         marginTop: 25,
