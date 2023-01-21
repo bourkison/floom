@@ -30,27 +30,27 @@
         },
         "floomMongooseModels": {
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion852c4867-build.zip"
+          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion8783b6a7-build.zip"
         },
         "floomSaveHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomSaveHandler-594f5945684362527063-build.zip"
+          "s3Key": "amplify-builds/floomSaveHandler-78465748314c6954626d-build.zip"
         },
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomProductHandler-4638516d3362336a3937-build.zip"
+          "s3Key": "amplify-builds/floomProductHandler-4248636437646b53456f-build.zip"
         },
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomPublicHandler-66372b734a6854556b45-build.zip"
+          "s3Key": "amplify-builds/floomPublicHandler-4266572f746869463859-build.zip"
         },
         "floomProductManager": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomProductManager-727a74644131504b4739-build.zip"
+          "s3Key": "amplify-builds/floomProductManager-4472344f653534754565-build.zip"
         }
       },
       "api": {

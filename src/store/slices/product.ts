@@ -12,6 +12,7 @@ import {
 import {createSaveOrDelete, deleteSaveOrDelete} from '@/api/save';
 import {queryProduct} from '@/api/product';
 import {RootState} from '@/store';
+import {queryPublicProduct} from '@/api/public';
 
 const productAdapter = createEntityAdapter();
 
@@ -62,57 +63,73 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
         },
         {getState},
     ) => {
-        let init: QueryProductInit = {
-            queryStringParameters: input.queryStringParameters,
-        };
+        const state = getState() as RootState;
 
-        // Set filters in the request.
-        if (input.filtered) {
-            const state = getState() as RootState;
-
-            init.queryStringParameters = init.queryStringParameters || {
-                loadAmount: 10,
-                type: 'unsaved',
+        if (!state.user.isGuest) {
+            let init: QueryProductInit = {
+                queryStringParameters: input.queryStringParameters,
             };
 
-            init.queryStringParameters.excludeDeleted =
-                state.product.filters.excludeDeleted;
-            init.queryStringParameters.excludeSaved =
-                state.product.filters.excludeSaved;
-
-            if (state.product.filters.gender.length) {
-                init.queryStringParameters = {
-                    ...init.queryStringParameters,
-                    filteredGenders: state.product.filters.gender.join(','),
+            // Set filters in the request.
+            if (input.filtered) {
+                init.queryStringParameters = init.queryStringParameters || {
+                    loadAmount: 10,
+                    type: 'unsaved',
                 };
+
+                init.queryStringParameters.excludeDeleted =
+                    state.product.filters.excludeDeleted;
+                init.queryStringParameters.excludeSaved =
+                    state.product.filters.excludeSaved;
+
+                if (state.product.filters.gender.length) {
+                    init.queryStringParameters = {
+                        ...init.queryStringParameters,
+                        filteredGenders: state.product.filters.gender.join(','),
+                    };
+                }
+
+                if (state.product.filters.color.length) {
+                    init.queryStringParameters = {
+                        ...init.queryStringParameters,
+                        filteredColors: state.product.filters.color.join(','),
+                    };
+                }
+
+                if (state.product.filters.category.length) {
+                    init.queryStringParameters = {
+                        ...init.queryStringParameters,
+                        filteredCategories:
+                            state.product.filters.category.join(','),
+                    };
+                }
+
+                if (state.product.filters.searchText) {
+                    init.queryStringParameters = {
+                        ...init.queryStringParameters,
+                        query: state.product.filters.searchText,
+                    };
+                }
             }
 
-            if (state.product.filters.color.length) {
-                init.queryStringParameters = {
-                    ...init.queryStringParameters,
-                    filteredColors: state.product.filters.color.join(','),
-                };
-            }
+            return await queryProduct({
+                init,
+            });
+        } else {
+            console.log('PUBLIC QUERY.');
 
-            if (state.product.filters.category.length) {
-                init.queryStringParameters = {
-                    ...init.queryStringParameters,
-                    filteredCategories:
-                        state.product.filters.category.join(','),
-                };
-            }
-
-            if (state.product.filters.searchText) {
-                init.queryStringParameters = {
-                    ...init.queryStringParameters,
-                    query: state.product.filters.searchText,
-                };
-            }
+            return await queryPublicProduct({
+                init: {
+                    body: {
+                        excludedProducts: [],
+                        filteredGenders: [],
+                        filteredCategories: [],
+                        filteredColors: [],
+                        loadAmount: 5,
+                    },
+                },
+            });
         }
-
-        return await queryProduct({
-            init,
-        });
     },
 );
 

@@ -39,6 +39,21 @@ export type QueryProductInit = {
     };
 };
 
+export type QueryPublicProductParams = {
+    init: QueryPublicProductInit;
+};
+
+export type QueryPublicProductInit = {
+    body: {
+        method?: 'QUERY_PRODUCT';
+        excludedProducts: string[];
+        filteredGenders: string[];
+        filteredCategories: string[];
+        filteredColors: string[];
+        loadAmount: number;
+    };
+};
+
 export type QueryProductResponse = {
     products: Product[];
     __moreToLoad: boolean;
