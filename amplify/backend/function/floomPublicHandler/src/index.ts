@@ -2,7 +2,7 @@ import aws from 'aws-sdk';
 import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 // @ts-ignore
 import MongooseModels from '/opt/nodejs/models';
-import {Model, FilterQuery} from 'mongoose';
+import {Model, FilterQuery, Types} from 'mongoose';
 let MONGODB_URI: string;
 
 type ProductType = {
@@ -151,6 +151,65 @@ const queryProducts = async (
     }
 };
 
+const getProducts = async (
+    event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> => {
+    const productIds: string[] = JSON.parse(event.body)?.products || [];
+
+    const Product: Model<ProductType> = await MongooseModels().Product(
+        MONGODB_URI,
+    );
+
+    let response: APIGatewayProxyResult = {
+        statusCode: 500,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: false}),
+    };
+
+    if (!productIds.length) {
+        response = {
+            statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: 'No products provided',
+            }),
+        };
+    }
+
+    try {
+        const products = await Product.find({
+            _id: {
+                $in: productIds.map(id => new Types.ObjectId(id)),
+            },
+        });
+
+        response = {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: true,
+                data: products,
+            }),
+        };
+
+        return response;
+    } catch (err) {
+        // TODO: Handle error and return appropriate response.
+        console.error(err);
+        return response;
+    }
+};
+
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
@@ -171,6 +230,9 @@ exports.handler = async (
     switch (JSON.parse(event.body)?.method || '') {
         case 'QUERY_PRODUCTS':
             response = await queryProducts(event);
+            break;
+        case 'GET_PRODUCTS':
+            response = await getProducts(event);
             break;
         default:
             response = {

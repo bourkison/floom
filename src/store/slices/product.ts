@@ -12,7 +12,9 @@ import {
 import {createSaveOrDelete, deleteSaveOrDelete} from '@/api/save';
 import {queryProduct} from '@/api/product';
 import {RootState} from '@/store';
-import {queryPublicProduct} from '@/api/public';
+import {getPublicProduct, queryPublicProduct} from '@/api/public';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {LOCAL_KEY_SAVED_PRODUCTS} from '@/constants';
 
 const productAdapter = createEntityAdapter();
 
@@ -116,12 +118,17 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                 init,
             });
         } else {
-            console.log('PUBLIC QUERY.');
+            const excludedSaved = state.product.filters.excludeSaved
+                ? JSON.parse(
+                      (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) ||
+                          '[]',
+                  )
+                : [];
 
             return await queryPublicProduct({
                 init: {
                     body: {
-                        excludedProducts: [],
+                        excludedProducts: excludedSaved,
                         filteredGenders: [],
                         filteredCategories: [],
                         filteredColors: [],
@@ -135,11 +142,24 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
 
 export const SAVE_PRODUCT = createAsyncThunk<void, string>(
     'product/SAVE_PRODUCT',
-    async _id => {
-        await createSaveOrDelete({
-            productId: _id,
-            init: {queryStringParameters: {type: 'save'}},
-        });
+    async (_id, {getState}) => {
+        const state = getState() as RootState;
+
+        if (!state.user.isGuest) {
+            await createSaveOrDelete({
+                productId: _id,
+                init: {queryStringParameters: {type: 'save'}},
+            });
+        } else {
+            const currentSavedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+            );
+            currentSavedProducts.push(_id);
+            await AsyncStorage.setItem(
+                LOCAL_KEY_SAVED_PRODUCTS,
+                JSON.stringify(currentSavedProducts),
+            );
+        }
     },
 );
 
@@ -182,21 +202,54 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
             },
             loadType: 'initial',
         },
-        {rejectWithValue},
+        {rejectWithValue, getState},
     ) => {
-        let init: QueryProductInit = {
-            queryStringParameters: input.queryStringParameters,
-        };
+        const state = getState() as RootState;
 
-        try {
-            return await queryProduct({
-                init,
-            });
-        } catch (err: any) {
-            return rejectWithValue({
-                message: err.message || undefined,
-                code: err?.response?.status || undefined,
-            });
+        if (!state.user.isGuest) {
+            let init: QueryProductInit = {
+                queryStringParameters: input.queryStringParameters,
+            };
+
+            try {
+                return await queryProduct({
+                    init,
+                });
+            } catch (err: any) {
+                return rejectWithValue({
+                    message: err.message || undefined,
+                    code: err?.response?.status || undefined,
+                });
+            }
+        } else {
+            const productIds: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+            );
+
+            console.log('PRODUCT IDS:', productIds);
+
+            try {
+                const products = await getPublicProduct({
+                    init: {
+                        body: {products: productIds},
+                    },
+                });
+
+                console.log('PRODUCTS:', products);
+
+                return {
+                    products,
+                    __moreToLoad: false,
+                    __loaded: products.length,
+                    __totalLength: products.length,
+                };
+            } catch (err: any) {
+                console.log('ERROR:', err);
+                return rejectWithValue({
+                    message: err.message || undefined,
+                    code: err?.response?.status || undefined,
+                });
+            }
         }
     },
 );

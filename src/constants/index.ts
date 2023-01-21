@@ -54,6 +54,8 @@ export const COLOUR_OPTIONS = [
     'Beige',
 ];
 
+export const LOCAL_KEY_SAVED_PRODUCTS = '@savedProducts';
+
 export const ACTION_BUTTON_SIZE_ACTIVE = 50;
 export const ACTION_BUTTON_SIZE_INACTIVE = 55;
 

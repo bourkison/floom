@@ -4,6 +4,7 @@ import {
     Product as ProductType,
     QueryProductResponse,
     QueryPublicProductParams,
+    GetPublicProductParams,
 } from '@/types/product';
 
 export async function queryPublicProduct(
@@ -44,4 +45,43 @@ export async function queryPublicProduct(
         __moreToLoad: data.__moreToLoad,
         __totalLength: data.__totalLength,
     };
+}
+
+export async function getPublicProduct(
+    input: GetPublicProductParams,
+): Promise<ProductType[]> {
+    const path = '/public';
+
+    console.log('geting public product', input.init);
+
+    input.init.body.method = 'GET_PRODUCTS';
+
+    const data = await API.post(API_NAME, path, input.init);
+
+    console.log('received public product', data);
+
+    let response: ProductType[] = [];
+
+    for (let i = 0; i < data.data.length; i++) {
+        response.push({
+            name: data.data[i].name,
+            images: data.data[i].images,
+            price: {
+                amount: data.data[i].price.amount,
+                saleAmount: data.data[i].price.saleAmount,
+                currency: data.data[i].price.currency,
+            },
+            link: data.data[i].link,
+            _id: data.data[i]._id,
+            colors: data.data[i].colors,
+            categories: data.data[i].categories,
+            gender: data.data[i].gender,
+            brand: data.data[i].brand,
+            vendorProductId: data.data[i].vendorProductId,
+            inStock: data.data[i].inStock,
+            description: data.data[i].description || '',
+        });
+    }
+
+    return response;
 }

@@ -45,12 +45,23 @@ export type QueryPublicProductParams = {
 
 export type QueryPublicProductInit = {
     body: {
-        method?: 'QUERY_PRODUCT';
+        method?: 'QUERY_PRODUCTS';
         excludedProducts: string[];
         filteredGenders: string[];
         filteredCategories: string[];
         filteredColors: string[];
         loadAmount: number;
+    };
+};
+
+export type GetPublicProductParams = {
+    init: GetPublicProductInit;
+};
+
+export type GetPublicProductInit = {
+    body: {
+        method?: 'GET_PRODUCTS';
+        products: string[];
     };
 };
 
