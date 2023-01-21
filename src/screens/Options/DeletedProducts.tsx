@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Spinner from '@/components/Utility/Spinner';
 import ProductListItem from '@/components/Product/ProductListItem';
-import {DELETE_COLOR} from '@/constants';
+import {DELETE_COLOR, PALETTE} from '@/constants';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
 import {
     DELETE_ALL_DELETED_PRODUCTS,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     },
     resetAllButton: {
         flex: 1,
-        backgroundColor: DELETE_COLOR,
+        backgroundColor: PALETTE.red[5],
         borderRadius: 5,
         paddingVertical: 8,
     },

@@ -1,16 +1,19 @@
 import React from 'react';
 import ProductList from '@/components/Product/ProductList';
-import {View, StyleSheet, useWindowDimensions} from 'react-native';
+import {View, StyleSheet, useWindowDimensions, Text} from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
-import {IMAGE_RATIO, IMAGE_PADDING} from '@/constants';
+import {IMAGE_RATIO, IMAGE_PADDING, PALETTE} from '@/constants';
 import FilterDropdown from '@/components/Product/FilterDropdown';
 
 import ActionButton from '@/components/Utility/ActionButton';
+import {useAppSelector} from '@/store/hooks';
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
+    const isGuest = useAppSelector(state => state.user.isGuest);
+    const user = useAppSelector(state => state.user.docData);
     const {width} = useWindowDimensions();
 
     return (
@@ -29,6 +32,13 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     <ActionButton type="buy" />
                     <ActionButton type="save" />
                 </View>
+                <View style={styles.welcomeTextContainer}>
+                    <Text style={styles.welcomeText}>
+                        {!isGuest && user
+                            ? `Logged in as ${user.email}`
+                            : 'Guest Mode. Create account for more features.'}
+                    </Text>
+                </View>
             </View>
         </View>
     );
@@ -36,7 +46,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 20,
+        paddingTop: 30,
         flex: 1,
         alignItems: 'center',
         alignContent: 'center',
@@ -54,6 +64,14 @@ const styles = StyleSheet.create({
         zIndex: -1,
     },
     flexOne: {flex: 1},
+    welcomeTextContainer: {
+        marginTop: 10,
+        zIndex: -1,
+    },
+    welcomeText: {
+        fontSize: 12,
+        color: PALETTE.neutral[3],
+    },
 });
 
 export default Home;

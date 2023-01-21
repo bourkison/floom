@@ -22,9 +22,21 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
     const dispatch = useAppDispatch();
     const action = useAppSelector(state => state.product.action);
 
+    const press = () => {
+        if (onPress) {
+            onPress();
+        } else {
+            dispatch(COMMENCE_ANIMATE(type));
+        }
+    };
+
     if (type === 'save') {
         return (
-            <View style={styles.buttonContainer}>
+            <View
+                style={[
+                    styles.buttonContainer,
+                    action === type ? styles.noShadow : styles.shadow,
+                ]}>
                 <AnimatedButton
                     scale={1}
                     style={{
@@ -41,17 +53,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
                             action === type
                                 ? ACTION_BUTTON_SIZE_ACTIVE
                                 : ACTION_BUTTON_SIZE_INACTIVE,
-                        borderColor: SAVE_COLOR,
+                        borderColor: PALETTE.lime[4],
                         backgroundColor:
-                            action === type ? SAVE_COLOR : PALETTE.slate[0],
+                            action === type ? SAVE_COLOR : PALETTE.neutral[0],
                     }}
-                    onPress={() => {
-                        if (onPress) {
-                            onPress();
-                        } else {
-                            dispatch(COMMENCE_ANIMATE(type));
-                        }
-                    }}>
+                    onPress={press}>
                     <View style={styles.button}>
                         <Ionicons
                             name="heart"
@@ -68,7 +74,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
 
     if (type === 'buy') {
         return (
-            <View style={styles.buttonContainer}>
+            <View
+                style={[
+                    styles.buttonContainer,
+                    action === type ? styles.noShadow : styles.shadow,
+                ]}>
                 <AnimatedButton
                     scale={1}
                     style={{
@@ -85,13 +95,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
                             action === type
                                 ? ACTION_BUTTON_SIZE_ACTIVE
                                 : ACTION_BUTTON_SIZE_INACTIVE,
-                        borderColor: BUY_COLOR,
+                        borderColor: PALETTE.blue[4],
                         backgroundColor:
-                            action === type ? BUY_COLOR : PALETTE.slate[0],
+                            action === type ? BUY_COLOR : PALETTE.neutral[0],
                     }}
-                    onPress={() => {
-                        dispatch(COMMENCE_ANIMATE('buy'));
-                    }}>
+                    onPress={press}>
                     <View style={styles.button}>
                         <AntDesign
                             name="shoppingcart"
@@ -107,7 +115,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
     }
 
     return (
-        <View style={styles.buttonContainer}>
+        <View
+            style={[
+                styles.buttonContainer,
+                action === type ? styles.noShadow : styles.shadow,
+            ]}>
             <AnimatedButton
                 scale={1}
                 style={{
@@ -124,13 +136,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
                         action === type
                             ? ACTION_BUTTON_SIZE_ACTIVE
                             : ACTION_BUTTON_SIZE_INACTIVE,
-                    borderColor: DELETE_COLOR,
+                    borderColor: PALETTE.rose[4],
                     backgroundColor:
-                        action === type ? DELETE_COLOR : PALETTE.slate[0],
+                        action === type ? DELETE_COLOR : PALETTE.neutral[0],
                 }}
-                onPress={() => {
-                    dispatch(COMMENCE_ANIMATE('delete'));
-                }}>
+                onPress={press}>
                 <View style={styles.button}>
                     <Feather
                         name="x"
@@ -152,6 +162,11 @@ const styles = StyleSheet.create({
         marginHorizontal: 8,
         justifyContent: 'center',
         alignItems: 'center',
+        shadowColor: PALETTE.slate[7],
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
     },
     actionButton: {
         zIndex: -1,
@@ -163,6 +178,12 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         alignItems: 'center',
         zIndex: -1,
+    },
+    noShadow: {
+        shadowOpacity: 0,
+    },
+    shadow: {
+        shadowOpacity: 0.4,
     },
 });
 

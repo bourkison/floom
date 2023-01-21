@@ -85,6 +85,6 @@ export const PALETTE = {
     zinc: COLOR_PALETTE_ZINC,
 };
 
-export const DELETE_COLOR: Color = PALETTE.red[6];
-export const SAVE_COLOR: Color = PALETTE.emerald[6];
+export const DELETE_COLOR: Color = PALETTE.rose[6];
+export const SAVE_COLOR: Color = PALETTE.lime[6];
 export const BUY_COLOR: Color = PALETTE.blue[6];

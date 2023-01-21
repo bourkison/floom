@@ -27,6 +27,7 @@ import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {PALETTE} from '@/constants';
 import {capitaliseString} from '@/services';
+import BrandLogo from './BrandLogo';
 
 export type ProductListItemProps = {
     product: ProductType;
@@ -35,7 +36,7 @@ export type ProductListItemProps = {
     onDelete?: (_id: string, index: number) => void;
 };
 
-const ITEM_HEIGHT = 72;
+const ITEM_HEIGHT = 108;
 const SNAP_ANIMATION_DURATION = 250;
 const SNAP_TO_DELETE_TRANSLATION = 7 / 8;
 
@@ -194,7 +195,10 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                             <Text style={styles.titleText}>
                                 {capitaliseString(product.name)}
                             </Text>
-                            <Text>${product.price.saleAmount}</Text>
+                            <View style={styles.priceContainer}>
+                                <Text>${product.price.saleAmount} </Text>
+                                <BrandLogo brand={product.brand} />
+                            </View>
                         </View>
                     </TouchableOpacity>
                 </GestureDetector>
@@ -213,15 +217,15 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     animatedContainer: {
-        borderBottomColor: '#1a1f25',
+        borderBottomColor: PALETTE.neutral[2],
         borderBottomWidth: 1,
-        backgroundColor: 'rgb(242, 242, 242)',
+        backgroundColor: PALETTE.neutral[0],
     },
     deleteContainer: {
         position: 'absolute',
         height: '100%',
         width: '100%',
-        backgroundColor: PALETTE.red[6],
+        backgroundColor: PALETTE.red[5],
         alignItems: 'flex-end',
         justifyContent: 'center',
     },
@@ -232,7 +236,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     animatedZeroContainer: {
-        borderTopColor: '#1a1f25',
+        borderTopColor: PALETTE.neutral[2],
         borderTopWidth: 1,
     },
     listView: {
@@ -255,6 +259,12 @@ const styles = StyleSheet.create({
     titleText: {
         fontWeight: '500',
         fontSize: 15,
+    },
+    priceContainer: {
+        flexDirection: 'row',
+        height: 18,
+        alignItems: 'center',
+        marginTop: 5,
     },
 });
 
