@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: PALETTE.rose[9],
+        backgroundColor: PALETTE.neutral[8],
         alignContent: 'center',
         justifyContent: 'center',
         alignItems: 'center',

@@ -14,7 +14,7 @@ export const COLOR_PALETTE_SLATE: Color[] = [
     '#1e293b',
     '#0f172a',
 ];
-export const COLOR_PALETTE_GRAY = [
+export const COLOR_PALETTE_GRAY: Color[] = [
     '#F9FAFB',
     '#F3F4F6',
     '#E5E7EB',

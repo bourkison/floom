@@ -21,6 +21,7 @@ type ProductType = {
     brand: string;
     vendorProductId: string;
     inStock: boolean;
+    description: string;
 };
 
 type UserType = {
@@ -223,6 +224,7 @@ const querySavedOrDeletedProduct = async (
     const email = event.requestContext?.authorizer?.claims?.email || undefined;
     const loadAmount = parseInt(event.queryStringParameters.loadAmount) || 5;
     const startAt = event.queryStringParameters.startAt || '';
+    const reversed = event.queryStringParameters.reversed === 'true' || false;
 
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
     const Product: Model<ProductType> = await MongooseModels().Product(

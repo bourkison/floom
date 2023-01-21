@@ -8,6 +8,7 @@ import Spinner from '@/components/Utility/Spinner';
 import {useAppDispatch} from '@/store/hooks';
 import {Auth} from 'aws-amplify';
 import {FETCH_USER} from '@/store/slices/user';
+import {PALETTE} from '@/constants';
 
 const Login = ({navigation}: StackScreenProps<AuthStackParamList, 'Login'>) => {
     const [email, setEmail] = useState('');
@@ -34,6 +35,9 @@ const Login = ({navigation}: StackScreenProps<AuthStackParamList, 'Login'>) => {
                     // TODO: Handle incorrect username/password error
                     throw err;
                 }
+
+                console.error('ERROR:', err);
+                throw err;
             });
 
             console.log('Logged in. Fetching user.');
@@ -55,25 +59,23 @@ const Login = ({navigation}: StackScreenProps<AuthStackParamList, 'Login'>) => {
     return (
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.container}>
-                <View>
+                <View style={styles.box}>
                     <TextInput
                         onChangeText={setEmail}
                         placeholder="Email"
-                        placeholderTextColor="#343E4B"
+                        placeholderTextColor={PALETTE.neutral[3]}
                         autoComplete="email"
                         autoCorrect={false}
                         autoCapitalize="none"
-                        style={styles.textInput}
+                        style={[styles.textInput, styles.bottomBorder]}
                         selectionColor="#000"
                         keyboardType="email-address"
                         returnKeyType="next"
                     />
-                </View>
-                <View>
                     <TextInput
                         onChangeText={setPassword}
                         placeholder="Password"
-                        placeholderTextColor="#343E4B"
+                        placeholderTextColor={PALETTE.neutral[3]}
                         autoComplete="password"
                         autoCorrect={false}
                         autoCapitalize="none"
@@ -84,7 +86,7 @@ const Login = ({navigation}: StackScreenProps<AuthStackParamList, 'Login'>) => {
                         onSubmitEditing={login}
                     />
                 </View>
-                <View>
+                <View style={styles.buttonContainer}>
                     <AnimatedButton
                         style={styles.loginButton}
                         textStyle={styles.loginButtonText}
@@ -120,38 +122,43 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        padding: 10,
         justifyContent: 'center',
+    },
+    box: {
+        marginTop: 10,
+        shadowColor: PALETTE.neutral[5],
+        shadowOpacity: 0.3,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        backgroundColor: PALETTE.neutral[0],
     },
     textInput: {
-        color: '#1a1f25',
-        borderColor: '#1a1f25',
-        backgroundColor: '#f3fcfa',
-        borderRadius: 5,
-        borderWidth: 2,
-        fontSize: 14,
-        flexShrink: 0,
-        flexGrow: 0,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        borderColor: PALETTE.neutral[2],
+    },
+    bottomBorder: {
+        borderBottomWidth: 1,
+    },
+    buttonContainer: {
         padding: 10,
-        marginBottom: 10,
     },
     loginButton: {
-        padding: 10,
-        backgroundColor: '#1a1f25',
+        padding: 7,
+        backgroundColor: PALETTE.neutral[8],
         justifyContent: 'center',
-        borderRadius: 25,
-        width: '50%',
-        flexGrow: 0,
-        flexShrink: 0,
-        alignSelf: 'center',
         alignItems: 'center',
+        borderRadius: 10,
+        width: '100%',
+        alignSelf: 'center',
     },
     loginButtonText: {
-        color: '#f3fcfa',
-        fontSize: 14,
+        color: PALETTE.gray[1],
+        fontSize: 12,
         fontWeight: 'bold',
         textAlign: 'center',
-        textTransform: 'uppercase',
         flexBasis: 14,
         flexShrink: 0,
         flexGrow: 0,
