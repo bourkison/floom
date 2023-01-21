@@ -25,6 +25,7 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {PALETTE} from '@/constants';
 
 export type ProductListItemProps = {
     product: ProductType;
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         height: '100%',
         width: '100%',
-        backgroundColor: '#CF3C48',
+        backgroundColor: PALETTE.red[6],
         alignItems: 'flex-end',
         justifyContent: 'center',
     },

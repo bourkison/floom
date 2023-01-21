@@ -1,105 +1,173 @@
-import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {StackScreenProps} from '@react-navigation/stack';
-import {OptionsStackParamList} from '@/nav/OptionsNavigator';
-import {useAppDispatch} from '@/store/hooks';
-import {LOGOUT} from '@/store/slices/user';
-import {Feather} from '@expo/vector-icons';
-import {Color} from '@/types';
+import React, {useState} from 'react';
+import {Text, ScrollView, StyleSheet, View} from 'react-native';
+import TextInput from '@/components/Utility/TextInput';
+import Spinner from '@/components/Utility/Spinner';
+import SectionHeader from '@/components/Utility/SectionHeader';
+import {useAppSelector} from '@/store/hooks';
+import AnimatedButton from '@/components/Utility/AnimatedButton';
+import {PALETTE} from '@/constants';
+import DeletedProductsWidget from '@/components/Options/DeletedProductsWidget';
 
-type OptionItemProps = {
-    children: string;
-    onPress?: () => void;
-    color?: Color;
-};
+const Options = () => {
+    const user = useAppSelector(state => state.user.docData);
+    const [name, setName] = useState(user?.name || '');
 
-const OptionItem: React.FC<OptionItemProps> = ({children, onPress, color}) => (
-    <TouchableOpacity
-        style={styles.optionLink}
-        onPress={onPress}
-        activeOpacity={0.5}>
-        <View style={styles.optionTextContainer}>
-            <Text style={{color: color || undefined}}>{children}</Text>
-        </View>
-        <View style={styles.optionIconContainer}>
-            <Feather
-                name="chevron-right"
-                size={18}
-                color={color || undefined}
-            />
-        </View>
-    </TouchableOpacity>
-);
+    const [secureTextP, setSecureTextP] = useState(false);
+    const [secureTextNP, setSecureTextNP] = useState(false);
+    const [secureTextCNP, setSecureTextCNP] = useState(false);
 
-const Options = ({
-    navigation,
-}: StackScreenProps<OptionsStackParamList, 'OptionsHome'>) => {
-    const dispatch = useAppDispatch();
+    const [password, setPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confNewPassword, setConfNewPassword] = useState('');
+    const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
-    const logout = async () => {
-        await dispatch(LOGOUT());
+    const updatePassword = async () => {
+        setIsUpdatingPassword(!isUpdatingPassword);
+        console.log('Update', password, newPassword, confNewPassword);
     };
 
+    if (!user) {
+        return (
+            <View>
+                <Text>No logged in user.</Text>
+            </View>
+        );
+    }
+
     return (
-        <View>
-            <View style={styles.optionsGroup}>
-                <OptionItem
-                    onPress={() => {
-                        navigation.navigate('Account');
-                    }}>
-                    Account
-                </OptionItem>
-                <OptionItem
-                    onPress={() => {
-                        navigation.navigate('DeletedProducts');
-                    }}>
-                    Deleted Products
-                </OptionItem>
+        <ScrollView style={styles.container}>
+            <View style={styles.section}>
+                <SectionHeader>Deleted Products</SectionHeader>
+                <DeletedProductsWidget />
             </View>
-            <View style={styles.optionsGroup}>
-                <OptionItem
-                    onPress={() => {
-                        navigation.navigate('AppInfo');
-                    }}>
-                    App Info
-                </OptionItem>
-                <OptionItem onPress={logout} color="#ce3b54">
-                    Logout
-                </OptionItem>
+            <View style={styles.section}>
+                <SectionHeader>Email</SectionHeader>
+                <Text style={{textAlign: 'center'}}>{user.email}</Text>
             </View>
-        </View>
+            <View style={styles.section}>
+                <SectionHeader>Account Info</SectionHeader>
+                <TextInput
+                    placeholder="Name"
+                    placeholderTextColor="#343E4B"
+                    onChangeText={setName}
+                    autoCapitalize="sentences"
+                    autoComplete="name"
+                    autoCorrect={false}
+                    value={name}
+                />
+            </View>
+
+            <View style={styles.section}>
+                <SectionHeader>Password</SectionHeader>
+                <TextInput
+                    placeholder="Current Password"
+                    placeholderTextColor="#343E4B"
+                    onChangeText={setPassword}
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect={false}
+                    secureTextEntry={secureTextP}
+                    editable={!isUpdatingPassword}
+                    onFocus={() => {
+                        // Hacky way due to the below issue:
+                        // https://github.com/facebook/react-native/issues/21911
+                        setSecureTextP(true);
+                    }}
+                    style={styles.passwordInput}
+                />
+                <TextInput
+                    placeholder="New Password"
+                    placeholderTextColor="#343E4B"
+                    onChangeText={setNewPassword}
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect={false}
+                    secureTextEntry={secureTextNP}
+                    editable={!isUpdatingPassword}
+                    onFocus={() => {
+                        // Hacky way due to the below issue:
+                        // https://github.com/facebook/react-native/issues/21911
+                        setSecureTextNP(true);
+                    }}
+                    style={styles.passwordInput}
+                />
+                <TextInput
+                    placeholder="Confirm New Password"
+                    placeholderTextColor="#343E4B"
+                    onChangeText={setConfNewPassword}
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    autoCorrect={false}
+                    secureTextEntry={secureTextCNP}
+                    editable={!isUpdatingPassword}
+                    onFocus={() => {
+                        // Hacky way due to the below issue:
+                        // https://github.com/facebook/react-native/issues/21911
+                        setSecureTextCNP(true);
+                    }}
+                />
+                <View style={styles.buttonContainer}>
+                    <AnimatedButton
+                        style={styles.updatePasswordButton}
+                        textStyle={styles.updatePasswordButtonText}
+                        onPress={updatePassword}
+                        disabled={isUpdatingPassword}>
+                        {isUpdatingPassword ? (
+                            <Spinner
+                                diameter={14}
+                                spinnerWidth={2}
+                                backgroundColor="#1a1f25"
+                                spinnerColor="#f3fcfa"
+                            />
+                        ) : (
+                            'Update Password'
+                        )}
+                    </AnimatedButton>
+                </View>
+            </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
-    logoutButton: {
-        maxWidth: 100,
-        borderColor: 'black',
-        borderWidth: 2,
-        borderRadius: 3,
+    container: {
+        flex: 1,
         padding: 5,
-        alignSelf: 'center',
-        backgroundColor: '#fff',
     },
-    optionsGroup: {
-        marginVertical: 10,
-        borderRadius: 3,
+    section: {
+        marginBottom: 15,
     },
-    optionLink: {
-        flexDirection: 'row',
-        paddingVertical: 10,
-        paddingHorizontal: 5,
-        backgroundColor: '#fff',
+    header: {
+        fontSize: 14,
+        marginVertical: 5,
+        fontWeight: 'bold',
     },
-    optionTextContainer: {
+    buttonContainer: {
+        padding: 10,
+    },
+    updatePasswordButton: {
+        padding: 7,
+        backgroundColor: PALETTE.neutral[8],
         flex: 1,
-    },
-    optionIconContainer: {
-        flex: 1,
-        alignSelf: 'flex-end',
-        flexBasis: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 25,
+        width: '100%',
         flexGrow: 0,
         flexShrink: 0,
+        alignSelf: 'center',
+    },
+    updatePasswordButtonText: {
+        color: PALETTE.gray[1],
+        fontSize: 12,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        flexBasis: 14,
+        flexShrink: 0,
+        flexGrow: 0,
+    },
+    passwordInput: {
+        marginBottom: 10,
     },
 });
 
