@@ -1,7 +1,6 @@
-import {queryProduct} from '@/api/product';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {Product} from '@/types/product';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
     ActivityIndicator,
@@ -15,28 +14,50 @@ import {
 } from 'react-native';
 import Spinner from '@/components/Utility/Spinner';
 import ProductListItem from '@/components/Product/ProductListItem';
-import {deleteAllDeletes, deleteSaveOrDelete} from '@/api/save';
 import {DELETE_COLOR} from '@/constants';
+import {useAppSelector, useAppDispatch} from '@/store/hooks';
+import {
+    DELETE_ALL_DELETED_PRODUCTS,
+    DELETE_DELETED_PRODUCT,
+    LOAD_DELETED_PRODUCTS,
+} from '@/store/slices/product';
 
 const DeletedProducts = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [moreToLoad, setMoreToLoad] = useState(false);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const isLoading = useAppSelector(state => state.product.deleted.isLoading);
+    const products = useAppSelector(state => state.product.deleted.products);
+    const moreToLoad = useAppSelector(
+        state => state.product.deleted.moreToLoad,
+    );
+    const isLoadingMore = useAppSelector(
+        state => state.product.deleted.isLoadingMore,
+    );
+
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const [modalVisible, setModalVisible] = useState(false);
     const [isDeletingAll, setIsDeletingAll] = useState(false);
 
+    const dispatch = useAppDispatch();
+
+    const loadInit = useCallback(async () => {
+        dispatch(
+            LOAD_DELETED_PRODUCTS({
+                queryStringParameters: {
+                    loadAmount: 25,
+                    type: 'deleted',
+                },
+                loadType: 'initial',
+            }),
+        );
+    }, [dispatch]);
+
     useEffect(() => {
         const initFetch = async () => {
             await loadInit();
-            setIsLoading(false);
         };
 
-        setIsLoading(true);
         initFetch();
-    }, []);
+    }, [loadInit]);
 
     const refresh = async () => {
         setIsRefreshing(true);
@@ -44,60 +65,30 @@ const DeletedProducts = () => {
         setIsRefreshing(false);
     };
 
-    const loadInit = async () => {
-        try {
-            const {products: p, __moreToLoad} = await queryProduct({
-                init: {
-                    queryStringParameters: {loadAmount: 25, type: 'deleted'},
-                },
-            });
-
-            setProducts(p);
-            setMoreToLoad(__moreToLoad);
-        } catch (err: any) {
-            if (err.response && err.response.status === 404) {
-                console.warn('No deleted products');
-                setProducts([]);
-            }
+    const loadMore = async () => {
+        if (moreToLoad) {
+            dispatch(
+                LOAD_DELETED_PRODUCTS({
+                    queryStringParameters: {
+                        loadAmount: 25,
+                        type: 'deleted',
+                        startAt: products[products.length - 1]._id,
+                    },
+                    loadType: 'more',
+                }),
+            );
         }
     };
 
-    const loadMore = async () => {
-        setIsLoadingMore(true);
-        const {products: p, __moreToLoad} = await queryProduct({
-            init: {
-                queryStringParameters: {
-                    loadAmount: 25,
-                    type: 'deleted',
-                    startAt: products[products.length - 1]._id,
-                },
-            },
-        });
-
-        setProducts([...products, ...p]);
-        setMoreToLoad(__moreToLoad);
-        setIsLoadingMore(false);
-    };
-
     const removeProduct = (_id: string, index: number) => {
-        setProducts([
-            ...products.slice(0, index),
-            ...products.slice(index + 1),
-        ]);
-        deleteSaveOrDelete({
-            productId: _id,
-            init: {queryStringParameters: {type: 'delete'}},
-        });
+        dispatch(DELETE_DELETED_PRODUCT({_id, index}));
     };
 
     const deleteAllProducts = async () => {
         setIsDeletingAll(!isDeletingAll);
-        await deleteAllDeletes({
-            init: {queryStringParameters: {deleteAll: 'true'}},
-        });
+        await dispatch(DELETE_ALL_DELETED_PRODUCTS());
         setIsDeletingAll(false);
         setModalVisible(false);
-        setProducts([]);
     };
 
     const ListItem: ListRenderItem<Product> = ({item, index}) => (

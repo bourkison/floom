@@ -8,38 +8,45 @@ import {
     Text,
 } from 'react-native';
 
-import {Product} from '@/types/product';
-import {queryProduct} from '@/api/product';
 import {Feather} from '@expo/vector-icons';
 
 import {useNavigation} from '@react-navigation/native';
 import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
+import {LOAD_DELETED_PRODUCTS} from '@/store/slices/product';
 
 const NUM_PRODUCTS = 5;
-const MARGIN_HORIZONTAL = 10;
 
 const DeletedProductsWidget = () => {
-    const [deletedProducts, setDeletedProducts] = useState<Product[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const deletedProducts = useAppSelector(state => {
+        const t = state.product.deleted.products.slice();
+        return t.slice(0, NUM_PRODUCTS);
+    });
+
+    const isLoading = useAppSelector(state => state.product.deleted.isLoading);
     const [imageSize, setImageSize] = useState({width: 0, height: 0});
 
     const navigation =
         useNavigation<StackNavigationProp<OptionsStackParamList>>();
 
+    const dispatch = useAppDispatch();
+
     useEffect(() => {
         const initFetch = async () => {
-            const {products} = await queryProduct({
-                init: {queryStringParameters: {loadAmount: 5, type: 'deleted'}},
-            });
-
-            setDeletedProducts(products);
-            setIsLoading(false);
+            dispatch(
+                LOAD_DELETED_PRODUCTS({
+                    queryStringParameters: {
+                        loadAmount: NUM_PRODUCTS,
+                        type: 'deleted',
+                    },
+                    loadType: 'initial',
+                }),
+            );
         };
 
-        setIsLoading(true);
         initFetch();
-    }, []);
+    }, [dispatch]);
 
     return (
         <View
@@ -49,7 +56,7 @@ const DeletedProductsWidget = () => {
                     layout: {width},
                 },
             }) => {
-                const n = (width - MARGIN_HORIZONTAL) / NUM_PRODUCTS;
+                const n = width / NUM_PRODUCTS;
                 setImageSize({width: n, height: n});
             }}>
             <TouchableOpacity
@@ -64,7 +71,7 @@ const DeletedProductsWidget = () => {
                         {deletedProducts.map(product => (
                             <Image
                                 key={product._id}
-                                style={imageSize}
+                                style={[imageSize]}
                                 source={{uri: product.images[0]}}
                             />
                         ))}
@@ -88,7 +95,7 @@ const styles = StyleSheet.create({
     imageContainer: {
         flexDirection: 'row',
         flex: 1,
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         marginTop: 10,
     },
     optionLink: {

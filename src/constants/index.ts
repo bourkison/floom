@@ -55,6 +55,7 @@ export const COLOUR_OPTIONS = [
 ];
 
 export const LOCAL_KEY_SAVED_PRODUCTS = '@savedProducts';
+export const LOCAL_KEY_DELETED_PRODUCTS = '@deletedProducts';
 
 export const ACTION_BUTTON_SIZE_ACTIVE = 50;
 export const ACTION_BUTTON_SIZE_INACTIVE = 55;

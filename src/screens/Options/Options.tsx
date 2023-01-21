@@ -5,30 +5,45 @@ import UpdatePasswordWidget from '@/components/Options/UpdatePasswordWidget';
 import DeletedProductsWidget from '@/components/Options/DeletedProductsWidget';
 import AccountDetailsWidget from '@/components/Options/AccountDetailsWidget';
 import LogoutWidget from '@/components/Options/LogoutWidget';
+import {useAppSelector} from '@/store/hooks';
 
 const Options = () => {
+    const isGuest = useAppSelector(state => state.user.isGuest);
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.section}>
                 <SectionHeader>Deleted Products</SectionHeader>
                 <DeletedProductsWidget />
             </View>
-            <View style={styles.section}>
-                <SectionHeader>Account Details</SectionHeader>
-                <AccountDetailsWidget />
-            </View>
-            <View style={styles.section}>
-                <SectionHeader>Password</SectionHeader>
-                <UpdatePasswordWidget />
-            </View>
+            {!isGuest ? (
+                <View>
+                    <View style={styles.section}>
+                        <SectionHeader>Account Details</SectionHeader>
+                        <AccountDetailsWidget />
+                    </View>
+                    <View style={styles.section}>
+                        <SectionHeader>Password</SectionHeader>
+                        <UpdatePasswordWidget />
+                    </View>
+                </View>
+            ) : (
+                <View style={styles.section}>
+                    <SectionHeader>Account</SectionHeader>
+                </View>
+            )}
+
             <View style={styles.section}>
                 <SectionHeader>App Info</SectionHeader>
             </View>
-            <View style={styles.section}>
-                <SectionHeader>Other</SectionHeader>
 
-                <LogoutWidget />
-            </View>
+            {!isGuest ? (
+                <View style={styles.section}>
+                    <SectionHeader>Other</SectionHeader>
+
+                    <LogoutWidget />
+                </View>
+            ) : undefined}
         </ScrollView>
     );
 };

@@ -9,12 +9,19 @@ import {
     QueryProductInit,
     QueryProductResponse,
 } from '@/types/product';
-import {createSaveOrDelete, deleteSaveOrDelete} from '@/api/save';
+import {
+    createSaveOrDelete,
+    deleteAllDeletes,
+    deleteSaveOrDelete,
+} from '@/api/save';
 import {queryProduct} from '@/api/product';
 import {RootState} from '@/store';
 import {getPublicProduct, queryPublicProduct} from '@/api/public';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {LOCAL_KEY_SAVED_PRODUCTS} from '@/constants';
+import {
+    LOCAL_KEY_DELETED_PRODUCTS,
+    LOCAL_KEY_SAVED_PRODUCTS,
+} from '@/constants';
 
 const productAdapter = createEntityAdapter();
 
@@ -32,6 +39,12 @@ const initialState = productAdapter.getInitialState({
         isLoadingMore: false,
     },
     unsaved: {
+        products: [] as ProductType[],
+        isLoading: false,
+        moreToLoad: true,
+        isLoadingMore: false,
+    },
+    deleted: {
         products: [] as ProductType[],
         isLoading: false,
         moreToLoad: true,
@@ -125,10 +138,20 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                   )
                 : [];
 
+            const excludedDeleted = state.product.filters.excludeDeleted
+                ? JSON.parse(
+                      (await AsyncStorage.getItem(
+                          LOCAL_KEY_DELETED_PRODUCTS,
+                      )) || '[]',
+                  )
+                : [];
+
+            const productsToExclude = [...excludedSaved, ...excludedDeleted];
+
             return await queryPublicProduct({
                 init: {
                     body: {
-                        excludedProducts: excludedSaved,
+                        excludedProducts: productsToExclude,
                         filteredGenders: [],
                         filteredCategories: [],
                         filteredColors: [],
@@ -165,11 +188,25 @@ export const SAVE_PRODUCT = createAsyncThunk<void, string>(
 
 export const DELETE_PRODUCT = createAsyncThunk<void, string>(
     'product/DELETE_PRODUCT',
-    async _id => {
-        await createSaveOrDelete({
-            productId: _id,
-            init: {queryStringParameters: {type: 'delete'}},
-        });
+    async (_id, {getState}) => {
+        const state = getState() as RootState;
+
+        if (!state.user.isGuest) {
+            await createSaveOrDelete({
+                productId: _id,
+                init: {queryStringParameters: {type: 'delete'}},
+            });
+        } else {
+            const currentDeletedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
+                    '[]',
+            );
+            currentDeletedProducts.push(_id);
+            await AsyncStorage.setItem(
+                LOCAL_KEY_DELETED_PRODUCTS,
+                JSON.stringify(currentDeletedProducts),
+            );
+        }
     },
 );
 
@@ -251,6 +288,80 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
                 });
             }
         }
+    },
+);
+
+export const LOAD_DELETED_PRODUCTS = createAsyncThunk<
+    QueryProductResponse,
+    LoadProductsParams,
+    {rejectValue: RejectWithValueType}
+>(
+    'product/LOAD_DELETED_PRODUCTS',
+    async (
+        input = {
+            queryStringParameters: {
+                loadAmount: 25,
+                type: 'deleted',
+            },
+            loadType: 'initial',
+        },
+        {rejectWithValue, getState},
+    ) => {
+        const state = getState() as RootState;
+
+        if (!state.user.isGuest) {
+            let init: QueryProductInit = {
+                queryStringParameters: input.queryStringParameters,
+            };
+
+            return await queryProduct({
+                init,
+            });
+        } else {
+            const productIds: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
+                    '[]',
+            );
+
+            try {
+                const products = await getPublicProduct({
+                    init: {
+                        body: {products: productIds},
+                    },
+                });
+
+                return {
+                    products,
+                    __moreToLoad: false,
+                    __loaded: products.length,
+                    __totalLength: products.length,
+                };
+            } catch (err: any) {
+                return rejectWithValue({
+                    message: err.message || undefined,
+                    code: err?.response?.status || undefined,
+                });
+            }
+        }
+    },
+);
+
+export const DELETE_DELETED_PRODUCT = createAsyncThunk<
+    void,
+    {_id: string; index: number}
+>('product/DELETE_DELETED_PRODUCT', async input => {
+    await deleteSaveOrDelete({
+        productId: input._id,
+        init: {queryStringParameters: {type: 'delete'}},
+    });
+});
+
+export const DELETE_ALL_DELETED_PRODUCTS = createAsyncThunk<void, undefined>(
+    'product/DELETE_DELETED_PRODUCT',
+    async () => {
+        await deleteAllDeletes({
+            init: {queryStringParameters: {deleteAll: 'true'}},
+        });
     },
 );
 
@@ -408,6 +519,27 @@ const productSlice = createSlice({
                 state.saved.isLoadingMore = false;
                 state.saved.moreToLoad = false;
             })
+            .addCase(LOAD_DELETED_PRODUCTS.pending, (state, action) => {
+                if (action.meta.arg.loadType === 'initial') {
+                    state.deleted.isLoading = true;
+                } else if (action.meta.arg.loadType === 'more') {
+                    state.deleted.isLoadingMore = true;
+                }
+            })
+            .addCase(LOAD_DELETED_PRODUCTS.fulfilled, (state, action) => {
+                if (action.meta.arg.loadType === 'more') {
+                    state.deleted.products = [
+                        ...state.deleted.products,
+                        ...action.payload.products,
+                    ];
+                } else {
+                    state.deleted.products = action.payload.products;
+                }
+
+                state.deleted.isLoading = false;
+                state.deleted.isLoadingMore = false;
+                state.deleted.moreToLoad = action.payload.__moreToLoad;
+            })
             .addCase(DELETE_SAVED_PRODUCT.pending, (state, action) => {
                 state.saved.products = [
                     ...state.saved.products.slice(0, action.meta.arg.index),
@@ -417,6 +549,19 @@ const productSlice = createSlice({
             .addCase(DELETE_SAVED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
                 console.log('Delete saved product rejected');
+            })
+            .addCase(DELETE_DELETED_PRODUCT.pending, (state, action) => {
+                state.deleted.products = [
+                    ...state.deleted.products.slice(0, action.meta.arg.index),
+                    ...state.deleted.products.slice(action.meta.arg.index + 1),
+                ];
+            })
+            .addCase(DELETE_DELETED_PRODUCT.rejected, () => {
+                // TODO: Handle rejections.
+                console.log('Delete saved product rejected');
+            })
+            .addCase(DELETE_ALL_DELETED_PRODUCTS.fulfilled, state => {
+                state.deleted.products = [];
             });
     },
 });
