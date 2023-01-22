@@ -30,12 +30,12 @@
         },
         "floomMongooseModels": {
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion8783b6a7-build.zip"
+          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion8c7d1d8d-build.zip"
         },
         "floomSaveHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomSaveHandler-78465748314c6954626d-build.zip"
+          "s3Key": "amplify-builds/floomSaveHandler-2f7171744a6d765a4832-build.zip"
         },
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",

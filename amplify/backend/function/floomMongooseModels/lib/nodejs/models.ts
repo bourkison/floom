@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, {Types} from 'mongoose';
 import mongooseConnect from './mongoose-connection';
 
 const userSchema = new mongoose.Schema({
@@ -87,6 +87,30 @@ const productSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true,
+    },
+    likedBy: {
+        type: [Types.ObjectId],
+        default: [],
+    },
+    likedCount: {
+        type: Number,
+        default: 0,
+    },
+    deletedBy: {
+        type: [Types.ObjectId],
+        default: [],
+    },
+    deletedCount: {
+        type: Number,
+        default: 0,
+    },
+    boughtBy: {
+        type: [Types.ObjectId],
+        default: [],
+    },
+    boughtCount: {
+        type: [Number],
+        default: 0,
     },
 });
 

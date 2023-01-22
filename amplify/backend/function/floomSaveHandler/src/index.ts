@@ -2,20 +2,11 @@ import aws from 'aws-sdk';
 import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 // @ts-ignore
 import MongooseModels from '/opt/nodejs/models';
-import {Model, Types, UpdateQuery} from 'mongoose';
+import {Model, UpdateQuery} from 'mongoose';
+import {UserType, ProductType} from './types';
+import {Update} from 'aws-sdk/clients/dynamodb';
 
 let MONGODB_URI: string;
-
-type UserType = {
-    _id: Types.ObjectId;
-    email: string;
-    name: string;
-    gender: string;
-    dob: Date;
-    country: string;
-    likedProducts: string[];
-    deletedProducts: string[];
-};
 
 const createSaveOrDelete = async (
     event: APIGatewayEvent,
@@ -25,6 +16,9 @@ const createSaveOrDelete = async (
     const _id = event.pathParameters.proxy;
 
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
+    const Product: Model<ProductType> = await MongooseModels().Product(
+        MONGODB_URI,
+    );
 
     let response: APIGatewayProxyResult = {
         statusCode: 500,
@@ -35,35 +29,57 @@ const createSaveOrDelete = async (
         body: JSON.stringify({success: false}),
     };
 
-    try {
-        // TODO: Check that user hasn't already liked
-        let update: UpdateQuery<UserType> =
-            type === 'save'
-                ? {
-                      $addToSet: {likedProducts: _id},
-                      $pull: {deletedProducts: _id},
-                  }
-                : {
-                      $addToSet: {deletedProducts: _id},
-                      $pull: {likedProducts: _id},
-                  };
-        await User.findOneAndUpdate({email: email}, update);
+    const updateUser = async () => {
+        try {
+            let update: UpdateQuery<UserType> =
+                type === 'save'
+                    ? {
+                          $addToSet: {likedProducts: _id},
+                          $pull: {deletedProducts: _id},
+                      }
+                    : {
+                          $addToSet: {deletedProducts: _id},
+                          $pull: {likedProducts: _id},
+                      };
+            await User.findOneAndUpdate({email: email}, update);
+        } catch (err) {
+            // TODO: Handle error and return appropriate response.
+            console.error(err);
+            throw err;
+        }
+    };
 
-        response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Headers': '*',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({success: true}),
-        };
+    const updateProduct = async () => {
+        try {
+            // First get user ID
+            const {_id: userId} = await User.findOne({email: email});
+            let update: UpdateQuery<ProductType> =
+                type === 'save'
+                    ? {$push: {likedBy: userId}, $inc: {likedCount: 1}}
+                    : {$push: {deletedBy: userId}, $inc: {deletedCount: 1}};
 
-        return response;
-    } catch (err) {
-        // TODO: Handle error and return appropriate response.
-        console.error(err);
-        return response;
-    }
+            await Product.findOneAndUpdate({_id}, update);
+        } catch (err) {
+            // TODO: Handle error and return appropriate response.
+            console.error(err);
+            return response;
+        }
+    };
+
+    // TODO: If error in update user, and not in update product - undo changes done to product.
+
+    await Promise.allSettled([updateUser(), updateProduct()]);
+
+    response = {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: true}),
+    };
+
+    return response;
 };
 
 const deleteSaveOrDelete = async (
@@ -74,6 +90,9 @@ const deleteSaveOrDelete = async (
     const _id = event.pathParameters.proxy;
 
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
+    const Product: Model<ProductType> = await MongooseModels().Product(
+        MONGODB_URI,
+    );
 
     let response: APIGatewayProxyResult = {
         statusCode: 500,
@@ -84,33 +103,55 @@ const deleteSaveOrDelete = async (
         body: JSON.stringify({success: false}),
     };
 
-    try {
-        let update: UpdateQuery<UserType> =
-            type == 'save'
-                ? {$pull: {likedProducts: _id}}
-                : {$pull: {deletedProducts: _id}};
+    const updateUser = async () => {
+        try {
+            let update: UpdateQuery<UserType> =
+                type === 'save'
+                    ? {$pull: {likedProducts: _id}}
+                    : {$pull: {deletedProducts: _id}};
 
-        await User.findOneAndUpdate({email: email}, update);
+            await User.findOneAndUpdate({email: email}, update);
+        } catch (err) {
+            console.error(err);
+            response = {
+                statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Headers': '*',
+                    'Access-Control-Allow-Origin': '*',
+                },
+                body: JSON.stringify({success: false, message: 'Update error'}),
+            };
+            throw err;
+        }
+    };
 
-        response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Headers': '*',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({success: true}),
-        };
-    } catch (err) {
-        console.error(err);
-        response = {
-            statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Headers': '*',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({success: false, message: 'Update error'}),
-        };
-    }
+    const updateProduct = async () => {
+        try {
+            // First get user ID
+            const {_id: userId} = await User.findOne({email: email});
+            let update: UpdateQuery<ProductType> =
+                type === 'save'
+                    ? {$pull: {likedBy: userId}, $inc: {likedCount: -1}}
+                    : {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}};
+
+            await Product.findOneAndUpdate({_id}, update);
+        } catch (err) {
+            console.error('Error updating product, continuing', err);
+        }
+    };
+
+    await Promise.allSettled([updateUser(), updateProduct()]);
+
+    // TODO: If error in update user, and not in update product - undo changes done to product.
+
+    response = {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: true}),
+    };
 
     return response;
 };
@@ -121,6 +162,9 @@ const deleteAllDeletes = async (
     const email = event.requestContext.authorizer.claims.email;
 
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
+    const Product: Model<ProductType> = await MongooseModels().Product(
+        MONGODB_URI,
+    );
 
     let response: APIGatewayProxyResult = {
         statusCode: 500,
@@ -132,7 +176,25 @@ const deleteAllDeletes = async (
     };
 
     try {
-        await User.findOneAndUpdate({email}, {deletedProducts: []});
+        const updateUser = async () => {
+            await User.findOneAndUpdate({email}, {deletedProducts: []});
+        };
+
+        const updateProducts = async () => {
+            const {deletedProducts, _id: userId} = await User.findOne(
+                {email},
+                {deletedProducts: 1},
+            );
+
+            await Product.updateMany(
+                {_id: {$in: deletedProducts}},
+                {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}},
+            );
+        };
+
+        await Promise.allSettled([updateUser(), updateProducts()]);
+
+        // TODO: If error in update user, and not in update product - undo changes done to product.
 
         response = {
             statusCode: 200,
