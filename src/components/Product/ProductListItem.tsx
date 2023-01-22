@@ -196,7 +196,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                                 {capitaliseString(product.name)}
                             </Text>
                             <View style={styles.priceContainer}>
-                                <Text>${product.price.saleAmount} </Text>
+                                <Text>${product.price[0].saleAmount} </Text>
                                 <BrandLogo brand={product.brand} />
                             </View>
                         </View>

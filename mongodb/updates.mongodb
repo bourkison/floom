@@ -1,0 +1,31 @@
+// db.products.updateMany({_id: ObjectId('634dc3d00b189c251874505b')}, {
+//     $set: {
+//         availableCountries: ['us', 'gb'],
+//         price: [{$getField: { field: 'price' }}],
+//     }
+// })
+
+// var temp = {
+//     currency: 'USD',
+//     amount: 39.99,
+//     saleAmount: 39.99
+// }
+
+// db.products.updateMany({_id: ObjectId('634dc3d00b189c251874505b')}, {
+//     $set: {
+//         price: temp
+//     }
+// })
+
+db.products.updateMany({_id: ObjectId('634dc3d00b189c251874505b')}, [
+    {
+        $set: {
+            availableCountries: ['us', 'gb'],
+            price: [{
+                $getField: {field: 'price', input: '$$CURRENT'}
+            }],
+            reports: [],
+            reportsCount: 0,
+        }
+    }
+]);

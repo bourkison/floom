@@ -1,5 +1,6 @@
 import mongoose, {Types} from 'mongoose';
 import mongooseConnect from './mongoose-connection';
+import {COUNTRY_CODES, CURRENCY_CODES} from './constants';
 
 const userSchema = new mongoose.Schema(
     {
@@ -19,6 +20,7 @@ const userSchema = new mongoose.Schema(
         country: {
             type: String,
             required: true,
+            enum: COUNTRY_CODES,
         },
         email: {
             type: String,
@@ -29,6 +31,10 @@ const userSchema = new mongoose.Schema(
             default: [],
         },
         deletedProducts: {
+            type: [mongoose.Types.ObjectId],
+            default: [],
+        },
+        reports: {
             type: [mongoose.Types.ObjectId],
             default: [],
         },
@@ -43,18 +49,26 @@ const productSchema = new mongoose.Schema(
             required: true,
         },
         price: {
-            amount: {
-                type: Number,
-                required: true,
-            },
-            saleAmount: {
-                type: Number,
-                required: true,
-            },
-            currency: {
-                type: String,
-                required: true,
-            },
+            type: [
+                {
+                    amount: {
+                        type: Number,
+                        required: true,
+                        minimum: 0,
+                    },
+                    saleAmount: {
+                        type: Number,
+                        required: true,
+                        minimum: 0,
+                    },
+                    currency: {
+                        type: String,
+                        required: true,
+                        enum: CURRENCY_CODES,
+                    },
+                },
+            ],
+            required: true,
         },
         link: {
             type: String,
@@ -92,6 +106,28 @@ const productSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        availableCountries: {
+            type: [String],
+            required: true,
+            validate: {
+                validator: function (countries: string[]) {
+                    countries.forEach(c => {
+                        if (!CURRENCY_CODES.includes(c)) {
+                            return false;
+                        }
+                    });
+
+                    return true;
+                },
+            },
+        },
+        // Assign a random number between 0 and 32,768 (16 bit int) to sort product by.
+        rnd: {
+            type: Number,
+            default: () => {
+                return Math.floor(Math.random() * 32_768);
+            },
+        },
         likedBy: {
             type: [Types.ObjectId],
             default: [],
@@ -119,12 +155,37 @@ const productSchema = new mongoose.Schema(
             default: 0,
             minimum: 0,
         },
-        // Assign a random number between 0 and 32,768 (16 bit int) to sort product by.
-        rnd: {
+        reports: {
+            type: [Types.ObjectId],
+            default: [],
+        },
+        reportsCount: {
             type: Number,
-            default: () => {
-                return Math.floor(Math.random() * 32_768);
-            },
+            default: 0,
+            minimum: 0,
+        },
+    },
+    {timestamps: true},
+);
+
+const reportSchema = new mongoose.Schema(
+    {
+        createdBy: {
+            type: Types.ObjectId,
+            required: true,
+        },
+        product: {
+            type: Types.ObjectId,
+            required: true,
+        },
+        message: {
+            type: String,
+            required: true,
+        },
+        reportType: {
+            type: String,
+            required: true,
+            enum: ['inappropriate', 'broken'],
         },
     },
     {timestamps: true},
@@ -143,7 +204,13 @@ const output = () => {
         return response;
     };
 
-    return {User, Product};
+    const Report = async (uri: string) => {
+        const connection = await mongooseConnect(uri);
+        const response = connection.model('Report', reportSchema);
+        return response;
+    };
+
+    return {User, Product, Report};
 };
 
 module.exports = output;

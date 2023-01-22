@@ -70,11 +70,13 @@ export default async function (HM_API_KEY: string) {
                 if (formatGender(product.categoryName)) {
                     const p = {
                         name: product.name,
-                        price: {
-                            amount: product.price.value,
-                            saleAmount: product.whitePrice.value,
-                            currency: product.price.currencyIso,
-                        },
+                        price: [
+                            {
+                                amount: product.price.value,
+                                saleAmount: product.whitePrice.value,
+                                currency: product.price.currencyIso,
+                            },
+                        ],
                         link: response.data.baseUrl + product.linkPdp,
                         images: product.galleryImages.map((i: any) => i.url),
                         colors: product.articleColorNames.map((c: string) =>
@@ -88,6 +90,7 @@ export default async function (HM_API_KEY: string) {
                         vendorProductId: product.code,
                         inStock: product.stock.stockLevel >= 1,
                         description: 'This is a test description.',
+                        availableCountries: ['us', 'gb'],
                     };
                     products.push(p);
                     console.log('Product pushed:', p);

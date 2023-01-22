@@ -381,7 +381,15 @@ export const CLEAR_FILTERS = createAsyncThunk<string, undefined>(
     'product/CLEAR_FILTERS',
     async (_, {getState}) => {
         const state = getState() as RootState;
-        return state.user.docData?.gender || '';
+        const g = state.user.docData?.gender;
+
+        if (g === 'male') {
+            return 'Male';
+        } else if (g === 'female') {
+            return 'Female';
+        }
+
+        return '';
     },
 );
 
@@ -614,6 +622,8 @@ const productSlice = createSlice({
                 state.filters.searchText = '';
                 state.filters.excludeDeleted = true;
                 state.filters.excludeSaved = true;
+
+                console.log('FILTERS:', state.filters);
             });
     },
 });

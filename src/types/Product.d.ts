@@ -1,11 +1,14 @@
+import {CURRENCIES, COUNTRIES} from '@/constants/countries';
+
 export type Product = {
     _id: string;
     name: string;
     price: {
         amount: number;
         saleAmount: number;
-        currency: string;
-    };
+        currency: keyof typeof CURRENCIES;
+    }[];
+    availableCountries: Array<keyof typeof COUNTRIES>;
     link: string;
     images: string[];
     colors: string[];

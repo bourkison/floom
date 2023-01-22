@@ -45,6 +45,8 @@ export const CATEGORY_OPTIONS = [
 export const COLOUR_OPTIONS = [
     'Black',
     'White',
+    'Green',
+    'Purple',
     'Gray',
     'Blue',
     'Red',

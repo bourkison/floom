@@ -1,5 +1,12 @@
 import React, {useState, useMemo, useCallback} from 'react';
-import {ImageBackground, StyleSheet, Text, View, ViewStyle} from 'react-native';
+import {
+    ImageBackground,
+    StyleSheet,
+    Text,
+    View,
+    ViewStyle,
+    TextStyle,
+} from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import {LinearGradient} from 'expo-linear-gradient';
 import {useWindowDimensions} from 'react-native';
@@ -441,6 +448,30 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         return style;
     };
 
+    const calculateSavedOrDeletedStyle = (type: 'text' | 'container') => {
+        let response: ViewStyle[] | TextStyle[] = [];
+
+        if (type === 'container') {
+            response.push(styles.savedOrDeletedContainer);
+
+            if (product.saved) {
+                response.push(styles.savedContainer);
+            } else if (product.deleted) {
+                response.push(styles.deletedContainer);
+            }
+        } else {
+            response.push(styles.savedOrDeletedText);
+
+            if (product.saved) {
+                response.push(styles.savedText);
+            } else if (product.deleted) {
+                response.push(styles.deletedText);
+            }
+        }
+
+        return response;
+    };
+
     let baseComponent = (
         <View
             style={[
@@ -473,6 +504,15 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         <View style={calculateImageIndicator(i)} key={i} />
                     ))}
                 </View>
+                <View style={calculateSavedOrDeletedStyle('container')}>
+                    <Text style={calculateSavedOrDeletedStyle('text')}>
+                        {product.saved
+                            ? 'Saved'
+                            : product.deleted
+                            ? 'Deleted'
+                            : undefined}
+                    </Text>
+                </View>
                 <View style={styles.imageOverlayContainer}>
                     <View style={styles.gradientContainer}>
                         <LinearGradient
@@ -491,7 +531,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                                 </View>
                                 <View style={styles.priceContainer}>
                                     <Text style={styles.priceText}>
-                                        ${product.price.saleAmount}
+                                        ${product.price[0].saleAmount}
                                     </Text>
                                 </View>
                             </View>
@@ -693,6 +733,38 @@ const styles = StyleSheet.create({
     titleContainer: {flex: 1},
     priceContainer: {flex: 1},
     brandContainer: {height: 24},
+    savedOrDeletedContainer: {
+        position: 'absolute',
+        borderRadius: 3,
+        borderWidth: 1,
+        paddingVertical: 5,
+        top: 35,
+        width: 96,
+        opacity: 0,
+    },
+    deletedContainer: {
+        left: 10,
+        transform: [{rotate: '-15deg'}],
+        opacity: 1,
+        borderColor: DELETE_COLOR + 'b3',
+    },
+    savedContainer: {
+        right: 10,
+        transform: [{rotate: '15deg'}],
+        opacity: 1,
+        borderColor: SAVE_COLOR + 'b3',
+    },
+    savedOrDeletedText: {
+        fontWeight: '500',
+        fontSize: 14,
+        textAlign: 'center',
+    },
+    savedText: {
+        color: SAVE_COLOR + 'b3',
+    },
+    deletedText: {
+        color: DELETE_COLOR + 'b3',
+    },
 });
 
 export default Product;

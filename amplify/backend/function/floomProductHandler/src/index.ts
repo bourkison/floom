@@ -14,7 +14,7 @@ type ProductType = {
         amount: number;
         saleAmount: number;
         currency: string;
-    };
+    }[];
     link: string;
     images: string[];
     colors: string[];
@@ -25,6 +25,7 @@ type ProductType = {
     inStock: boolean;
     description: string;
     rnd: number;
+    availableCountries: string[];
 };
 
 type UserType = {
@@ -238,6 +239,7 @@ const queryUnsavedProduct = async (
                   inStock: 1,
                   link: 1,
                   price: 1,
+                  availableCountries: 1,
                   saved: {
                       $in: [user._id, '$likedBy'],
                   },
@@ -263,6 +265,7 @@ const queryUnsavedProduct = async (
                           inStock: 1,
                           link: 1,
                           price: 1,
+                          availableCountries: 1,
                           saved: {
                               $in: [user._id, '$likedBy'],
                           },

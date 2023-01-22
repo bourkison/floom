@@ -33,11 +33,14 @@ export async function queryProduct(
         response.push({
             name: data.data[i].name,
             images: data.data[i].images,
-            price: {
-                amount: data.data[i].price.amount,
-                saleAmount: data.data[i].price.saleAmount,
-                currency: data.data[i].price.currency,
-            },
+            price: data.data[i].price.map((p: any) => {
+                return {
+                    currency: p.currency,
+                    amount: p.amount,
+                    saleAmount: p.saleAmount,
+                };
+            }),
+            availableCountries: data.data[i].availableCountries,
             link: data.data[i].link,
             _id: data.data[i]._id,
             colors: data.data[i].colors,
@@ -82,11 +85,14 @@ export async function getProduct(
     return {
         name: data.data.name,
         images: data.data.images,
-        price: {
-            amount: data.data.price.amount,
-            saleAmount: data.data.price.saleAmount,
-            currency: data.data.price.currency,
-        },
+        price: data.data.price.map((p: any) => {
+            return {
+                currency: p.currency,
+                amount: p.amount,
+                saleAmount: p.saleAmount,
+            };
+        }),
+        availableCountries: data.data.availableCountries,
         link: data.data.link,
         _id: data.data._id,
         colors: data.data.colors,

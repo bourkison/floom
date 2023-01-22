@@ -4,7 +4,7 @@ export type ProductType = {
         amount: number;
         saleAmount: number;
         currency: string;
-    };
+    }[];
     link: string;
     images: string[];
     colors: string[];
@@ -13,4 +13,5 @@ export type ProductType = {
     brand: string;
     vendorProductId: string;
     inStock: boolean;
+    availableCountries: string[];
 };

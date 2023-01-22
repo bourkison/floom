@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
     View,
     Text,
@@ -7,6 +7,7 @@ import {
     ImageBackground,
     useWindowDimensions,
     ViewStyle,
+    TextStyle,
 } from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
@@ -46,22 +47,12 @@ const ProductView = ({
     const translateY = useSharedValue(0);
     const minY = useSharedValue(0);
 
-    const [previousRoute, setPreviousRoute] =
-        useState<keyof MainStackParamList>('Home');
     const [isGoingBack, setIsGoingBack] = useState(false);
 
     const dispatch = useAppDispatch();
 
     const [containerHeight, setContainerHeight] = useState(0);
     const [contentHeight, setContentHeight] = useState(0);
-
-    useEffect(() => {
-        const {routes} = navigation.getState();
-
-        if (routes.length > 1) {
-            setPreviousRoute(routes[routes.length - 2].name);
-        }
-    }, [navigation, setPreviousRoute]);
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -195,21 +186,17 @@ const ProductView = ({
             dispatch(COMMENCE_ANIMATE('save'));
         };
 
-        if (previousRoute === 'Home') {
-            return (
-                <View style={styles.actionButtonContainer}>
+        return (
+            <View style={styles.actionButtonContainer}>
+                {!route.params.product.deleted ? (
                     <ActionButton type="delete" onPress={deleteProduct} />
-                    <ActionButton type="buy" onPress={buyProduct} />
+                ) : undefined}
+                <ActionButton type="buy" onPress={buyProduct} />
+                {!route.params.product.saved ? (
                     <ActionButton type="save" onPress={saveProduct} />
-                </View>
-            );
-        } else {
-            return (
-                <View style={styles.actionButtonContainer}>
-                    <ActionButton type="buy" onPress={buyProduct} />
-                </View>
-            );
-        }
+                ) : undefined}
+            </View>
+        );
     };
 
     return (
@@ -299,7 +286,7 @@ const ProductView = ({
                             <View style={styles.priceContainer}>
                                 <Text style={styles.priceText}>
                                     $
-                                    {route.params.product.price.amount.toString()}
+                                    {route.params.product.price[0].amount.toString()}
                                 </Text>
                             </View>
 
