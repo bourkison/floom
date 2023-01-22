@@ -1,1 +1,20 @@
-db.products.updateMany({}, [{$set: {rnd: {$floor: {$multiply: [{$rand: {}}, 32_768]}}}}])
+// db.products.findOneAndUpdate({_id: ObjectId('63a0a6cd06de14da3d1d5a16')}, {
+//     $addToSet: {deletedBy: ObjectId('635ece3c42fb6b2e01a2c2a6')},
+//     $pull: {likedBy: ObjectId('635ece3c42fb6b2e01a2c2a6')},
+//     $inc: {
+//         deletedCount: 1,
+//         likedCount: {
+//             // $cond: [
+//             //     { $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$likedBy'] },
+//             //     -1, 
+//             //     0
+//             // ],
+//             $size: '$likedBy'
+//         },
+//     },
+// })
+
+db.products.find({_id: ObjectId('63a0a6cd06de14da3d1d5a16')}, {
+    userInLiked: {$in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$likedBy']},
+    userInDeleted: {$in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$deletedBy']}
+});

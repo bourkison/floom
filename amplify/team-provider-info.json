@@ -35,12 +35,12 @@
         "floomSaveHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomSaveHandler-53445676665059503170-build.zip"
+          "s3Key": "amplify-builds/floomSaveHandler-414e35543648706c6e4a-build.zip"
         },
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomProductHandler-544c787731625a304664-build.zip"
+          "s3Key": "amplify-builds/floomProductHandler-32635435514d67736f2f-build.zip"
         },
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",

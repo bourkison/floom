@@ -42,15 +42,47 @@ const createSaveOrDelete = async (
         await User.findOneAndUpdate({email: email}, update);
     };
 
+    let userInLiked: boolean;
+    let userInDeleted: boolean;
+
     const updateProduct = async () => {
         // First get user ID
         const {_id: userId} = await User.findOne({email: email});
+
+        // Check if user has liked or deleted.
+        const product = (
+            await Product.findOne(
+                {_id},
+                {
+                    userInLiked: {$in: [userId, '$likedBy']},
+                    userInDeleted: {$in: [userId, '$deletedBy']},
+                },
+            )
+        ).toObject<{userInLiked: boolean; userInDeleted: boolean}>();
+
+        userInLiked = product.userInLiked;
+        userInDeleted = product.userInDeleted;
+
         let update: UpdateQuery<ProductType> =
             type === 'save'
-                ? {$addToSet: {likedBy: userId}, $inc: {likedCount: 1}}
-                : {$addToSet: {deletedBy: userId}, $inc: {deletedCount: 1}};
+                ? {
+                      $addToSet: {likedBy: userId},
+                      $pull: {deletedBy: userId},
+                      $inc: {
+                          likedCount: !userInLiked ? 1 : 0,
+                          deletedCount: userInDeleted ? -1 : 0,
+                      },
+                  }
+                : {
+                      $addToSet: {deletedBy: userId},
+                      $pull: {likedBy: userId},
+                      $inc: {
+                          deletedCount: !userInDeleted ? 1 : 0,
+                          likedCount: userInLiked ? -1 : 0,
+                      },
+                  };
 
-        console.log(await Product.findOneAndUpdate({_id}, update));
+        await Product.findOneAndUpdate({_id}, update);
     };
 
     const [userResult, productResult] = await Promise.allSettled([
@@ -65,10 +97,25 @@ const createSaveOrDelete = async (
     ) {
         // First get user ID
         const {_id: userId} = await User.findOne({email: email});
+
         let update: UpdateQuery<ProductType> =
             type === 'save'
-                ? {$pull: {likedBy: userId}, $inc: {likedCount: -1}}
-                : {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}};
+                ? {
+                      $pull: {likedBy: userId},
+                      $addToSet: userInDeleted ? {deletedBy: userId} : {},
+                      $inc: {
+                          likedCount: userInLiked ? -1 : 0,
+                          deletedCount: userInDeleted ? 1 : 0,
+                      },
+                  }
+                : {
+                      $pull: {deletedBy: userId},
+                      $addToSet: userInLiked ? {likedBy: userId} : {},
+                      $inc: {
+                          deletedCount: userInDeleted ? -1 : 0,
+                          likedCount: userInLiked ? 1 : 0,
+                      },
+                  };
 
         await Product.findOneAndUpdate({_id}, update);
     }

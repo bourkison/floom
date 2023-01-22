@@ -224,12 +224,51 @@ const queryUnsavedProduct = async (
         }
 
         const products = ordered
-            ? await Product.find(query)
+            ? await Product.find(query, {
+                  _id: 1,
+                  name: 1,
+                  vendorProductId: 1,
+                  brand: 1,
+                  categories: 1,
+                  colors: 1,
+                  gender: 1,
+                  images: 1,
+                  inStock: 1,
+                  link: 1,
+                  price: 1,
+                  saved: {
+                      $in: [user._id, '$likedBy'],
+                  },
+                  deleted: {
+                      $in: [user._id, '$deletedBy'],
+                  },
+              })
                   .sort({rnd: -1, _id: -1})
                   .limit(loadAmount)
             : await Product.aggregate([
                   {$match: query},
                   {$sample: {size: loadAmount}},
+                  {
+                      $project: {
+                          _id: 1,
+                          name: 1,
+                          vendorProductId: 1,
+                          brand: 1,
+                          categories: 1,
+                          colors: 1,
+                          gender: 1,
+                          images: 1,
+                          inStock: 1,
+                          link: 1,
+                          price: 1,
+                          saved: {
+                              $in: [user._id, '$likedBy'],
+                          },
+                          deleted: {
+                              $in: [user._id, '$deletedBy'],
+                          },
+                      },
+                  },
               ]);
 
         if (!products || !products.length) {
@@ -654,7 +693,13 @@ const querySavedOrDeletedProduct = async (
         },
         body: JSON.stringify({
             success: true,
-            data: products,
+            data: products.map(product => {
+                return {
+                    ...product,
+                    saved: type === 'saved',
+                    deleted: type === 'deleted',
+                };
+            }),
             __totalLength: arrLength,
             __moreToLoad: moreToLoad,
             __loaded: products.length,
