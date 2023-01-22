@@ -395,36 +395,10 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
 
     const touchGesture = Gesture.Tap().onTouchesUp(e => {
         const TAP_PERCENTILE = 5; // If 4, first and last quarters of the image will change image.
-        const ROTATION_Y = 12;
-        const ROTATION_X = 2;
-        const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
 
         if (e.allTouches[0].x < (width - IMAGE_PADDING) / TAP_PERCENTILE) {
             if (imageIndex > 0) {
                 // LEFT TAP
-
-                // Y ROTATION
-                rotationY.value = withTiming(
-                    -ROTATION_Y,
-                    {duration: ANIMATION_DURATION},
-                    () => {
-                        rotationY.value = withTiming(0, {
-                            duration: ANIMATION_DURATION,
-                        });
-                    },
-                );
-
-                // X ROTATION
-                const yPercentage = -((e.allTouches[0].y / height) * 2 - 1);
-                rotationX.value = withTiming(
-                    ROTATION_X * yPercentage,
-                    {duration: ANIMATION_DURATION},
-                    () => {
-                        rotationX.value = withTiming(0, {
-                            duration: ANIMATION_DURATION,
-                        });
-                    },
-                );
                 runOnJS(setImageIndex)(imageIndex - 1);
                 runOnJS(Haptics.selectionAsync)();
             }
@@ -434,29 +408,6 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         ) {
             if (imageIndex < product.images.length - 1) {
                 // RIGHT TAP
-
-                // Y ROTATION
-                rotationY.value = withTiming(
-                    ROTATION_Y,
-                    {duration: ANIMATION_DURATION},
-                    () => {
-                        rotationY.value = withTiming(0, {
-                            duration: ANIMATION_DURATION,
-                        });
-                    },
-                );
-
-                // X ROTATION
-                const xPercentage = (e.allTouches[0].x / height) * 2 - 1;
-                rotationX.value = withTiming(
-                    ROTATION_X * xPercentage,
-                    {duration: ANIMATION_DURATION},
-                    () => {
-                        rotationX.value = withTiming(0, {
-                            duration: ANIMATION_DURATION,
-                        });
-                    },
-                );
                 runOnJS(setImageIndex)(imageIndex + 1);
                 runOnJS(Haptics.selectionAsync)();
             }
