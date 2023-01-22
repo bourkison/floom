@@ -61,7 +61,15 @@ const DeletedProducts = () => {
 
     const refresh = async () => {
         setIsRefreshing(true);
-        await loadInit();
+        await dispatch(
+            LOAD_DELETED_PRODUCTS({
+                queryStringParameters: {
+                    loadAmount: 25,
+                    type: 'deleted',
+                },
+                loadType: 'refresh',
+            }),
+        );
         setIsRefreshing(false);
     };
 

@@ -95,6 +95,7 @@ const productSchema = new mongoose.Schema({
     likedCount: {
         type: Number,
         default: 0,
+        minimum: 0,
     },
     deletedBy: {
         type: [Types.ObjectId],
@@ -103,14 +104,16 @@ const productSchema = new mongoose.Schema({
     deletedCount: {
         type: Number,
         default: 0,
+        minimum: 0,
     },
     boughtBy: {
         type: [Types.ObjectId],
         default: [],
     },
     boughtCount: {
-        type: [Number],
+        type: Number,
         default: 0,
+        minimum: 0,
     },
 });
 

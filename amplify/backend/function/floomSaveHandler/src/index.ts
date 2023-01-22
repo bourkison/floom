@@ -4,7 +4,6 @@ import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 import MongooseModels from '/opt/nodejs/models';
 import {Model, UpdateQuery} from 'mongoose';
 import {UserType, ProductType} from './types';
-import {Update} from 'aws-sdk/clients/dynamodb';
 
 let MONGODB_URI: string;
 
@@ -30,45 +29,62 @@ const createSaveOrDelete = async (
     };
 
     const updateUser = async () => {
-        try {
-            let update: UpdateQuery<UserType> =
-                type === 'save'
-                    ? {
-                          $addToSet: {likedProducts: _id},
-                          $pull: {deletedProducts: _id},
-                      }
-                    : {
-                          $addToSet: {deletedProducts: _id},
-                          $pull: {likedProducts: _id},
-                      };
-            await User.findOneAndUpdate({email: email}, update);
-        } catch (err) {
-            // TODO: Handle error and return appropriate response.
-            console.error(err);
-            throw err;
-        }
+        let update: UpdateQuery<UserType> =
+            type === 'save'
+                ? {
+                      $addToSet: {likedProducts: _id},
+                      $pull: {deletedProducts: _id},
+                  }
+                : {
+                      $addToSet: {deletedProducts: _id},
+                      $pull: {likedProducts: _id},
+                  };
+        await User.findOneAndUpdate({email: email}, update);
     };
 
     const updateProduct = async () => {
-        try {
-            // First get user ID
-            const {_id: userId} = await User.findOne({email: email});
-            let update: UpdateQuery<ProductType> =
-                type === 'save'
-                    ? {$push: {likedBy: userId}, $inc: {likedCount: 1}}
-                    : {$push: {deletedBy: userId}, $inc: {deletedCount: 1}};
+        // First get user ID
+        const {_id: userId} = await User.findOne({email: email});
+        let update: UpdateQuery<ProductType> =
+            type === 'save'
+                ? {$addToSet: {likedBy: userId}, $inc: {likedCount: 1}}
+                : {$addToSet: {deletedBy: userId}, $inc: {deletedCount: 1}};
 
-            await Product.findOneAndUpdate({_id}, update);
-        } catch (err) {
-            // TODO: Handle error and return appropriate response.
-            console.error(err);
-            return response;
-        }
+        console.log(await Product.findOneAndUpdate({_id}, update));
     };
 
-    // TODO: If error in update user, and not in update product - undo changes done to product.
+    const [userResult, productResult] = await Promise.allSettled([
+        updateUser(),
+        updateProduct(),
+    ]);
 
-    await Promise.allSettled([updateUser(), updateProduct()]);
+    // Undo product changes if user not successful but product is.
+    if (
+        userResult.status === 'rejected' &&
+        productResult.status === 'fulfilled'
+    ) {
+        // First get user ID
+        const {_id: userId} = await User.findOne({email: email});
+        let update: UpdateQuery<ProductType> =
+            type === 'save'
+                ? {$pull: {likedBy: userId}, $inc: {likedCount: -1}}
+                : {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}};
+
+        await Product.findOneAndUpdate({_id}, update);
+    }
+
+    if (userResult.status === 'rejected') {
+        response = {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: false, message: 'Update error'}),
+        };
+
+        return response;
+    }
 
     response = {
         statusCode: 200,
@@ -76,7 +92,10 @@ const createSaveOrDelete = async (
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Origin': '*',
         },
-        body: JSON.stringify({success: true}),
+        body: JSON.stringify({
+            success: true,
+            productSuccess: productResult.status === 'fulfilled',
+        }),
     };
 
     return response;
@@ -104,45 +123,55 @@ const deleteSaveOrDelete = async (
     };
 
     const updateUser = async () => {
-        try {
-            let update: UpdateQuery<UserType> =
-                type === 'save'
-                    ? {$pull: {likedProducts: _id}}
-                    : {$pull: {deletedProducts: _id}};
+        let update: UpdateQuery<UserType> =
+            type === 'save'
+                ? {$pull: {likedProducts: _id}}
+                : {$pull: {deletedProducts: _id}};
 
-            await User.findOneAndUpdate({email: email}, update);
-        } catch (err) {
-            console.error(err);
-            response = {
-                statusCode: 500,
-                headers: {
-                    'Access-Control-Allow-Headers': '*',
-                    'Access-Control-Allow-Origin': '*',
-                },
-                body: JSON.stringify({success: false, message: 'Update error'}),
-            };
-            throw err;
-        }
+        await User.findOneAndUpdate({email: email}, update);
     };
 
     const updateProduct = async () => {
-        try {
-            // First get user ID
-            const {_id: userId} = await User.findOne({email: email});
-            let update: UpdateQuery<ProductType> =
-                type === 'save'
-                    ? {$pull: {likedBy: userId}, $inc: {likedCount: -1}}
-                    : {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}};
+        const {_id: userId} = await User.findOne({email: email});
+        let update: UpdateQuery<ProductType> =
+            type === 'save'
+                ? {$pull: {likedBy: userId}, $inc: {likedCount: -1}}
+                : {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}};
 
-            await Product.findOneAndUpdate({_id}, update);
-        } catch (err) {
-            console.error('Error updating product, continuing', err);
-        }
+        await Product.findOneAndUpdate({_id}, update);
     };
 
-    await Promise.allSettled([updateUser(), updateProduct()]);
+    const [userResult, productResult] = await Promise.allSettled([
+        updateUser(),
+        updateProduct(),
+    ]);
 
-    // TODO: If error in update user, and not in update product - undo changes done to product.
+    // Undo product changes if user not successful but product is.
+    if (
+        userResult.status === 'rejected' &&
+        productResult.status === 'fulfilled'
+    ) {
+        const {_id: userId} = await User.findOne({email: email});
+        let update: UpdateQuery<ProductType> =
+            type === 'save'
+                ? {$addToSet: {likedBy: userId}, $inc: {likedCount: 1}}
+                : {$addToSet: {deletedBy: userId}, $inc: {deletedCount: 1}};
+
+        await Product.findOneAndUpdate({_id}, update);
+    }
+
+    if (userResult.status === 'rejected') {
+        response = {
+            statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({success: false, message: 'Update error'}),
+        };
+
+        return response;
+    }
 
     response = {
         statusCode: 200,
@@ -175,36 +204,44 @@ const deleteAllDeletes = async (
         body: JSON.stringify({success: false}),
     };
 
-    try {
-        const updateUser = async () => {
-            await User.findOneAndUpdate({email}, {deletedProducts: []});
-        };
+    const updateUser = async () => {
+        await User.findOneAndUpdate({email}, {deletedProducts: []});
+    };
 
-        const updateProducts = async () => {
-            const {deletedProducts, _id: userId} = await User.findOne(
-                {email},
-                {deletedProducts: 1},
-            );
+    const updateProducts = async () => {
+        const {deletedProducts, _id: userId} = await User.findOne(
+            {email},
+            {deletedProducts: 1},
+        );
 
-            await Product.updateMany(
-                {_id: {$in: deletedProducts}},
-                {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}},
-            );
-        };
+        await Product.updateMany(
+            {_id: {$in: deletedProducts}},
+            {$pull: {deletedBy: userId}, $inc: {deletedCount: -1}},
+        );
+    };
 
-        await Promise.allSettled([updateUser(), updateProducts()]);
+    const [userResult, productResult] = await Promise.allSettled([
+        updateUser(),
+        updateProducts(),
+    ]);
 
-        // TODO: If error in update user, and not in update product - undo changes done to product.
+    // Undo product changes if user not successful but product is.
+    if (
+        userResult.status === 'rejected' &&
+        productResult.status === 'fulfilled'
+    ) {
+        const {deletedProducts, _id: userId} = await User.findOne(
+            {email},
+            {deletedProducts: 1},
+        );
 
-        response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Headers': '*',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({success: true}),
-        };
-    } catch (err) {
+        await Product.updateMany(
+            {_id: {$in: deletedProducts}},
+            {$addToSet: {deletedBy: userId}, $inc: {deletedCount: 1}},
+        );
+    }
+
+    if (userResult.status === 'rejected') {
         response = {
             statusCode: 500,
             headers: {
@@ -213,7 +250,18 @@ const deleteAllDeletes = async (
             },
             body: JSON.stringify({success: false, message: 'Update error'}),
         };
+
+        return response;
     }
+
+    response = {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: true}),
+    };
 
     return response;
 };

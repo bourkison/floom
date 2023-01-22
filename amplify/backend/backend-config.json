@@ -1,25 +1,67 @@
 {
-  "auth": {
-    "floomCognito": {
-      "service": "Cognito",
-      "providerPlugin": "awscloudformation",
+  "api": {
+    "floomapi": {
       "dependsOn": [
         {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
           "category": "function",
-          "resourceName": "floomCognitoPostConfirmation",
-          "triggerProvider": "Cognito",
+          "resourceName": "floomSaveHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomProductHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomUserHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomPublicHandler"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "auth": {
+    "floomCognito": {
+      "customAuth": false,
+      "dependsOn": [
+        {
           "attributes": [
             "Arn",
             "Name"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "floomCognitoPostConfirmation",
+          "triggerProvider": "Cognito"
         }
       ],
-      "customAuth": false,
       "frontendAuthConfig": {
-        "socialProviders": [],
-        "usernameAttributes": [
-          "EMAIL"
+        "mfaConfiguration": "OPTIONAL",
+        "mfaTypes": [
+          "TOTP"
         ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
         "signupAttributes": [
           "BIRTHDATE",
           "EMAIL",
@@ -27,147 +69,267 @@
           "LOCALE",
           "NAME"
         ],
-        "passwordProtectionSettings": {
-          "passwordPolicyMinLength": 8,
-          "passwordPolicyCharacters": []
-        },
-        "mfaConfiguration": "OPTIONAL",
-        "mfaTypes": [
-          "TOTP"
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
         ],
         "verificationMechanisms": [
           "EMAIL"
         ]
-      }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito"
     }
   },
   "function": {
     "floomCognitoPostConfirmation": {
       "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
       "dependsOn": [
         {
-          "category": "function",
-          "resourceName": "floomMongooseModels",
           "attributes": [
             "Arn"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
         }
-      ]
-    },
-    "floomUserHandler": {
-      "build": true,
+      ],
       "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "floomMongooseModels",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
+      "service": "Lambda"
     },
     "floomMongooseModels": {
-      "providerPlugin": "awscloudformation",
-      "service": "LambdaLayer",
-      "build": true
-    },
-    "floomSaveHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "floomMongooseModels",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
+      "service": "LambdaLayer"
     },
     "floomProductHandler": {
       "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
       "dependsOn": [
         {
-          "category": "function",
-          "resourceName": "floomMongooseModels",
           "attributes": [
             "Arn"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
         }
-      ]
-    },
-    "floomPublicHandler": {
-      "build": true,
+      ],
       "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "floomMongooseModels",
-          "attributes": [
-            "Arn"
-          ]
-        }
-      ]
+      "service": "Lambda"
     },
     "floomProductManager": {
       "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
       "dependsOn": [
         {
-          "category": "function",
-          "resourceName": "floomMongooseModels",
           "attributes": [
             "Arn"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
         }
-      ]
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "floomPublicHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "floomSaveHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "floomUserHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
-  "api": {
-    "floomapi": {
-      "service": "API Gateway",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [
+  "parameters": {
+    "AMPLIFY_function_floomCognitoPostConfirmation_deploymentBucketName": {
+      "usedBy": [
         {
           "category": "function",
-          "resourceName": "floomSaveHandler",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
+          "resourceName": "floomCognitoPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomCognitoPostConfirmation_s3Key": {
+      "usedBy": [
         {
           "category": "function",
-          "resourceName": "floomProductHandler",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
+          "resourceName": "floomCognitoPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomCognitoPostConfirmation_secretsPathAmplifyAppId": {
+      "usedBy": [
         {
           "category": "function",
-          "resourceName": "floomUserHandler",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
+          "resourceName": "floomCognitoPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomMongooseModels_deploymentBucketName": {
+      "usedBy": [
         {
           "category": "function",
-          "resourceName": "floomPublicHandler",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
+          "resourceName": "floomMongooseModels"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomMongooseModels_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomMongooseModels"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomProductHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomProductHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomProductHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomProductHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomProductHandler_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomProductHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomProductManager_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomProductManager"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomProductManager_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomProductManager"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomProductManager_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomProductManager"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomPublicHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomPublicHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomPublicHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomPublicHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomPublicHandler_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomPublicHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomSaveHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomSaveHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomSaveHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomSaveHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomSaveHandler_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomSaveHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomUserHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomUserHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomUserHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomUserHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomUserHandler_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomUserHandler"
         }
       ]
     }

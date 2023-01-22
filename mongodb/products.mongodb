@@ -1,4 +1,1 @@
-db.products.aggregate([
-    {$match: {_id: {$nin: ['634dd63b0b189c25187bd470']}}},
-    {$sample: {size: 5}}
-])
+db.products.findOneAndUpdate({_id: ObjectId('637bbccd06de14da3d4e35af')}, {$set: {$push: {likedBy: ObjectId('635ece3c42fb6b2e01a2c2a6')}, $inc: {likedCount: 1}}})

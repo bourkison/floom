@@ -357,7 +357,7 @@ export const DELETE_DELETED_PRODUCT = createAsyncThunk<
 });
 
 export const DELETE_ALL_DELETED_PRODUCTS = createAsyncThunk<void, undefined>(
-    'product/DELETE_DELETED_PRODUCT',
+    'product/DELETE_ALL_DELETED_PRODUCTS',
     async () => {
         await deleteAllDeletes({
             init: {queryStringParameters: {deleteAll: 'true'}},
@@ -558,7 +558,10 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_DELETED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
-                console.log('Delete saved product rejected');
+                console.log('Delete deleted product rejected');
+            })
+            .addCase(DELETE_ALL_DELETED_PRODUCTS.pending, () => {
+                console.log('Deleting all products');
             })
             .addCase(DELETE_ALL_DELETED_PRODUCTS.fulfilled, state => {
                 state.deleted.products = [];

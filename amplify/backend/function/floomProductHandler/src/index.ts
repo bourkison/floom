@@ -55,20 +55,20 @@ const queryUnsavedProduct = async (
         .filteredGenders
         ? event.queryStringParameters.filteredGenders
               .split(',')
-              .map(g => g.toLowerCase())
+              .map(g => g.toLowerCase().trim()[0])
         : [];
 
     const filteredCategories: string[] = event.queryStringParameters
         .filteredCategories
         ? event.queryStringParameters.filteredCategories
               .split(',')
-              .map(c => c.toLowerCase())
+              .map(c => c.toLowerCase().trim())
         : [];
 
     const filteredColors: string[] = event.queryStringParameters.filteredColors
         ? event.queryStringParameters.filteredColors
               .split(',')
-              .map(c => c.toLowerCase())
+              .map(c => c.toLowerCase().trim())
         : [];
 
     // TODO:  Implement search functionality
@@ -263,7 +263,7 @@ const querySavedOrDeletedProduct = async (
             type === 'saved'
                 ? {
                       likedProducts: {
-                          $slice: loadAmount,
+                          $slice: !reversed ? loadAmount : -loadAmount,
                       },
                       __length: {
                           $size: '$likedProducts',
@@ -271,7 +271,7 @@ const querySavedOrDeletedProduct = async (
                   }
                 : {
                       deletedProducts: {
-                          $slice: loadAmount,
+                          $slice: !reversed ? loadAmount : -loadAmount,
                       },
                       __length: {
                           $size: '$deletedProducts',
@@ -289,7 +289,7 @@ const querySavedOrDeletedProduct = async (
 
         productIds = type === 'saved' ? likedProducts : deletedProducts;
         arrLength = __length;
-        arrStartAtIndex = 0;
+        arrStartAtIndex = -1;
     } else {
         // Change aggregation to $likedProducts or $deletedProducts based on
         // If we're palling saved or deleted.
@@ -388,6 +388,10 @@ const querySavedOrDeletedProduct = async (
             }),
         };
         return response;
+    }
+
+    if (reversed) {
+        productIds.reverse();
     }
 
     // Have to sort the products in how they are retrieved from the User

@@ -39,6 +39,7 @@ const DeletedProductsWidget = () => {
                     queryStringParameters: {
                         loadAmount: NUM_PRODUCTS,
                         type: 'deleted',
+                        reversed: true,
                     },
                     loadType: 'initial',
                 }),
