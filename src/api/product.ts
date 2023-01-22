@@ -47,6 +47,8 @@ export async function queryProduct(
             vendorProductId: data.data[i].vendorProductId,
             inStock: data.data[i].inStock,
             description: data.data[i].description || '',
+            saved: data.data[i].saved,
+            deleted: data.data[i].deleted,
         });
     }
 
@@ -94,5 +96,7 @@ export async function getProduct(
         vendorProductId: data.data.vendorProductId,
         inStock: data.data.inStock,
         description: data.data.description,
+        saved: data.data.saved,
+        deleted: data.data.deleted,
     };
 }

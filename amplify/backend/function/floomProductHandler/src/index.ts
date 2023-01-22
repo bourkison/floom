@@ -206,10 +206,12 @@ const queryUnsavedProduct = async (
         }
 
         if (filteredColors.length) {
+            const regex = new RegExp(filteredColors.join('|'), 'gi');
+
             query = {
                 ...query,
                 colors: {
-                    $in: filteredColors,
+                    $regex: regex,
                 },
             };
         }

@@ -15,6 +15,8 @@ export type Product = {
     vendorProductId: string;
     inStock: boolean;
     description: string;
+    saved: boolean;
+    deleted: boolean;
 };
 
 // API
