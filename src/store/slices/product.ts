@@ -64,7 +64,8 @@ const initialState = productAdapter.getInitialState({
 
 export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
     QueryProductResponse,
-    LoadProductsParams
+    LoadProductsParams,
+    {rejectValue: RejectWithValueType}
 >(
     'product/LOAD_UNSAVED_PRODUCTS',
     async (
@@ -76,7 +77,7 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
             loadType: 'initial',
             filtered: true,
         },
-        {getState},
+        {getState, rejectWithValue},
     ) => {
         const state = getState() as RootState;
 
@@ -96,6 +97,15 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                     state.product.filters.excludeDeleted;
                 init.queryStringParameters.excludeSaved =
                     state.product.filters.excludeSaved;
+
+                // If not excluding deleted or saved, order products to avoid duplication.
+                // TODO: Ordered products are generally bad as will only show through 1 brand at a time (from when they were added).
+                if (
+                    !state.product.filters.excludeDeleted ||
+                    !state.product.filters.excludeSaved
+                ) {
+                    init.queryStringParameters.ordered = true;
+                }
 
                 if (state.product.filters.gender.length) {
                     init.queryStringParameters = {
@@ -127,9 +137,16 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                 }
             }
 
-            return await queryProduct({
-                init,
-            });
+            try {
+                return await queryProduct({
+                    init,
+                });
+            } catch (err: any) {
+                return rejectWithValue({
+                    message: err.message || undefined,
+                    code: err?.response?.status || undefined,
+                });
+            }
         } else {
             const excludedSaved = state.product.filters.excludeSaved
                 ? JSON.parse(
@@ -480,6 +497,27 @@ const productSlice = createSlice({
                 state.unsaved.moreToLoad = action.payload.__moreToLoad;
                 console.log(state.unsaved.moreToLoad);
             })
+            .addCase(
+                LOAD_UNSAVED_PRODUCTS.rejected,
+                (state, {meta, payload}) => {
+                    // TODO: Handle rejections.
+                    // If initial load or refresh and 404
+                    if (
+                        (meta.arg.loadType === 'initial' ||
+                            meta.arg.loadType === 'refresh') &&
+                        meta.rejectedWithValue &&
+                        payload &&
+                        payload.code &&
+                        payload.code === 404
+                    ) {
+                        state.unsaved.products = [];
+                    }
+
+                    state.unsaved.isLoading = false;
+                    state.unsaved.isLoadingMore = false;
+                    state.unsaved.moreToLoad = false;
+                },
+            )
             .addCase(LOAD_SAVED_PRODUCTS.pending, (state, action) => {
                 if (action.meta.arg.loadType === 'initial') {
                     state.saved.isLoading = true;

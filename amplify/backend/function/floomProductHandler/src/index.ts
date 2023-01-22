@@ -22,6 +22,7 @@ type ProductType = {
     vendorProductId: string;
     inStock: boolean;
     description: string;
+    rnd: number;
 };
 
 type UserType = {
@@ -55,7 +56,7 @@ const queryUnsavedProduct = async (
         .filteredGenders
         ? event.queryStringParameters.filteredGenders
               .split(',')
-              .map(g => g.toLowerCase().trim()[0])
+              .map(g => g.toLowerCase().trim())
         : [];
 
     const filteredCategories: string[] = event.queryStringParameters
@@ -71,8 +72,7 @@ const queryUnsavedProduct = async (
               .map(c => c.toLowerCase().trim())
         : [];
 
-    // TODO:  Implement search functionality
-    // const searchText: string = event.queryStringParameters.query || '';
+    const searchText: string = event.queryStringParameters.query || '';
 
     const Product: Model<ProductType> = await MongooseModels().Product(
         MONGODB_URI,
@@ -133,14 +133,27 @@ const queryUnsavedProduct = async (
         };
 
         if (startAt && ordered) {
-            query._id = {
-                ...query._id,
-                $lt: new Types.ObjectId(startAt),
+            const {rnd} = (
+                await Product.findById(new Types.ObjectId(startAt))
+            ).toObject();
+
+            query = {
+                ...query,
+                _id: {
+                    ...query._id,
+                    $lt: new Types.ObjectId(startAt),
+                },
+                rnd: {
+                    $lt: rnd,
+                },
             };
         }
 
         if (filteredGenders.length) {
-            const regex = new RegExp(filteredGenders.join('|'), 'gi');
+            const regex = new RegExp(
+                filteredGenders.map(g => `^${g}$`).join('|'),
+                'gi',
+            );
             query = {
                 ...query,
                 gender: {
@@ -167,8 +180,19 @@ const queryUnsavedProduct = async (
             };
         }
 
+        if (searchText) {
+            query = {
+                ...query,
+                $text: {
+                    $search: searchText,
+                },
+            };
+        }
+
         const products = ordered
-            ? await Product.find(query).sort({_id: -1}).limit(loadAmount)
+            ? await Product.find(query)
+                  .sort({rnd: -1, _id: -1})
+                  .limit(loadAmount)
             : await Product.aggregate([
                   {$match: query},
                   {$sample: {size: loadAmount}},
@@ -325,38 +349,123 @@ const querySavedOrDeletedProduct = async (
                   };
 
         // Second aggregation is slicing the actual relevant data.
-        let secondAggregation =
-            type === 'saved'
-                ? {
-                      $project: {
-                          likedProducts: {
-                              $slice: [
-                                  '$likedProducts',
-                                  {
-                                      $add: ['$__startAtIndex', 1],
-                                  },
-                                  loadAmount,
-                              ],
+        let secondAggregation: any;
+        if (!reversed) {
+            secondAggregation =
+                type === 'saved'
+                    ? {
+                          $project: {
+                              likedProducts: {
+                                  $slice: [
+                                      '$likedProducts',
+                                      {
+                                          $add: ['$__startAtIndex', 1],
+                                      },
+                                      loadAmount,
+                                  ],
+                              },
+                              __length: 1,
+                              __startAtIndex: 1,
                           },
-                          __length: 1,
-                          __startAtIndex: 1,
-                      },
-                  }
-                : {
-                      $project: {
-                          deletedProducts: {
-                              $slice: [
-                                  '$deletedProducts',
-                                  {
-                                      $add: ['$__startAtIndex', 1],
-                                  },
-                                  loadAmount,
-                              ],
+                      }
+                    : {
+                          $project: {
+                              deletedProducts: {
+                                  $slice: [
+                                      '$deletedProducts',
+                                      {
+                                          $add: ['$__startAtIndex', 1],
+                                      },
+                                      loadAmount,
+                                  ],
+                              },
+                              __length: 1,
+                              __startAtIndex: 1,
                           },
-                          __length: 1,
-                          __startAtIndex: 1,
-                      },
-                  };
+                      };
+        } else {
+            /*
+             * Below aggregation based on below function to return reversed array
+             * though $slice has slightly different behaviour to .slice():
+             * (arr, index, amount) => {
+             *   let start = index - amount;
+             *
+             *   if (start < 0) {
+             *       start = 0;
+             *   }
+             *
+             *   return arr.slice(start, index)
+             * }
+             */
+            secondAggregation =
+                type === 'saved'
+                    ? {
+                          $project: {
+                              likedProducts: {
+                                  $slice: [
+                                      '$likedProducts',
+                                      {
+                                          $max: [
+                                              {
+                                                  $subtract: [
+                                                      '$__startAtIndex',
+                                                      loadAmount,
+                                                  ],
+                                              },
+                                              0,
+                                          ],
+                                      },
+                                      {
+                                          $max: [
+                                              {
+                                                  $subtract: [
+                                                      '$__startAtIndex',
+                                                      loadAmount,
+                                                  ],
+                                              },
+                                              0,
+                                          ],
+                                      },
+                                  ],
+                              },
+                              __length: 1,
+                              __startAtIndex: 1,
+                          },
+                      }
+                    : {
+                          $project: {
+                              deletedProducts: {
+                                  $slice: [
+                                      '$deletedProducts',
+                                      {
+                                          $max: [
+                                              {
+                                                  $subtract: [
+                                                      '$__startAtIndex',
+                                                      loadAmount,
+                                                  ],
+                                              },
+                                              0,
+                                          ],
+                                      },
+                                      {
+                                          $max: [
+                                              {
+                                                  $subtract: [
+                                                      '$__startAtIndex',
+                                                      loadAmount,
+                                                  ],
+                                              },
+                                              0,
+                                          ],
+                                      },
+                                  ],
+                              },
+                              __length: 1,
+                              __startAtIndex: 1,
+                          },
+                      };
+        }
 
         const mongoResponse = (
             await User.aggregate<{
@@ -435,9 +544,14 @@ const querySavedOrDeletedProduct = async (
         return response;
     }
 
-    // If number of previously loaded (arrStartAt + 1) + number loaded
-    // is equal to total length, we know we have loaded everything, hence no more to load
-    const moreToLoad = !(arrStartAtIndex + 1 + products.length >= arrLength);
+    /*
+     * Non-reversed logic:
+     *   If number of previously loaded (arrStartAt + 1) + number loaded on this load
+     *   is equal to total array length, we know we have loaded everything, hence no more to load.
+     */
+    const moreToLoad = !reversed
+        ? !(arrStartAtIndex + 1 + products.length >= arrLength)
+        : arrStartAtIndex - loadAmount > 0;
 
     response = {
         statusCode: 200,

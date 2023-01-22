@@ -37,6 +37,7 @@ export type QueryProductInit = {
         filteredColors?: string;
         query?: string;
         reversed?: boolean;
+        ordered?: boolean;
     };
 };
 

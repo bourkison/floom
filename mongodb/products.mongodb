@@ -1,1 +1,1 @@
-db.products.findOneAndUpdate({_id: ObjectId('637bbccd06de14da3d4e35af')}, {$set: {$push: {likedBy: ObjectId('635ece3c42fb6b2e01a2c2a6')}, $inc: {likedCount: 1}}})
+db.products.updateMany({}, [{$set: {rnd: {$floor: {$multiply: [{$rand: {}}, 32_768]}}}}])

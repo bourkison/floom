@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, StyleSheet, ActivityIndicator} from 'react-native';
+import {View, StyleSheet, ActivityIndicator, Text} from 'react-native';
 import Product from '@/components/Product/Product';
 
 import {LOAD_UNSAVED_PRODUCTS} from '@/store/slices/product';
@@ -35,7 +35,7 @@ const ProductList = () => {
                 queryStringParameters.startAt = startAt;
             }
 
-            dispatch(
+            await dispatch(
                 LOAD_UNSAVED_PRODUCTS({
                     queryStringParameters,
                     loadType,
@@ -62,6 +62,14 @@ const ProductList = () => {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator />
+            </View>
+        );
+    }
+
+    if (!products.length && !isLoading && !moreToLoad) {
+        return (
+            <View>
+                <Text>No products.</Text>
             </View>
         );
     }
