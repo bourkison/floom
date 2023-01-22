@@ -2,9 +2,11 @@ import React, {useEffect} from 'react';
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native';
 import Product from '@/components/Product/Product';
 
-import {LOAD_UNSAVED_PRODUCTS} from '@/store/slices/product';
+import {LOAD_UNSAVED_PRODUCTS, CLEAR_FILTERS} from '@/store/slices/product';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {QueryProductInit} from '@/types/product';
+import AnimatedButton from '@/components/Utility/AnimatedButton';
+import {PALETTE} from '@/constants';
 
 const NUM_SHOWN_PRODUCTS = 5;
 
@@ -58,6 +60,25 @@ const ProductList = () => {
         }
     }, [products, isLoading, dispatch, isLoadingMore, moreToLoad]);
 
+    const retry = async (clearFilters: boolean) => {
+        if (clearFilters) {
+            await dispatch(CLEAR_FILTERS());
+        }
+
+        let queryStringParameters: QueryProductInit['queryStringParameters'] = {
+            loadAmount: 10,
+            type: 'unsaved',
+        };
+
+        await dispatch(
+            LOAD_UNSAVED_PRODUCTS({
+                queryStringParameters,
+                loadType: 'initial',
+                filtered: true,
+            }),
+        );
+    };
+
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
@@ -68,8 +89,32 @@ const ProductList = () => {
 
     if (!products.length && !isLoading && !moreToLoad) {
         return (
-            <View>
-                <Text>No products.</Text>
+            <View style={styles.noProductsContainer}>
+                <View style={styles.noProductsContainerVert}>
+                    <View style={styles.noProductsTextContainer}>
+                        <Text style={styles.noProductsText}>
+                            No products found
+                        </Text>
+                    </View>
+                    <View>
+                        <AnimatedButton
+                            onPress={() => {
+                                retry(false);
+                            }}
+                            style={styles.retryButton}
+                            textStyle={styles.retryButtonText}>
+                            Retry
+                        </AnimatedButton>
+                        <AnimatedButton
+                            onPress={() => {
+                                retry(true);
+                            }}
+                            style={styles.clearRetryButton}
+                            textStyle={styles.clearRetryButtonText}>
+                            Clear Filters and Refresh
+                        </AnimatedButton>
+                    </View>
+                </View>
             </View>
         );
     }
@@ -95,6 +140,64 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    noProductsContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        flexDirection: 'row',
+    },
+    noProductsContainerVert: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    noProductsTextContainer: {
+        marginBottom: 5,
+    },
+    noProductsText: {
+        color: PALETTE.neutral[5],
+    },
+    retryButton: {
+        paddingVertical: 7,
+        paddingHorizontal: 100,
+        backgroundColor: PALETTE.neutral[8],
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        width: '100%',
+        alignSelf: 'center',
+    },
+    retryButtonText: {
+        color: PALETTE.gray[1],
+        fontSize: 12,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        flexBasis: 14,
+        flexShrink: 0,
+        flexGrow: 0,
+    },
+    clearRetryButton: {
+        paddingVertical: 7,
+        paddingHorizontal: 50,
+        borderColor: PALETTE.neutral[8],
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        width: '100%',
+        alignSelf: 'center',
+        marginTop: 3,
+    },
+    clearRetryButtonText: {
+        color: PALETTE.neutral[8],
+        fontSize: 12,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        flexBasis: 14,
+        flexShrink: 0,
+        flexGrow: 0,
     },
 });
 

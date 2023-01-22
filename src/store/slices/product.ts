@@ -53,7 +53,7 @@ const initialState = productAdapter.getInitialState({
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
     action: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
     filters: {
-        gender: ['Unisex'] as string[],
+        gender: [] as string[],
         category: [] as string[],
         color: [] as string[],
         searchText: '',
@@ -99,7 +99,6 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                     state.product.filters.excludeSaved;
 
                 // If not excluding deleted or saved, order products to avoid duplication.
-                // TODO: Ordered products are generally bad as will only show through 1 brand at a time (from when they were added).
                 if (
                     !state.product.filters.excludeDeleted ||
                     !state.product.filters.excludeSaved
@@ -280,16 +279,12 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
                 (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
             );
 
-            console.log('PRODUCT IDS:', productIds);
-
             try {
                 const products = await getPublicProduct({
                     init: {
                         body: {products: productIds},
                     },
                 });
-
-                console.log('PRODUCTS:', products);
 
                 return {
                     products,
@@ -298,7 +293,6 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
                     __totalLength: products.length,
                 };
             } catch (err: any) {
-                console.log('ERROR:', err);
                 return rejectWithValue({
                     message: err.message || undefined,
                     code: err?.response?.status || undefined,
@@ -379,6 +373,15 @@ export const DELETE_ALL_DELETED_PRODUCTS = createAsyncThunk<void, undefined>(
         await deleteAllDeletes({
             init: {queryStringParameters: {deleteAll: 'true'}},
         });
+    },
+);
+
+// Async thunk in order to get access to gender in user slice.
+export const CLEAR_FILTERS = createAsyncThunk<string, undefined>(
+    'product/CLEAR_FILTERS',
+    async (_, {getState}) => {
+        const state = getState() as RootState;
+        return state.user.docData?.gender || '';
     },
 );
 
@@ -603,6 +606,14 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_ALL_DELETED_PRODUCTS.fulfilled, state => {
                 state.deleted.products = [];
+            })
+            .addCase(CLEAR_FILTERS.fulfilled, (state, action) => {
+                state.filters.gender = action.payload ? [action.payload] : [];
+                state.filters.category = [];
+                state.filters.color = [];
+                state.filters.searchText = '';
+                state.filters.excludeDeleted = true;
+                state.filters.excludeSaved = true;
             });
     },
 });

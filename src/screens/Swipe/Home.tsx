@@ -16,6 +16,17 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const user = useAppSelector(state => state.user.docData);
     const {width} = useWindowDimensions();
 
+    const isLoading = useAppSelector(state => state.product.unsaved.isLoading);
+    const isLoadingMore = useAppSelector(
+        state => state.product.unsaved.isLoadingMore,
+    );
+    const moreToLoad = useAppSelector(
+        state => state.product.unsaved.moreToLoad,
+    );
+    const productsLength = useAppSelector(
+        state => state.product.unsaved.products.length,
+    );
+
     return (
         <View style={styles.flexOne}>
             <FilterDropdown />
@@ -27,7 +38,17 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     ]}>
                     <ProductList />
                 </View>
-                <View style={styles.buttonsContainer}>
+                {/* Don't render action buttons if no products found. */}
+                <View
+                    style={[
+                        styles.buttonsContainer,
+                        !isLoading &&
+                        !isLoadingMore &&
+                        !moreToLoad &&
+                        !productsLength
+                            ? styles.hidden
+                            : undefined,
+                    ]}>
                     <ActionButton type="delete" />
                     <ActionButton type="buy" />
                     <ActionButton type="save" />
@@ -71,6 +92,9 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 12,
         color: PALETTE.neutral[3],
+    },
+    hidden: {
+        opacity: 0,
     },
 });
 
