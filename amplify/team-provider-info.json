@@ -40,7 +40,7 @@
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomProductHandler-49373856484d79462f38-build.zip"
+          "s3Key": "amplify-builds/floomProductHandler-544c787731625a304664-build.zip"
         },
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",

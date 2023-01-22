@@ -6,6 +6,8 @@ import {Model, Types, FilterQuery} from 'mongoose';
 
 let MONGODB_URI: string;
 
+const MAX_LOAD_AMOUNT = 50;
+
 type ProductType = {
     name: string;
     price: {
@@ -88,6 +90,38 @@ const queryUnsavedProduct = async (
         body: JSON.stringify({success: false}),
     };
 
+    if (loadAmount > MAX_LOAD_AMOUNT) {
+        response = {
+            statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: `Max load amount is ${MAX_LOAD_AMOUNT}`,
+            }),
+        };
+
+        return response;
+    }
+
+    if (loadAmount <= 0) {
+        response = {
+            statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: `Load amount is 0 or less`,
+            }),
+        };
+
+        return response;
+    }
+
     try {
         const user = (
             await User.findOne(
@@ -110,7 +144,7 @@ const queryUnsavedProduct = async (
         }
 
         let excludedProductsArr: Types.ObjectId[] = [];
-        console.log('TEST');
+
         if (excludeDeleted) {
             excludedProductsArr = [
                 ...excludedProductsArr,
@@ -276,6 +310,38 @@ const querySavedOrDeletedProduct = async (
         return response;
     }
 
+    if (loadAmount > MAX_LOAD_AMOUNT) {
+        response = {
+            statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: `Max load amount is ${MAX_LOAD_AMOUNT}`,
+            }),
+        };
+
+        return response;
+    }
+
+    if (loadAmount <= 0) {
+        response = {
+            statusCode: 400,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: `Load amount is 0 or less`,
+            }),
+        };
+
+        return response;
+    }
+
     let productIds: Types.ObjectId[];
     let arrLength: number;
     let arrStartAtIndex: number;
@@ -313,7 +379,7 @@ const querySavedOrDeletedProduct = async (
 
         productIds = type === 'saved' ? likedProducts : deletedProducts;
         arrLength = __length;
-        arrStartAtIndex = -1;
+        arrStartAtIndex = !reversed ? -1 : arrLength;
     } else {
         // Change aggregation to $likedProducts or $deletedProducts based on
         // If we're palling saved or deleted.
@@ -416,14 +482,20 @@ const querySavedOrDeletedProduct = async (
                                           ],
                                       },
                                       {
-                                          $max: [
+                                          $cond: [
                                               {
-                                                  $subtract: [
-                                                      '$__startAtIndex',
-                                                      loadAmount,
+                                                  $lt: [
+                                                      {
+                                                          $subtract: [
+                                                              '$__startAtIndex',
+                                                              loadAmount,
+                                                          ],
+                                                      },
+                                                      0,
                                                   ],
                                               },
-                                              0,
+                                              '$__startAtIndex',
+                                              loadAmount,
                                           ],
                                       },
                                   ],
@@ -449,14 +521,20 @@ const querySavedOrDeletedProduct = async (
                                           ],
                                       },
                                       {
-                                          $max: [
+                                          $cond: [
                                               {
-                                                  $subtract: [
-                                                      '$__startAtIndex',
-                                                      loadAmount,
+                                                  $lt: [
+                                                      {
+                                                          $subtract: [
+                                                              '$__startAtIndex',
+                                                              loadAmount,
+                                                          ],
+                                                      },
+                                                      0,
                                                   ],
                                               },
-                                              0,
+                                              '$__startAtIndex',
+                                              loadAmount,
                                           ],
                                       },
                                   ],
@@ -512,6 +590,21 @@ const querySavedOrDeletedProduct = async (
                 _id: {
                     $in: productIds,
                 },
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                vendorProductId: 1,
+                brand: 1,
+                categories: 1,
+                colors: 1,
+                gender: 1,
+                images: 1,
+                inStock: 1,
+                link: 1,
+                price: 1,
             },
         },
         {

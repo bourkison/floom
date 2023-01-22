@@ -45,6 +45,7 @@ const DeletedProducts = () => {
                 queryStringParameters: {
                     loadAmount: 25,
                     type: 'deleted',
+                    reversed: true,
                 },
                 loadType: 'initial',
             }),
@@ -66,6 +67,7 @@ const DeletedProducts = () => {
                 queryStringParameters: {
                     loadAmount: 25,
                     type: 'deleted',
+                    reversed: true,
                 },
                 loadType: 'refresh',
             }),
@@ -81,6 +83,7 @@ const DeletedProducts = () => {
                         loadAmount: 25,
                         type: 'deleted',
                         startAt: products[products.length - 1]._id,
+                        reversed: true,
                     },
                     loadType: 'more',
                 }),

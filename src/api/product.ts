@@ -22,7 +22,12 @@ export async function queryProduct(
 
     let response: ProductType[] = [];
 
-    console.log('RESPONSE:', data.data.length, data.__loaded);
+    console.log(
+        'RESPONSE:',
+        data.data.length,
+        data.__loaded,
+        data.__moreToLoad,
+    );
 
     for (let i = 0; i < data.data.length; i++) {
         response.push({
