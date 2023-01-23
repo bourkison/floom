@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {
     View,
     Text,
@@ -6,18 +6,17 @@ import {
     useWindowDimensions,
     Image,
     TouchableOpacity,
+    Animated as RNAnimated,
+    LayoutAnimation,
 } from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import * as Haptics from 'expo-haptics';
 
-import Animated, {
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
-} from 'react-native-reanimated';
-import {GestureDetector, Gesture} from 'react-native-gesture-handler';
+import {
+    GestureDetector,
+    Gesture,
+    RectButton,
+} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 
 import {useAppDispatch} from '@/store/hooks';
@@ -25,9 +24,11 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {PALETTE} from '@/constants';
+import {BUY_COLOR, PALETTE} from '@/constants';
 import {capitaliseString} from '@/services';
 import BrandLogo from './BrandLogo';
+
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 export type ProductListItemProps = {
     product: ProductType;
@@ -37,8 +38,6 @@ export type ProductListItemProps = {
 };
 
 export const PRODUCT_LIST_ITEM_HEIGHT = 108;
-const SNAP_ANIMATION_DURATION = 250;
-const SNAP_TO_DELETE_TRANSLATION = 7 / 8;
 
 const ProductListItem: React.FC<ProductListItemProps> = ({
     product,
@@ -46,39 +45,29 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     type,
     onDelete,
 }) => {
-    const contextX = useSharedValue(0);
-    const offsetX = useSharedValue(0);
-    const sHeight = useSharedValue(PRODUCT_LIST_ITEM_HEIGHT);
+    const ref = useRef<Swipeable>(null);
 
-    const isDeleting = useSharedValue(false);
-    const isAnimating = useSharedValue(false);
-
-    const {width} = useWindowDimensions();
     const dispatch = useAppDispatch();
 
-    const [imageContSize, setImageContSize] = useState(1);
     const [imageSize, setImageSize] = useState({width: 0, height: 0});
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
-    const rStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {
-                    translateX: offsetX.value,
-                },
-            ],
-            height: sHeight.value,
-        };
-    });
-
-    const rDelStyle = useAnimatedStyle(() => {
-        return {
-            height: sHeight.value,
-        };
-    });
-
     const deleteProduct = useCallback(() => {
+        const layoutAnimConfig = {
+            duration: 300,
+            update: {
+                type: LayoutAnimation.Types.easeInEaseOut,
+            },
+            delete: {
+                duration: 100,
+                type: LayoutAnimation.Types.easeInEaseOut,
+                property: LayoutAnimation.Properties.opacity,
+            },
+        };
+
+        LayoutAnimation.configureNext(layoutAnimConfig);
+
         if (type === 'saved') {
             dispatch(DELETE_SAVED_PRODUCT({_id: product._id, index}));
         }
@@ -88,87 +77,70 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         }
     }, [dispatch, index, onDelete, type, product]);
 
-    const navigateToProduct = useCallback(() => {
-        navigation.navigate('ProductView', {
-            product: product,
-        });
-    }, [navigation, product]);
-
-    const panGesture = Gesture.Pan()
-        .activeOffsetX(-10)
-        .failOffsetY([-10, 10])
-        .onStart(() => {
-            contextX.value = offsetX.value;
-        })
-        .onUpdate(e => {
-            if (!isAnimating.value) {
-                let v = e.translationX + contextX.value;
-
-                if (v > 0) {
-                    return;
-                } else if (v < -width / 2 && !isDeleting.value) {
-                    // Snap to delete.
-                    isDeleting.value = true;
-                    isAnimating.value = true;
-                    offsetX.value = withTiming(
-                        -width * SNAP_TO_DELETE_TRANSLATION,
-                        {duration: SNAP_ANIMATION_DURATION},
-                        () => {
-                            isAnimating.value = false;
-                        },
-                    );
-                    runOnJS(Haptics.selectionAsync)();
-                } else if (v > -width / 2 + 1 && isDeleting.value) {
-                    // Disable snap to delete.
-                    isDeleting.value = false;
-                    isAnimating.value = true;
-                    offsetX.value = withTiming(
-                        v,
-                        {duration: SNAP_ANIMATION_DURATION},
-                        () => {
-                            isAnimating.value = false;
-                        },
-                    );
-                    runOnJS(Haptics.selectionAsync)();
-                } else if (!isDeleting.value) {
-                    // Run normally if not snapped.
-                    offsetX.value = v;
-                }
-            }
-        })
-        .onEnd(e => {
-            if (isDeleting.value && e.state === 5) {
-                // Run delete animation and remove from the store.
-                offsetX.value = withTiming(-width, {}, () => {
-                    sHeight.value = withTiming(0, {}, () => {
-                        runOnJS(deleteProduct)();
-                    });
-                });
-            } else {
-                offsetX.value = withSpring(0);
-            }
-        });
-
     return (
-        <View style={styles.container}>
-            <Animated.View style={[styles.deleteContainer, rDelStyle]}>
-                <Text style={styles.deleteText}>Delete</Text>
-            </Animated.View>
-            <Animated.View
-                style={[
-                    styles.animatedContainer,
-                    index === 0 ? styles.animatedZeroContainer : undefined,
-                    rStyle,
-                ]}>
-                <GestureDetector gesture={panGesture}>
+        <View style={{overflow: 'hidden'}}>
+            <Swipeable
+                childrenContainerStyle={styles.container}
+                ref={ref}
+                renderRightActions={(progress, dragX) => {
+                    const trans = dragX.interpolate({
+                        inputRange: [0, 50, 100, 101],
+                        outputRange: [-20, 0, 0, 1],
+                    });
+
+                    return (
+                        <View style={styles.rightAction}>
+                            <RNAnimated.Text
+                                style={[
+                                    styles.deleteText,
+                                    {
+                                        transform: [{translateX: trans}],
+                                    },
+                                ]}>
+                                Delete
+                            </RNAnimated.Text>
+                        </View>
+                    );
+                }}
+                renderLeftActions={(progress, dragX) => {
+                    const trans = dragX.interpolate({
+                        inputRange: [0, 50, 100, 101],
+                        outputRange: [-20, 0, 0, 1],
+                    });
+
+                    return (
+                        <View style={styles.leftAction}>
+                            <RNAnimated.Text
+                                style={[
+                                    styles.deleteText,
+                                    {textAlign: 'right'},
+                                    {
+                                        transform: [{translateX: trans}],
+                                    },
+                                ]}>
+                                Buy
+                            </RNAnimated.Text>
+                        </View>
+                    );
+                }}
+                onSwipeableWillOpen={() => {
+                    Haptics.selectionAsync();
+                }}
+                onSwipeableOpen={direction => {
+                    if (direction === 'right') {
+                        deleteProduct();
+                    }
+                }}>
+                <View style={{flex: 1, backgroundColor: PALETTE.neutral[0]}}>
                     <TouchableOpacity
-                        onPress={navigateToProduct}
                         style={styles.listView}
-                        delayPressIn={50}>
+                        onPress={() => {
+                            navigation.navigate('ProductView', {product});
+                        }}>
                         <View
                             style={[
                                 styles.imageContainer,
-                                {flexBasis: imageContSize},
+                                {flexBasis: PRODUCT_LIST_ITEM_HEIGHT},
                             ]}
                             onLayout={({
                                 nativeEvent: {
@@ -184,7 +156,6 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                                         height -
                                         styles.imageContainer.padding * 2,
                                 });
-                                setImageContSize(height);
                             }}>
                             <Image
                                 style={[styles.image, imageSize]}
@@ -201,25 +172,22 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                             </View>
                         </View>
                     </TouchableOpacity>
-                </GestureDetector>
-            </Animated.View>
+                </View>
+            </Swipeable>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#00000011',
         justifyContent: 'flex-start',
         alignContent: 'flex-start',
+        borderBottomColor: PALETTE.neutral[2],
+        borderBottomWidth: 1,
+        height: PRODUCT_LIST_ITEM_HEIGHT,
     },
     flexOne: {
         flex: 1,
-    },
-    animatedContainer: {
-        borderBottomColor: PALETTE.neutral[2],
-        borderBottomWidth: 1,
-        backgroundColor: PALETTE.neutral[0],
     },
     deleteContainer: {
         position: 'absolute',
@@ -231,7 +199,6 @@ const styles = StyleSheet.create({
     },
     deleteText: {
         color: '#f3fcf0',
-        marginRight: 10,
         fontWeight: 'bold',
         fontSize: 12,
     },
@@ -242,12 +209,16 @@ const styles = StyleSheet.create({
     listView: {
         flex: 1,
         flexDirection: 'row',
+        height: PRODUCT_LIST_ITEM_HEIGHT,
+        width: '100%',
+        backgroundColor: PALETTE.neutral[0],
     },
     imageContainer: {
         flex: 1,
         padding: 5,
         flexGrow: 0,
         flexShrink: 0,
+        height: PRODUCT_LIST_ITEM_HEIGHT,
     },
     image: {},
     titleContainer: {
@@ -265,6 +236,18 @@ const styles = StyleSheet.create({
         height: 18,
         alignItems: 'center',
         marginTop: 5,
+    },
+    rightAction: {
+        backgroundColor: PALETTE.red[5],
+        flex: 1,
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+    },
+    leftAction: {
+        backgroundColor: BUY_COLOR,
+        flex: 1,
+        alignItems: 'flex-start',
+        justifyContent: 'center',
     },
 });
 

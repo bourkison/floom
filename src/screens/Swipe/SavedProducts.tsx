@@ -83,7 +83,6 @@ const SavedProducts = ({}: StackScreenProps<
                 <ActivityIndicator style={styles.activityIndicator} />
             ) : (
                 <FlashList
-                    style={styles.container}
                     data={savedProducts}
                     renderItem={({item, index}) => (
                         <ProductListItem
