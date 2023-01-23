@@ -62,6 +62,9 @@ export const LOCAL_KEY_DELETED_PRODUCTS = '@deletedProducts';
 export const ACTION_BUTTON_SIZE_ACTIVE = 50;
 export const ACTION_BUTTON_SIZE_INACTIVE = 55;
 
+export const DELETED_STORED_PRODUCTS_AMOUNT = 100;
+export const SAVED_STORED_PRODUCTS_AMOUNT = 100;
+
 export const PALETTE = {
     amber: COLOR_PALETTE_AMBER,
     blue: COLOR_PALETTE_BLUE,

@@ -38,6 +38,7 @@ const SavedProducts = ({}: StackScreenProps<
                 queryStringParameters: {
                     loadAmount: 25,
                     type: 'saved',
+                    reversed: true,
                 },
             };
 

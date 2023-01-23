@@ -19,6 +19,8 @@ import {LOAD_DELETED_PRODUCTS} from '@/store/slices/product';
 const NUM_PRODUCTS = 5;
 
 const DeletedProductsWidget = () => {
+    const [loadAttempted, setLoadAttempted] = useState(false);
+
     const deletedProducts = useAppSelector(state => {
         const t = state.product.deleted.products.slice();
         return t.slice(0, NUM_PRODUCTS);
@@ -46,8 +48,15 @@ const DeletedProductsWidget = () => {
             );
         };
 
-        initFetch();
-    }, [dispatch]);
+        if (
+            deletedProducts.length < NUM_PRODUCTS &&
+            !isLoading &&
+            !loadAttempted
+        ) {
+            setLoadAttempted(true);
+            initFetch();
+        }
+    }, [dispatch, deletedProducts, isLoading, loadAttempted]);
 
     return (
         <View

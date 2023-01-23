@@ -19,8 +19,10 @@ import {RootState} from '@/store';
 import {getPublicProduct, queryPublicProduct} from '@/api/public';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+    DELETED_STORED_PRODUCTS_AMOUNT,
     LOCAL_KEY_DELETED_PRODUCTS,
     LOCAL_KEY_SAVED_PRODUCTS,
+    SAVED_STORED_PRODUCTS_AMOUNT,
 } from '@/constants';
 
 const productAdapter = createEntityAdapter();
@@ -179,21 +181,21 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
     },
 );
 
-export const SAVE_PRODUCT = createAsyncThunk<void, string>(
+export const SAVE_PRODUCT = createAsyncThunk<void, ProductType>(
     'product/SAVE_PRODUCT',
-    async (_id, {getState}) => {
+    async (p, {getState}) => {
         const state = getState() as RootState;
 
         if (!state.user.isGuest) {
             await createSaveOrDelete({
-                productId: _id,
+                productId: p._id,
                 init: {queryStringParameters: {type: 'save'}},
             });
         } else {
             const currentSavedProducts: string[] = JSON.parse(
                 (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
             );
-            currentSavedProducts.push(_id);
+            currentSavedProducts.push(p._id);
             await AsyncStorage.setItem(
                 LOCAL_KEY_SAVED_PRODUCTS,
                 JSON.stringify(currentSavedProducts),
@@ -202,14 +204,14 @@ export const SAVE_PRODUCT = createAsyncThunk<void, string>(
     },
 );
 
-export const DELETE_PRODUCT = createAsyncThunk<void, string>(
+export const DELETE_PRODUCT = createAsyncThunk<void, ProductType>(
     'product/DELETE_PRODUCT',
-    async (_id, {getState}) => {
+    async (p, {getState}) => {
         const state = getState() as RootState;
 
         if (!state.user.isGuest) {
             await createSaveOrDelete({
-                productId: _id,
+                productId: p._id,
                 init: {queryStringParameters: {type: 'delete'}},
             });
         } else {
@@ -217,7 +219,7 @@ export const DELETE_PRODUCT = createAsyncThunk<void, string>(
                 (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
                     '[]',
             );
-            currentDeletedProducts.push(_id);
+            currentDeletedProducts.push(p._id);
             await AsyncStorage.setItem(
                 LOCAL_KEY_DELETED_PRODUCTS,
                 JSON.stringify(currentDeletedProducts),
@@ -470,17 +472,38 @@ const productSlice = createSlice({
     },
     extraReducers: builder => {
         builder
-            .addCase(SAVE_PRODUCT.pending, state => {
+            .addCase(SAVE_PRODUCT.pending, (state, action) => {
                 state.animation = 'idle';
                 state.unsaved.products = state.unsaved.products.slice(1);
+
+                state.saved.products.unshift({
+                    ...action.meta.arg,
+                    deleted: false,
+                    saved: true,
+                });
+
+                state.saved.products = state.saved.products.slice(
+                    0,
+                    SAVED_STORED_PRODUCTS_AMOUNT,
+                );
             })
             .addCase(SAVE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
                 console.warn('Like product rejected');
             })
-            .addCase(DELETE_PRODUCT.pending, state => {
+            .addCase(DELETE_PRODUCT.pending, (state, action) => {
                 state.animation = 'idle';
                 state.unsaved.products = state.unsaved.products.slice(1);
+                state.deleted.products.unshift({
+                    ...action.meta.arg,
+                    saved: false,
+                    deleted: true,
+                });
+
+                state.deleted.products = state.deleted.products.slice(
+                    0,
+                    DELETED_STORED_PRODUCTS_AMOUNT,
+                );
             })
             .addCase(DELETE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.

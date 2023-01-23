@@ -9,6 +9,7 @@ let MONGODB_URI: string;
 const MAX_LOAD_AMOUNT = 50;
 
 type ProductType = {
+    _id: Types.ObjectId;
     name: string;
     price: {
         amount: number;
@@ -227,7 +228,7 @@ const queryUnsavedProduct = async (
         }
 
         const products = ordered
-            ? await Product.find(query, {
+            ? await Product.find<ProductType>(query, {
                   _id: 1,
                   name: 1,
                   vendorProductId: 1,
@@ -240,16 +241,10 @@ const queryUnsavedProduct = async (
                   link: 1,
                   price: 1,
                   availableCountries: 1,
-                  saved: {
-                      $in: [user._id, '$likedBy'],
-                  },
-                  deleted: {
-                      $in: [user._id, '$deletedBy'],
-                  },
               })
                   .sort({rnd: -1, _id: -1})
                   .limit(loadAmount)
-            : await Product.aggregate([
+            : await Product.aggregate<ProductType>([
                   {$match: query},
                   {$sample: {size: loadAmount}},
                   {
@@ -266,12 +261,6 @@ const queryUnsavedProduct = async (
                           link: 1,
                           price: 1,
                           availableCountries: 1,
-                          saved: {
-                              $in: [user._id, '$likedBy'],
-                          },
-                          deleted: {
-                              $in: [user._id, '$deletedBy'],
-                          },
                       },
                   },
               ]);
@@ -304,7 +293,17 @@ const queryUnsavedProduct = async (
             },
             body: JSON.stringify({
                 success: true,
-                data: products,
+                data: products.map(p => {
+                    return {
+                        ...p,
+                        saved: !excludeSaved
+                            ? user.likedProducts.includes(p._id)
+                            : false,
+                        deleted: !excludeDeleted
+                            ? user.deletedProducts.includes(p._id)
+                            : false,
+                    };
+                }),
                 __totalLength: 'unknown',
                 __moreToLoad: moreToLoad,
                 __loaded: products.length,

@@ -131,11 +131,11 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     );
 
     const saveProduct = useCallback(() => {
-        dispatch(SAVE_PRODUCT(product._id));
+        dispatch(SAVE_PRODUCT(product));
     }, [dispatch, product]);
 
     const deleteProduct = useCallback(() => {
-        dispatch(DELETE_PRODUCT(product._id));
+        dispatch(DELETE_PRODUCT(product));
     }, [dispatch, product]);
 
     const buyProduct = useCallback(async () => {

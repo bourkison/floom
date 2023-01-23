@@ -7,7 +7,6 @@ import {
     ImageBackground,
     useWindowDimensions,
     ViewStyle,
-    TextStyle,
 } from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
