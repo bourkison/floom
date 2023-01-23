@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -28,7 +28,12 @@ import {IMAGE_RATIO, PALETTE} from '@/constants';
 import {capitaliseString, stringifyColors} from '@/services';
 
 import {useAppDispatch} from '@/store/hooks';
-import {COMMENCE_ANIMATE, SET_ACTION} from '@/store/slices/product';
+import {
+    COMMENCE_ANIMATE,
+    DELETE_PRODUCT,
+    SAVE_PRODUCT,
+    SET_ACTION,
+} from '@/store/slices/product';
 
 import * as WebBrowser from 'expo-web-browser';
 
@@ -46,12 +51,23 @@ const ProductView = ({
     const translateY = useSharedValue(0);
     const minY = useSharedValue(0);
 
+    const [previousRoute, setPreviousRoute] =
+        useState<keyof MainStackParamList>('Home');
+
     const [isGoingBack, setIsGoingBack] = useState(false);
 
     const dispatch = useAppDispatch();
 
     const [containerHeight, setContainerHeight] = useState(0);
     const [contentHeight, setContentHeight] = useState(0);
+
+    useEffect(() => {
+        const {routes} = navigation.getState();
+
+        if (routes.length > 1) {
+            setPreviousRoute(routes[routes.length - 2].name);
+        }
+    }, [navigation, setPreviousRoute]);
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -168,21 +184,28 @@ const ProductView = ({
 
     const ActionSection = () => {
         const deleteProduct = () => {
-            dispatch(SET_ACTION('delete'));
+            if (previousRoute === 'Home') {
+                dispatch(COMMENCE_ANIMATE('delete'));
+            } else {
+                dispatch(DELETE_PRODUCT(route.params.product));
+            }
+
             goBack();
-            dispatch(COMMENCE_ANIMATE('delete'));
         };
 
         const buyProduct = async () => {
-            dispatch(SET_ACTION('buy'));
             await WebBrowser.openBrowserAsync(route.params.product.link);
             dispatch(SET_ACTION('idle'));
         };
 
         const saveProduct = () => {
-            dispatch(SET_ACTION('save'));
+            if (previousRoute === 'Home') {
+                dispatch(COMMENCE_ANIMATE('save'));
+            } else {
+                dispatch(SAVE_PRODUCT(route.params.product));
+            }
+
             goBack();
-            dispatch(COMMENCE_ANIMATE('save'));
         };
 
         return (

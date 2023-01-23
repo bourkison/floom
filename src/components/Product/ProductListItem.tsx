@@ -36,7 +36,7 @@ export type ProductListItemProps = {
     onDelete?: (_id: string, index: number) => void;
 };
 
-const ITEM_HEIGHT = 108;
+export const PRODUCT_LIST_ITEM_HEIGHT = 108;
 const SNAP_ANIMATION_DURATION = 250;
 const SNAP_TO_DELETE_TRANSLATION = 7 / 8;
 
@@ -48,7 +48,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
 }) => {
     const contextX = useSharedValue(0);
     const offsetX = useSharedValue(0);
-    const sHeight = useSharedValue(ITEM_HEIGHT);
+    const sHeight = useSharedValue(PRODUCT_LIST_ITEM_HEIGHT);
 
     const isDeleting = useSharedValue(false);
     const isAnimating = useSharedValue(false);

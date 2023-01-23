@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Feather, AntDesign, Ionicons} from '@expo/vector-icons';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
-import {COMMENCE_ANIMATE} from '@/store/slices/product';
+import {COMMENCE_ANIMATE, SET_ACTION} from '@/store/slices/product';
 import {
     SAVE_COLOR,
     BUY_COLOR,
@@ -23,6 +23,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
     const action = useAppSelector(state => state.product.action);
 
     const press = () => {
+        dispatch(SET_ACTION(type));
+
         if (onPress) {
             onPress();
         } else {

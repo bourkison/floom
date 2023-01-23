@@ -7,16 +7,17 @@ import {
     StyleSheet,
     ActivityIndicator,
     RefreshControl,
-    FlatList,
-    ListRenderItem,
 } from 'react-native';
 
-import ProductListItem from '@/components/Product/ProductListItem';
+import ProductListItem, {
+    PRODUCT_LIST_ITEM_HEIGHT,
+} from '@/components/Product/ProductListItem';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
 import {LOAD_SAVED_PRODUCTS} from '@/store/slices/product';
-import {Product as ProductType, QueryProductInit} from '@/types/product';
+import {QueryProductInit} from '@/types/product';
+import {FlashList} from '@shopify/flash-list';
 
-const ON_END_REACHED_THRESHOLD = 0;
+const ON_END_REACHED_THRESHOLD = 1;
 
 const SavedProducts = ({}: StackScreenProps<
     MainStackParamList,
@@ -76,23 +77,29 @@ const SavedProducts = ({}: StackScreenProps<
         }
     };
 
-    const ListItem: ListRenderItem<ProductType> = ({item, index}) => (
-        <ProductListItem product={item} index={index} type="saved" />
-    );
-
     return (
         <View style={styles.safeContainer}>
             {isLoading ? (
-                <ActivityIndicator />
+                <ActivityIndicator style={styles.activityIndicator} />
             ) : (
-                <FlatList
+                <FlashList
                     style={styles.container}
                     data={savedProducts}
-                    renderItem={ListItem}
+                    renderItem={({item, index}) => (
+                        <ProductListItem
+                            product={item}
+                            index={index}
+                            type="saved"
+                        />
+                    )}
                     keyExtractor={item => item._id}
-                    onEndReached={
-                        moreToLoad && !isLoadingMore ? loadMore : undefined
-                    }
+                    onEndReached={() => {
+                        if (moreToLoad && !isLoadingMore) {
+                            loadMore();
+                        }
+                    }}
+                    estimatedItemSize={PRODUCT_LIST_ITEM_HEIGHT}
+                    removeClippedSubviews={true}
                     onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
                     ListFooterComponent={
                         isLoadingMore ? (
@@ -117,9 +124,13 @@ const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
     },
-    container: {
+    contentContainer: {
+        backgroundColor: 'violet',
         flex: 1,
+    },
+    container: {
         flexDirection: 'column',
+        background: 'violet',
     },
     activityIndicator: {
         marginTop: 5,

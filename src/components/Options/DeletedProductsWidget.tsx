@@ -36,7 +36,7 @@ const DeletedProductsWidget = () => {
 
     useEffect(() => {
         const initFetch = async () => {
-            dispatch(
+            await dispatch(
                 LOAD_DELETED_PRODUCTS({
                     queryStringParameters: {
                         loadAmount: NUM_PRODUCTS,
@@ -55,6 +55,8 @@ const DeletedProductsWidget = () => {
         ) {
             setLoadAttempted(true);
             initFetch();
+        } else if (!loadAttempted) {
+            setLoadAttempted(true);
         }
     }, [dispatch, deletedProducts, isLoading, loadAttempted]);
 

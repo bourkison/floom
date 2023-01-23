@@ -476,16 +476,30 @@ const productSlice = createSlice({
                 state.animation = 'idle';
                 state.unsaved.products = state.unsaved.products.slice(1);
 
-                state.saved.products.unshift({
-                    ...action.meta.arg,
-                    deleted: false,
-                    saved: true,
-                });
+                if (!action.meta.arg.saved) {
+                    state.saved.products.unshift({
+                        ...action.meta.arg,
+                        deleted: false,
+                        saved: true,
+                    });
 
-                state.saved.products = state.saved.products.slice(
-                    0,
-                    SAVED_STORED_PRODUCTS_AMOUNT,
-                );
+                    if (
+                        state.saved.products.length >
+                        SAVED_STORED_PRODUCTS_AMOUNT
+                    ) {
+                        state.saved.products = state.saved.products.slice(
+                            0,
+                            SAVED_STORED_PRODUCTS_AMOUNT,
+                        );
+                        state.saved.moreToLoad = true;
+                    }
+                }
+
+                if (action.meta.arg.deleted) {
+                    state.deleted.products = state.deleted.products.filter(
+                        p => p._id !== action.meta.arg._id,
+                    );
+                }
             })
             .addCase(SAVE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
@@ -500,10 +514,25 @@ const productSlice = createSlice({
                     deleted: true,
                 });
 
-                state.deleted.products = state.deleted.products.slice(
-                    0,
-                    DELETED_STORED_PRODUCTS_AMOUNT,
-                );
+                if (!action.meta.arg.deleted) {
+                    if (
+                        state.deleted.products.length >
+                        DELETED_STORED_PRODUCTS_AMOUNT
+                    ) {
+                        state.deleted.products = state.deleted.products.slice(
+                            0,
+                            DELETED_STORED_PRODUCTS_AMOUNT,
+                        );
+
+                        state.deleted.moreToLoad = true;
+                    }
+                }
+
+                if (action.meta.arg.saved) {
+                    state.saved.products = state.saved.products.filter(p => {
+                        p._id !== action.meta.arg._id;
+                    });
+                }
             })
             .addCase(DELETE_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.

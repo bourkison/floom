@@ -1,11 +1,8 @@
 import AnimatedButton from '@/components/Utility/AnimatedButton';
-import {Product} from '@/types/product';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     ActivityIndicator,
-    FlatList,
-    ListRenderItem,
     StyleSheet,
     RefreshControl,
     Modal,
@@ -13,7 +10,9 @@ import {
     Text,
 } from 'react-native';
 import Spinner from '@/components/Utility/Spinner';
-import ProductListItem from '@/components/Product/ProductListItem';
+import ProductListItem, {
+    PRODUCT_LIST_ITEM_HEIGHT,
+} from '@/components/Product/ProductListItem';
 import {DELETE_COLOR, PALETTE} from '@/constants';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
 import {
@@ -21,8 +20,15 @@ import {
     DELETE_DELETED_PRODUCT,
     LOAD_DELETED_PRODUCTS,
 } from '@/store/slices/product';
+import {FlashList} from '@shopify/flash-list';
+
+const INITIAL_LOAD_AMOUNT = 10;
+const SUBSEQUENT_LOAD_AMOUNT = 10;
+const ON_END_REACHED_THRESHOLD = 1;
 
 const DeletedProducts = () => {
+    const [loadAttempted, setLoadAttempted] = useState(false);
+
     const isLoading = useAppSelector(state => state.product.deleted.isLoading);
     const products = useAppSelector(state => state.product.deleted.products);
     const moreToLoad = useAppSelector(
@@ -39,33 +45,38 @@ const DeletedProducts = () => {
 
     const dispatch = useAppDispatch();
 
-    const loadInit = useCallback(async () => {
-        dispatch(
-            LOAD_DELETED_PRODUCTS({
-                queryStringParameters: {
-                    loadAmount: 25,
-                    type: 'deleted',
-                    reversed: true,
-                },
-                loadType: 'initial',
-            }),
-        );
-    }, [dispatch]);
-
     useEffect(() => {
         const initFetch = async () => {
-            await loadInit();
+            await dispatch(
+                LOAD_DELETED_PRODUCTS({
+                    queryStringParameters: {
+                        loadAmount: INITIAL_LOAD_AMOUNT,
+                        type: 'deleted',
+                        reversed: true,
+                    },
+                    loadType: 'initial',
+                }),
+            );
         };
 
-        initFetch();
-    }, [loadInit]);
+        if (
+            products.length < INITIAL_LOAD_AMOUNT &&
+            !isLoading &&
+            !loadAttempted
+        ) {
+            setLoadAttempted(true);
+            initFetch();
+        } else if (!loadAttempted) {
+            setLoadAttempted(true);
+        }
+    }, [products, isLoading, loadAttempted, dispatch]);
 
     const refresh = async () => {
         setIsRefreshing(true);
         await dispatch(
             LOAD_DELETED_PRODUCTS({
                 queryStringParameters: {
-                    loadAmount: 25,
+                    loadAmount: SUBSEQUENT_LOAD_AMOUNT,
                     type: 'deleted',
                     reversed: true,
                 },
@@ -80,7 +91,7 @@ const DeletedProducts = () => {
             dispatch(
                 LOAD_DELETED_PRODUCTS({
                     queryStringParameters: {
-                        loadAmount: 25,
+                        loadAmount: SUBSEQUENT_LOAD_AMOUNT,
                         type: 'deleted',
                         startAt: products[products.length - 1]._id,
                         reversed: true,
@@ -102,28 +113,30 @@ const DeletedProducts = () => {
         setModalVisible(false);
     };
 
-    const ListItem: ListRenderItem<Product> = ({item, index}) => (
-        <ProductListItem
-            product={item}
-            index={index}
-            type="deleted"
-            onDelete={removeProduct}
-        />
-    );
-
     if (isLoading) {
         return <ActivityIndicator />;
     }
 
     return (
         <View style={styles.container}>
-            <FlatList
+            <FlashList
                 data={products}
                 keyExtractor={item => item._id}
-                renderItem={ListItem}
-                onEndReached={
-                    moreToLoad && !isLoadingMore ? loadMore : undefined
-                }
+                renderItem={({item, index}) => (
+                    <ProductListItem
+                        product={item}
+                        index={index}
+                        type="deleted"
+                        onDelete={removeProduct}
+                    />
+                )}
+                onEndReached={() => {
+                    if (moreToLoad && !isLoadingMore) {
+                        loadMore();
+                    }
+                }}
+                estimatedItemSize={PRODUCT_LIST_ITEM_HEIGHT}
+                removeClippedSubviews={true}
                 ListHeaderComponent={
                     <View style={styles.resetAllButtonContainer}>
                         <AnimatedButton
@@ -137,7 +150,9 @@ const DeletedProducts = () => {
                     </View>
                 }
                 ListFooterComponent={
-                    isLoadingMore ? <ActivityIndicator /> : undefined
+                    isLoadingMore ? (
+                        <ActivityIndicator style={styles.activityIndicator} />
+                    ) : undefined
                 }
                 refreshControl={
                     <RefreshControl
@@ -145,6 +160,7 @@ const DeletedProducts = () => {
                         refreshing={isRefreshing}
                     />
                 }
+                onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
             />
             <Modal visible={modalVisible} transparent={true}>
                 <Pressable
@@ -274,6 +290,9 @@ const styles = StyleSheet.create({
     warningContainer: {
         paddingHorizontal: 10,
         paddingTop: 10,
+    },
+    activityIndicator: {
+        marginTop: 5,
     },
 });
 
