@@ -302,6 +302,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 Math.abs(offsetX.value) < ACTION_THRESHOLD &&
                 -offsetY.value < ACTION_THRESHOLD
             ) {
+                console.log('idle');
                 action.value = 'idle';
                 runOnJS(setAction)('idle');
                 runOnJS(Haptics.selectionAsync)();
@@ -309,7 +310,9 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             // else if we're not buying and we should be (i.e. offsetY value above 2x action threshold)
             else if (
                 action.value !== 'buy' &&
-                -offsetY.value >= ACTION_THRESHOLD
+                -offsetY.value >= ACTION_THRESHOLD &&
+                offsetX.value < ACTION_THRESHOLD &&
+                offsetX.value > -ACTION_THRESHOLD
             ) {
                 action.value = 'buy';
                 runOnJS(setAction)('buy');
@@ -320,6 +323,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 action.value !== 'save' &&
                 offsetX.value >= ACTION_THRESHOLD
             ) {
+                console.log('save');
                 action.value = 'save';
                 runOnJS(setAction)('save');
                 runOnJS(Haptics.selectionAsync)();
@@ -329,6 +333,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 action.value !== 'delete' &&
                 offsetX.value <= -ACTION_THRESHOLD
             ) {
+                console.log('deleted');
                 action.value = 'delete';
                 runOnJS(setAction)('delete');
                 runOnJS(Haptics.selectionAsync)();

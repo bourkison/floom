@@ -12,7 +12,6 @@ type OptionProps = {
     header: string;
     value: string;
     bottomBorder: boolean;
-    onPress?: () => void;
 };
 
 const AccountDetailsWidget = () => {
@@ -20,48 +19,40 @@ const AccountDetailsWidget = () => {
     const navigation =
         useNavigation<StackNavigationProp<OptionsStackParamList>>();
 
-    const Option: React.FC<OptionProps> = ({
-        header,
-        value,
-        onPress,
-        bottomBorder,
-    }) => {
+    const Option: React.FC<OptionProps> = ({header, value, bottomBorder}) => {
         return (
-            <TouchableOpacity
+            <View
                 style={[
                     styles.optionLink,
                     // eslint-disable-next-line react-native/no-inline-styles
                     {borderBottomWidth: bottomBorder ? 1 : 0},
-                ]}
-                onPress={onPress}
-                activeOpacity={0.5}>
+                ]}>
                 <View style={styles.optionHeaderContainer}>
                     <Text style={styles.optionHeader}>{header}</Text>
                 </View>
                 <View style={styles.optionValueContainer}>
                     <Text style={styles.optionValue}>{value}</Text>
                 </View>
-            </TouchableOpacity>
+            </View>
         );
     };
 
     return (
-        <View style={styles.box}>
+        <TouchableOpacity
+            style={styles.box}
+            activeOpacity={0.5}
+            onPress={() => {
+                navigation.navigate('UpdateDetail');
+            }}>
             <Option
                 header="Email"
                 value={user?.email || ''}
                 bottomBorder={true}
-                onPress={() => {
-                    navigation.navigate('UpdateDetail', {type: 'email'});
-                }}
             />
             <Option
                 header="Name"
                 value={user?.name || ''}
                 bottomBorder={true}
-                onPress={() => {
-                    navigation.navigate('UpdateDetail', {type: 'name'});
-                }}
             />
             <Option
                 header="Gender"
@@ -78,7 +69,7 @@ const AccountDetailsWidget = () => {
                 value={dayjs(user?.dob).format('YYYY/MM/DD') || ''}
                 bottomBorder={false}
             />
-        </View>
+        </TouchableOpacity>
     );
 };
 

@@ -16,9 +16,7 @@ export type OptionsStackParamList = {
     OptionsHome: undefined;
     DeletedProducts: undefined;
     AppInfo: undefined;
-    UpdateDetail: {
-        type: 'email' | 'name' | 'gender' | 'country' | 'dob';
-    };
+    UpdateDetail: undefined;
 };
 
 const OptionsStack = createStackNavigator<OptionsStackParamList>();

@@ -27,7 +27,7 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {BUY_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
+import {BUY_COLOR, DELETE_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
 import {capitaliseString} from '@/services';
 import BrandLogo from './BrandLogo';
 import * as WebBrowser from 'expo-web-browser';
@@ -40,6 +40,7 @@ export type ProductListItemProps = {
 };
 
 export const PRODUCT_LIST_ITEM_HEIGHT = 108;
+const ACTION_THRESHOLD = 0.4;
 
 const ProductListItem: React.FC<ProductListItemProps> = ({
     product,
@@ -132,24 +133,30 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         })
         .onUpdate(e => {
             if (!isAnimating.value) {
-                let percentage = -(e.translationX + contextX.value) / width;
+                let percentage = (e.translationX + contextX.value) / width;
 
-                if (percentage > 0.5 && !isDeleting.value) {
+                if (percentage < -ACTION_THRESHOLD && !isDeleting.value) {
                     isDeleting.value = true;
                     runOnJS(Haptics.selectionAsync)();
-                } else if (percentage < 0.5 && isDeleting.value) {
+                } else if (percentage > -ACTION_THRESHOLD && isDeleting.value) {
                     isDeleting.value = false;
                     runOnJS(Haptics.selectionAsync)();
-                } else if (percentage < -0.5 && !isRightSwipeActive.value) {
+                } else if (
+                    percentage > ACTION_THRESHOLD &&
+                    !isRightSwipeActive.value
+                ) {
                     isRightSwipeActive.value = true;
                     runOnJS(Haptics.selectionAsync)();
-                } else if (percentage > -0.5 && isRightSwipeActive.value) {
+                } else if (
+                    percentage < ACTION_THRESHOLD &&
+                    isRightSwipeActive.value
+                ) {
                     isRightSwipeActive.value = false;
                     runOnJS(Haptics.selectionAsync)();
                 }
 
-                leftSwipeOpacity.value = percentage < 0 ? 1 : 0;
-                rightSwipeOpacity.value = percentage > 0 ? 1 : 0;
+                leftSwipeOpacity.value = percentage > 0 ? 1 : 0;
+                rightSwipeOpacity.value = percentage < 0 ? 1 : 0;
 
                 percentageX.value = interpolate(
                     percentage,
@@ -157,7 +164,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                     [-0.9, -0.95, -0.4, 0, 0.4, 0.85, 0.9],
                 );
 
-                offsetX.value = -percentageX.value * width;
+                offsetX.value = percentageX.value * width;
             }
         })
         .onEnd(e => {
@@ -268,7 +275,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         height: '100%',
         width: '100%',
-        backgroundColor: PALETTE.red[5],
+        backgroundColor: DELETE_COLOR,
         alignItems: 'flex-end',
         justifyContent: 'center',
     },
@@ -281,7 +288,7 @@ const styles = StyleSheet.create({
     },
     deleteText: {
         color: '#f3fcf0',
-        marginRight: 10,
+        marginHorizontal: 10,
         fontWeight: 'bold',
         fontSize: 12,
     },

@@ -5,7 +5,13 @@ import Spinner from '@/components/Utility/Spinner';
 import {PALETTE} from '@/constants';
 import {Auth} from 'aws-amplify';
 
-const UpdatePasswordWidget = () => {
+type UpdatePasswordWidgetProps = {
+    invertButton?: boolean;
+};
+
+const UpdatePasswordWidget: React.FC<UpdatePasswordWidgetProps> = ({
+    invertButton = false,
+}) => {
     const [secureTextP, setSecureTextP] = useState(false);
     const [secureTextNP, setSecureTextNP] = useState(false);
     const [secureTextCNP, setSecureTextCNP] = useState(false);
@@ -86,8 +92,16 @@ const UpdatePasswordWidget = () => {
             </View>
             <View style={styles.buttonContainer}>
                 <AnimatedButton
-                    style={styles.updatePasswordButton}
-                    textStyle={styles.updatePasswordButtonText}
+                    style={
+                        !invertButton
+                            ? styles.updatePasswordButton
+                            : styles.invertedUpdatePasswordButton
+                    }
+                    textStyle={
+                        !invertButton
+                            ? styles.updatePasswordButtonText
+                            : styles.invertedUpdatePasswordButtonText
+                    }
                     onPress={updatePassword}
                     disabled={isUpdatingPassword}>
                     {isUpdatingPassword ? (
@@ -121,6 +135,26 @@ const styles = StyleSheet.create({
     },
     updatePasswordButtonText: {
         color: PALETTE.gray[1],
+        fontSize: 12,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        flexBasis: 14,
+        flexShrink: 0,
+        flexGrow: 0,
+    },
+    invertedUpdatePasswordButton: {
+        padding: 7,
+        borderColor: PALETTE.neutral[8],
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        width: '100%',
+        alignSelf: 'center',
+    },
+    invertedUpdatePasswordButtonText: {
+        color: PALETTE.neutral[8],
         fontSize: 12,
         fontWeight: 'bold',
         textAlign: 'center',

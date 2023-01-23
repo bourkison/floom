@@ -136,7 +136,6 @@ const DeletedProducts = () => {
                     }
                 }}
                 estimatedItemSize={PRODUCT_LIST_ITEM_HEIGHT}
-                removeClippedSubviews={true}
                 ListHeaderComponent={
                     <View style={styles.resetAllButtonContainer}>
                         <AnimatedButton

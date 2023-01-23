@@ -135,7 +135,7 @@ export const UpdateDetailHeader: React.FC<StackHeaderProps> = ({
                 <Feather name="chevron-left" size={24} />
             </Pressable>
         }>
-        Update Account
+        Account Details
     </HeaderTemplate>
 );
 
