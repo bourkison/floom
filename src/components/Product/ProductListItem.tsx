@@ -16,7 +16,7 @@ import Animated, {
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
+    Easing,
     withTiming,
 } from 'react-native-reanimated';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
@@ -27,9 +27,10 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {PALETTE} from '@/constants';
+import {BUY_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
 import {capitaliseString} from '@/services';
 import BrandLogo from './BrandLogo';
+import * as WebBrowser from 'expo-web-browser';
 
 export type ProductListItemProps = {
     product: ProductType;
@@ -48,9 +49,12 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
 }) => {
     const contextX = useSharedValue(0);
     const offsetX = useSharedValue(0);
+    const rightSwipeOpacity = useSharedValue(0);
+    const leftSwipeOpacity = useSharedValue(1);
     const percentageX = useSharedValue(0);
 
     const isDeleting = useSharedValue(false);
+    const isRightSwipeActive = useSharedValue(false);
     const isAnimating = useSharedValue(false);
 
     const {width} = useWindowDimensions();
@@ -68,6 +72,18 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                     translateX: offsetX.value,
                 },
             ],
+        };
+    });
+
+    const rRightSwipeStyle = useAnimatedStyle(() => {
+        return {
+            opacity: leftSwipeOpacity.value,
+        };
+    });
+
+    const rLeftSwipeStyle = useAnimatedStyle(() => {
+        return {
+            opacity: rightSwipeOpacity.value,
         };
     });
 
@@ -95,6 +111,13 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         }
     }, [dispatch, index, onDelete, type, product]);
 
+    const buyProduct = async () => {
+        await WebBrowser.openBrowserAsync(product.link);
+        offsetX.value = withTiming(0, {
+            easing: Easing.inOut(Easing.quad),
+        });
+    };
+
     const navigateToProduct = useCallback(() => {
         navigation.navigate('ProductView', {
             product: product,
@@ -102,18 +125,14 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     }, [navigation, product]);
 
     const panGesture = Gesture.Pan()
-        .activeOffsetX(-10)
+        .activeOffsetX([-10, 10])
         .failOffsetY([-10, 10])
         .onStart(() => {
             contextX.value = offsetX.value;
         })
         .onUpdate(e => {
             if (!isAnimating.value) {
-                let percentage = -((e.translationX + contextX.value) / width);
-
-                if (percentage < 0) {
-                    percentage = 0;
-                }
+                let percentage = -(e.translationX + contextX.value) / width;
 
                 if (percentage > 0.5 && !isDeleting.value) {
                     isDeleting.value = true;
@@ -121,12 +140,21 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                 } else if (percentage < 0.5 && isDeleting.value) {
                     isDeleting.value = false;
                     runOnJS(Haptics.selectionAsync)();
+                } else if (percentage < -0.5 && !isRightSwipeActive.value) {
+                    isRightSwipeActive.value = true;
+                    runOnJS(Haptics.selectionAsync)();
+                } else if (percentage > -0.5 && isRightSwipeActive.value) {
+                    isRightSwipeActive.value = false;
+                    runOnJS(Haptics.selectionAsync)();
                 }
+
+                leftSwipeOpacity.value = percentage < 0 ? 1 : 0;
+                rightSwipeOpacity.value = percentage > 0 ? 1 : 0;
 
                 percentageX.value = interpolate(
                     percentage,
-                    [0, 0.4, 0.55, 1],
-                    [0, 0.4, 0.85, 0.9],
+                    [-1, -0.55, -0.4, 0, 0.4, 0.55, 1],
+                    [-0.9, -0.95, -0.4, 0, 0.4, 0.85, 0.9],
                 );
 
                 offsetX.value = -percentageX.value * width;
@@ -138,16 +166,34 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                 offsetX.value = withTiming(-width, {duration: 100}, () => {
                     runOnJS(deleteProduct)();
                 });
+            } else if (isRightSwipeActive.value && e.state === 5) {
+                offsetX.value = withTiming(width, {duration: 500});
+                runOnJS(buyProduct)();
             } else {
-                offsetX.value = withSpring(0);
+                offsetX.value = withTiming(0, {
+                    easing: Easing.inOut(Easing.quad),
+                });
             }
         });
 
     return (
         <View style={styles.container}>
-            <View style={[styles.deleteContainer]}>
+            <Animated.View style={[styles.deleteContainer, rLeftSwipeStyle]}>
                 <Text style={styles.deleteText}>Delete</Text>
-            </View>
+            </Animated.View>
+            <Animated.View
+                style={[
+                    styles.rightSwipeContainer,
+                    {
+                        backgroundColor:
+                            type === 'saved' ? BUY_COLOR : SAVE_COLOR,
+                    },
+                    rRightSwipeStyle,
+                ]}>
+                <Text style={styles.deleteText}>
+                    {type === 'saved' ? 'Buy' : 'Save'}
+                </Text>
+            </Animated.View>
             <Animated.View
                 style={[
                     styles.animatedContainer,
@@ -224,6 +270,13 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: PALETTE.red[5],
         alignItems: 'flex-end',
+        justifyContent: 'center',
+    },
+    rightSwipeContainer: {
+        position: 'absolute',
+        height: '100%',
+        width: '100%',
+        alignItems: 'flex-start',
         justifyContent: 'center',
     },
     deleteText: {
