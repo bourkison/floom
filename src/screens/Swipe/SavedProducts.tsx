@@ -16,6 +16,7 @@ import {useAppSelector, useAppDispatch} from '@/store/hooks';
 import {LOAD_SAVED_PRODUCTS} from '@/store/slices/product';
 import {QueryProductInit} from '@/types/product';
 import {FlashList} from '@shopify/flash-list';
+import FilterDropdown from '@/components/Product/FilterDropdown';
 
 const ON_END_REACHED_THRESHOLD = 1;
 
@@ -79,6 +80,7 @@ const SavedProducts = ({}: StackScreenProps<
 
     return (
         <View style={styles.safeContainer}>
+            <FilterDropdown />
             {isLoading ? (
                 <ActivityIndicator style={styles.activityIndicator} />
             ) : (

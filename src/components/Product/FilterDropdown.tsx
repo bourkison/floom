@@ -4,15 +4,22 @@ import {
     View,
     Text,
     StyleSheet,
-    Modal,
     TouchableOpacity,
     TextInput,
     Platform,
+    ScrollView,
+    useWindowDimensions,
 } from 'react-native';
 import Constants from 'expo-constants';
 
 import {Ionicons} from '@expo/vector-icons';
-import {GENDER_OPTIONS, CATEGORY_OPTIONS, COLOUR_OPTIONS} from '@/constants';
+import {
+    GENDER_OPTIONS,
+    CATEGORY_OPTIONS,
+    COLOUR_OPTIONS,
+    PALETTE,
+} from '@/constants';
+
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {
     TOGGLE_EXCLUDE,
@@ -56,7 +63,13 @@ const FilterDropdown = () => {
     const [visible, setVisible] = useState(false);
     const [dropdownTop, setDropdownTop] = useState(0);
 
-    const DropdownButton = useRef(null);
+    const [hiddenPressableTop, setHiddenPressableTop] = useState(0);
+    const [hiddenPressableHeight, setHiddenPressableHeight] = useState(0);
+
+    const {height: windowHeight} = useWindowDimensions();
+
+    const DropdownButton = useRef<TouchableOpacity>(null);
+    const SearchInput = useRef<TextInput>(null);
 
     // TODO: Currently just getting state from store. Should potentially
     // keep a local reference within this component then only dispatch to store
@@ -83,13 +96,18 @@ const FilterDropdown = () => {
     const dispatch = useAppDispatch();
 
     const toggleDropdown = () => {
-        visible ? setVisible(false) : openDropdown();
+        visible ? closeDropdown() : openDropdown();
     };
 
     const openDropdown = () => {
-        if (measureDropdownTop()) {
+        if (dropdownTop || measureDropdownTop()) {
             setVisible(true);
         }
+    };
+
+    const closeDropdown = () => {
+        SearchInput.current?.blur();
+        setVisible(false);
     };
 
     const toggleExclude = (type: 'saved' | 'deleted') => {
@@ -111,16 +129,17 @@ const FilterDropdown = () => {
                 filtered: true,
             }),
         );
-        setVisible(false);
+
+        closeDropdown();
     };
 
     const measureDropdownTop = (): boolean => {
         console.log(dropdownTop);
         if (DropdownButton && DropdownButton.current) {
-            // @ts-ignore
-            DropdownButton.current.measure((_fx, _fy, _w, h, _px, py) => {
-                const statusBar = Platform.OS === 'ios' ? 0 : Constants.statusBarHeight;
-                setDropdownTop(py + h - statusBar);
+            DropdownButton.current.measure((_fx, _fy, _w, h) => {
+                const statusBar =
+                    Platform.OS === 'ios' ? 0 : Constants.statusBarHeight;
+                setDropdownTop(h - statusBar);
             });
 
             return true;
@@ -137,16 +156,51 @@ const FilterDropdown = () => {
                 activeOpacity={0.6}
                 onLayout={measureDropdownTop}>
                 <View style={styles.buttonsContainer}>
-                    <Text style={styles.buttonText}>Filters</Text>
-                    <Ionicons
-                        name="options-outline"
-                        style={styles.buttonIcon}
-                    />
+                    <View style={styles.textInputContainer}>
+                        <View style={styles.searchSection}>
+                            <Ionicons
+                                name="search"
+                                style={styles.searchIcon}
+                                color={PALETTE.neutral[0]}
+                            />
+
+                            <TextInput
+                                ref={SearchInput}
+                                style={styles.searchInput}
+                                placeholder="Search"
+                                placeholderTextColor={PALETTE.neutral[3]}
+                                onChangeText={updateSearchText}
+                                onFocus={openDropdown}
+                                onSubmitEditing={search}
+                                value={searchText}
+                                returnKeyType="search"
+                                selectTextOnFocus={true}
+                            />
+                        </View>
+                    </View>
+                    <View style={styles.iconContainer}>
+                        <Ionicons
+                            name="options-outline"
+                            style={styles.buttonIcon}
+                            size={16}
+                        />
+                    </View>
                 </View>
             </TouchableOpacity>
-            <Modal visible={visible} transparent={true}>
-                <Pressable style={styles.flexOne} onPress={toggleDropdown}>
-                    <View style={[styles.dropdown, {top: dropdownTop}]}>
+            {visible ? (
+                <View style={[styles.pressable, {top: dropdownTop}]}>
+                    <ScrollView
+                        style={styles.dropdown}
+                        keyboardShouldPersistTaps={'never'}
+                        onLayout={({
+                            nativeEvent: {
+                                layout: {height},
+                            },
+                        }) => {
+                            const topVal = height;
+                            setHiddenPressableTop(topVal);
+                            setHiddenPressableHeight(windowHeight - height);
+                        }}>
                         <View style={styles.columnsContainer}>
                             <View style={styles.column}>
                                 <Text style={styles.columnHeader}>Gender</Text>
@@ -183,14 +237,6 @@ const FilterDropdown = () => {
                                     />
                                 ))}
                             </View>
-                        </View>
-                        <View>
-                            <TextInput
-                                style={styles.searchInput}
-                                placeholder="Search..."
-                                onChangeText={updateSearchText}
-                                value={searchText}
-                            />
                         </View>
                         <View style={styles.columnsContainer}>
                             <View style={styles.column}>
@@ -272,9 +318,16 @@ const FilterDropdown = () => {
                                 </AnimatedButton>
                             </Pressable>
                         </View>
-                    </View>
-                </Pressable>
-            </Modal>
+                    </ScrollView>
+                    <Pressable
+                        style={{
+                            height: hiddenPressableHeight,
+                            top: hiddenPressableTop,
+                        }}
+                        onPress={closeDropdown}
+                    />
+                </View>
+            ) : undefined}
         </View>
     );
 };
@@ -284,8 +337,17 @@ const styles = StyleSheet.create({
         zIndex: 999,
     },
     flexOne: {flex: 1},
+    pressable: {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        position: 'absolute',
+        flex: 1,
+        flexDirection: 'column',
+    },
     buttonsContainer: {
-        backgroundColor: '#fff',
+        backgroundColor: '#FFF',
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
@@ -302,9 +364,12 @@ const styles = StyleSheet.create({
     buttonText: {
         fontWeight: '500',
     },
-    buttonIcon: {
-        marginLeft: 3,
+    iconContainer: {
+        flexBasis: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
+    buttonIcon: {},
     dropdown: {
         position: 'absolute',
         width: '100%',
@@ -352,17 +417,28 @@ const styles = StyleSheet.create({
         flexShrink: 0,
         marginBottom: 3,
     },
-    searchInput: {
-        color: '#1a1f25',
-        borderColor: '#1a1f25',
-        backgroundColor: '#f3fcfa',
+    textInputContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        paddingLeft: 10,
+    },
+    searchSection: {
+        backgroundColor: PALETTE.neutral[5],
         borderRadius: 5,
-        borderWidth: 2,
+        width: '100%',
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    searchInput: {
+        color: PALETTE.neutral[0],
         fontSize: 14,
-        flexShrink: 0,
-        flexGrow: 0,
-        padding: 10,
-        marginBottom: 10,
+        alignSelf: 'center',
+        paddingVertical: 5,
+        flex: 1,
+    },
+    searchIcon: {
+        paddingHorizontal: 5,
     },
     activeExclude: {
         borderColor: '#1a1f25',

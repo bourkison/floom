@@ -1,3 +1,5 @@
+import {Product as ProductType} from '@/types/product';
+
 export const capitaliseString = (str: string): string => {
     const capitaliseFirstLetter = (s: string) => {
         if (s && s[0]) {
@@ -38,4 +40,14 @@ export const stringifyColors = (colors: string[]): string => {
             return capitaliseString(color);
         })
         .join(', ');
+};
+
+export const alreadyExists = (id: string, array: ProductType[]): boolean => {
+    array.forEach(product => {
+        if (id === product._id) {
+            return true;
+        }
+    });
+
+    return false;
 };

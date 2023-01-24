@@ -5,7 +5,7 @@ import {StackHeaderProps} from '@react-navigation/stack';
 import {Entypo, Ionicons, Feather} from '@expo/vector-icons';
 
 type HeaderProps = {
-    children: string;
+    children: string | JSX.Element;
     leftIcon?: JSX.Element;
     rightIcon?: JSX.Element;
 };
@@ -27,7 +27,11 @@ const HeaderTemplate: React.FC<HeaderProps> = ({
         <View style={styles.headerRow}>
             {leftIcon || <View style={styles.headerIcon} />}
             <View style={styles.headerTitleContainer}>
-                <Text style={styles.headerTitle}>{children}</Text>
+                {typeof children === 'string' ? (
+                    <Text style={styles.headerTitle}>{children}</Text>
+                ) : (
+                    children
+                )}
             </View>
             {rightIcon || <View style={styles.headerIcon} />}
         </View>
