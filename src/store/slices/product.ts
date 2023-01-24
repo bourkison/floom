@@ -529,9 +529,9 @@ const productSlice = createSlice({
                 }
 
                 if (action.meta.arg.saved) {
-                    state.saved.products = state.saved.products.filter(p => {
-                        p._id !== action.meta.arg._id;
-                    });
+                    state.saved.products = state.saved.products.filter(
+                        p => p._id !== action.meta.arg._id,
+                    );
                 }
             })
             .addCase(DELETE_PRODUCT.rejected, () => {

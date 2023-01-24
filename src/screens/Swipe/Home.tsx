@@ -1,6 +1,6 @@
 import React from 'react';
 import ProductList from '@/components/Product/ProductList';
-import {View, StyleSheet, useWindowDimensions, Text} from 'react-native';
+import {View, StyleSheet, useWindowDimensions} from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
@@ -12,8 +12,6 @@ import ActionButton from '@/components/Utility/ActionButton';
 import {useAppSelector} from '@/store/hooks';
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
-    const isGuest = useAppSelector(state => state.user.isGuest);
-    const user = useAppSelector(state => state.user.docData);
     const {width} = useWindowDimensions();
 
     const isLoading = useAppSelector(state => state.product.unsaved.isLoading);
@@ -52,13 +50,6 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     <ActionButton type="delete" />
                     <ActionButton type="buy" />
                     <ActionButton type="save" />
-                </View>
-                <View style={styles.welcomeTextContainer}>
-                    <Text style={styles.welcomeText}>
-                        {!isGuest && user
-                            ? `Logged in as ${user.email}`
-                            : 'Guest Mode. Create account for more features.'}
-                    </Text>
                 </View>
             </View>
         </View>

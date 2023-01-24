@@ -139,7 +139,7 @@ const FilterDropdown = () => {
             DropdownButton.current.measure((_fx, _fy, _w, h) => {
                 const statusBar =
                     Platform.OS === 'ios' ? 0 : Constants.statusBarHeight;
-                setDropdownTop(h - statusBar);
+                setDropdownTop(h);
             });
 
             return true;
@@ -188,7 +188,16 @@ const FilterDropdown = () => {
                 </View>
             </TouchableOpacity>
             {visible ? (
-                <View style={[styles.pressable, {top: dropdownTop}]}>
+                <View
+                    style={[
+                        styles.pressable,
+                        {
+                            top: dropdownTop,
+                            shadowColor: PALETTE.neutral[9],
+                            shadowOpacity: 0.2,
+                            shadowOffset: {height: 5},
+                        },
+                    ]}>
                     <ScrollView
                         style={styles.dropdown}
                         keyboardShouldPersistTaps={'never'}
@@ -322,7 +331,7 @@ const FilterDropdown = () => {
                     <Pressable
                         style={{
                             height: hiddenPressableHeight,
-                            top: hiddenPressableTop,
+                            top: hiddenPressableTop + 10,
                         }}
                         onPress={closeDropdown}
                     />
@@ -374,14 +383,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         backgroundColor: '#fff',
-        shadowColor: '#000000',
-        shadowRadius: 4,
-        shadowOffset: {height: 4, width: 0},
-        shadowOpacity: 0.5,
-        borderRadius: 5,
+        borderBottomLeftRadius: 5,
+        borderBottomRightRadius: 5,
         paddingTop: 10,
         paddingBottom: 0,
         paddingHorizontal: 15,
+        elevation: 5,
     },
     columnsContainer: {
         flexDirection: 'row',
@@ -425,6 +432,7 @@ const styles = StyleSheet.create({
     searchSection: {
         backgroundColor: PALETTE.neutral[5],
         borderRadius: 5,
+        marginVertical: 5,
         width: '100%',
         flex: 1,
         flexDirection: 'row',

@@ -134,6 +134,7 @@ const ProductView = ({
             ) {
                 navigation.navigate('Home', {imageIndex});
             } else {
+                dispatch(SET_ACTION('idle'));
                 navigation.pop();
             }
         }
