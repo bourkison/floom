@@ -27,7 +27,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
 
     return (
         <View style={styles.flexOne}>
-            <FilterDropdown />
+            <FilterDropdown obj="unsaved" />
             <View style={styles.container}>
                 <View
                     style={[

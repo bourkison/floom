@@ -80,7 +80,7 @@ const SavedProducts = ({}: StackScreenProps<
 
     return (
         <View style={styles.safeContainer}>
-            <FilterDropdown />
+            <FilterDropdown obj="saved" />
             {isLoading ? (
                 <ActivityIndicator style={styles.activityIndicator} />
             ) : (

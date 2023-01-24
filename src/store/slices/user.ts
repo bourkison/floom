@@ -28,11 +28,23 @@ export const FETCH_USER = createAsyncThunk(
 
             const state = getState() as RootState;
             const user = await getUser({username: username, init: {}});
-            if (!state.product.filters.gender.includes(user.gender)) {
+            if (!state.product.unsaved.filters.gender.includes(user.gender)) {
                 if (user.gender === 'male') {
-                    dispatch(TOGGLE_FILTER({item: 'Male', type: 'gender'}));
+                    dispatch(
+                        TOGGLE_FILTER({
+                            item: 'Male',
+                            type: 'gender',
+                            obj: 'unsaved',
+                        }),
+                    );
                 } else if (user.gender === 'female') {
-                    dispatch(TOGGLE_FILTER({item: 'Female', type: 'gender'}));
+                    dispatch(
+                        TOGGLE_FILTER({
+                            item: 'Female',
+                            type: 'gender',
+                            obj: 'unsaved',
+                        }),
+                    );
                 }
             }
 

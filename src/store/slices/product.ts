@@ -24,6 +24,7 @@ import {
     LOCAL_KEY_SAVED_PRODUCTS,
     SAVED_STORED_PRODUCTS_AMOUNT,
 } from '@/constants';
+import {alreadyExists, buildInitWithFilters} from '@/services';
 
 const productAdapter = createEntityAdapter();
 
@@ -39,29 +40,41 @@ const initialState = productAdapter.getInitialState({
         isLoading: false,
         moreToLoad: true,
         isLoadingMore: false,
+        filters: {
+            gender: [] as string[],
+            category: [] as string[],
+            color: [] as string[],
+            searchText: '',
+        },
     },
     unsaved: {
         products: [] as ProductType[],
         isLoading: false,
         moreToLoad: true,
         isLoadingMore: false,
+        filters: {
+            gender: [] as string[],
+            category: [] as string[],
+            color: [] as string[],
+            searchText: '',
+            excludeDeleted: true,
+            excludeSaved: true,
+        },
     },
     deleted: {
         products: [] as ProductType[],
         isLoading: false,
         moreToLoad: true,
         isLoadingMore: false,
+        filters: {
+            gender: [] as string[],
+            category: [] as string[],
+            color: [] as string[],
+            searchText: '',
+        },
     },
     animation: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
     action: 'idle' as 'idle' | 'save' | 'buy' | 'delete',
-    filters: {
-        gender: [] as string[],
-        category: [] as string[],
-        color: [] as string[],
-        searchText: '',
-        excludeDeleted: true,
-        excludeSaved: true,
-    },
 });
 
 export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
@@ -88,54 +101,12 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                 queryStringParameters: input.queryStringParameters,
             };
 
-            // Set filters in the request.
             if (input.filtered) {
-                init.queryStringParameters = init.queryStringParameters || {
-                    loadAmount: 10,
-                    type: 'unsaved',
-                };
-
-                init.queryStringParameters.excludeDeleted =
-                    state.product.filters.excludeDeleted;
-                init.queryStringParameters.excludeSaved =
-                    state.product.filters.excludeSaved;
-
-                // If not excluding deleted or saved, order products to avoid duplication.
-                if (
-                    !state.product.filters.excludeDeleted ||
-                    !state.product.filters.excludeSaved
-                ) {
-                    init.queryStringParameters.ordered = true;
-                }
-
-                if (state.product.filters.gender.length) {
-                    init.queryStringParameters = {
-                        ...init.queryStringParameters,
-                        filteredGenders: state.product.filters.gender.join(','),
-                    };
-                }
-
-                if (state.product.filters.color.length) {
-                    init.queryStringParameters = {
-                        ...init.queryStringParameters,
-                        filteredColors: state.product.filters.color.join(','),
-                    };
-                }
-
-                if (state.product.filters.category.length) {
-                    init.queryStringParameters = {
-                        ...init.queryStringParameters,
-                        filteredCategories:
-                            state.product.filters.category.join(','),
-                    };
-                }
-
-                if (state.product.filters.searchText) {
-                    init.queryStringParameters = {
-                        ...init.queryStringParameters,
-                        query: state.product.filters.searchText,
-                    };
-                }
+                init = buildInitWithFilters(
+                    init,
+                    'unsaved',
+                    state.product.unsaved.filters,
+                );
             }
 
             try {
@@ -149,14 +120,14 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                 });
             }
         } else {
-            const excludedSaved = state.product.filters.excludeSaved
+            const excludedSaved = state.product.unsaved.filters.excludeSaved
                 ? JSON.parse(
                       (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) ||
                           '[]',
                   )
                 : [];
 
-            const excludedDeleted = state.product.filters.excludeDeleted
+            const excludedDeleted = state.product.unsaved.filters.excludeDeleted
                 ? JSON.parse(
                       (await AsyncStorage.getItem(
                           LOCAL_KEY_DELETED_PRODUCTS,
@@ -265,6 +236,14 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
             let init: QueryProductInit = {
                 queryStringParameters: input.queryStringParameters,
             };
+
+            if (input.filtered) {
+                init = buildInitWithFilters(
+                    init,
+                    'saved',
+                    state.product.saved.filters,
+                );
+            }
 
             try {
                 return await queryProduct({
@@ -379,21 +358,21 @@ export const DELETE_ALL_DELETED_PRODUCTS = createAsyncThunk<void, undefined>(
 );
 
 // Async thunk in order to get access to gender in user slice.
-export const CLEAR_FILTERS = createAsyncThunk<string, undefined>(
-    'product/CLEAR_FILTERS',
-    async (_, {getState}) => {
-        const state = getState() as RootState;
-        const g = state.user.docData?.gender;
+export const CLEAR_FILTERS = createAsyncThunk<
+    string,
+    {obj: 'saved' | 'unsaved' | 'deleted'}
+>('product/CLEAR_FILTERS', async (_, {getState}) => {
+    const state = getState() as RootState;
+    const g = state.user.docData?.gender;
 
-        if (g === 'male') {
-            return 'Male';
-        } else if (g === 'female') {
-            return 'Female';
-        }
+    if (g === 'male') {
+        return 'Male';
+    } else if (g === 'female') {
+        return 'Female';
+    }
 
-        return '';
-    },
-);
+    return '';
+});
 
 const productSlice = createSlice({
     name: 'product',
@@ -411,53 +390,73 @@ const productSlice = createSlice({
             action: PayloadAction<{
                 item: string;
                 type: 'gender' | 'category' | 'color';
+                obj: 'unsaved' | 'saved' | 'deleted';
             }>,
         ) {
             // Push to relevant filter if exists, other wise exclude it.
             if (action.payload.type === 'gender') {
-                if (!state.filters.gender.includes(action.payload.item)) {
-                    state.filters.gender = [
-                        ...state.filters.gender,
+                if (
+                    !state[action.payload.obj].filters.gender.includes(
+                        action.payload.item,
+                    )
+                ) {
+                    state[action.payload.obj].filters.gender = [
+                        ...state[action.payload.obj].filters.gender,
                         action.payload.item,
                     ];
                 } else {
-                    state.filters.gender = state.filters.gender.filter(
-                        i => i !== action.payload.item,
-                    );
+                    state[action.payload.obj].filters.gender = state[
+                        action.payload.obj
+                    ].filters.gender.filter(i => i !== action.payload.item);
                 }
             } else if (action.payload.type === 'category') {
-                if (!state.filters.category.includes(action.payload.item)) {
-                    state.filters.category = [
-                        ...state.filters.category,
+                if (
+                    !state[action.payload.obj].filters.category.includes(
+                        action.payload.item,
+                    )
+                ) {
+                    state[action.payload.obj].filters.category = [
+                        ...state[action.payload.obj].filters.category,
                         action.payload.item,
                     ];
                 } else {
-                    state.filters.category = state.filters.category.filter(
-                        i => i !== action.payload.item,
-                    );
+                    state[action.payload.obj].filters.category = state[
+                        action.payload.obj
+                    ].filters.category.filter(i => i !== action.payload.item);
                 }
             } else if (action.payload.type === 'color') {
-                if (!state.filters.color.includes(action.payload.item)) {
-                    state.filters.color = [
-                        ...state.filters.color,
+                if (
+                    !state[action.payload.obj].filters.color.includes(
+                        action.payload.item,
+                    )
+                ) {
+                    state[action.payload.obj].filters.color = [
+                        ...state[action.payload.obj].filters.color,
                         action.payload.item,
                     ];
                 } else {
-                    state.filters.color = state.filters.color.filter(
-                        i => i !== action.payload.item,
-                    );
+                    state[action.payload.obj].filters.color = state[
+                        action.payload.obj
+                    ].filters.color.filter(i => i !== action.payload.item);
                 }
             }
         },
-        UPDATE_SEARCH_FILTER(state, action: PayloadAction<string>) {
-            console.log('Slice:', action.payload);
-            state.filters.searchText = action.payload;
+        UPDATE_SEARCH_FILTER(
+            state,
+            action: PayloadAction<{
+                obj: 'saved' | 'unsaved' | 'deleted';
+                pl: string;
+            }>,
+        ) {
+            state[action.payload.obj].filters.searchText = action.payload.pl;
         },
         TOGGLE_EXCLUDE(state, action: PayloadAction<'deleted' | 'saved'>) {
             if (action.payload === 'saved') {
-                state.filters.excludeSaved = !state.filters.excludeSaved;
+                state.unsaved.filters.excludeSaved =
+                    !state.unsaved.filters.excludeSaved;
             } else if (action.payload === 'deleted') {
-                state.filters.excludeDeleted = !state.filters.excludeDeleted;
+                state.unsaved.filters.excludeDeleted =
+                    !state.unsaved.filters.excludeDeleted;
             }
         },
         BUY_PRODUCT(state) {
@@ -474,15 +473,24 @@ const productSlice = createSlice({
         builder
             .addCase(SAVE_PRODUCT.pending, (state, action) => {
                 state.animation = 'idle';
-                state.unsaved.products = state.unsaved.products.slice(1);
 
-                if (!action.meta.arg.saved) {
+                // Slice from unsaved if they are the same.
+                if (state.unsaved.products[0]?._id === action.meta.arg._id) {
+                    state.unsaved.products = state.unsaved.products.slice(1);
+                }
+
+                // Unshift into saved if not saved from API response, and not already in our array (to avoid duplicates).
+                if (
+                    !action.meta.arg.saved &&
+                    !alreadyExists(action.meta.arg._id, state.saved.products)
+                ) {
                     state.saved.products.unshift({
                         ...action.meta.arg,
                         deleted: false,
                         saved: true,
                     });
 
+                    // Ensure we don't overload on memory by only storing SAVED_STORED_PRODUCTS_AMOUNT of products.
                     if (
                         state.saved.products.length >
                         SAVED_STORED_PRODUCTS_AMOUNT
@@ -507,14 +515,24 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_PRODUCT.pending, (state, action) => {
                 state.animation = 'idle';
-                state.unsaved.products = state.unsaved.products.slice(1);
-                state.deleted.products.unshift({
-                    ...action.meta.arg,
-                    saved: false,
-                    deleted: true,
-                });
 
-                if (!action.meta.arg.deleted) {
+                // Slice from unsaved if they are the same.
+                if (state.unsaved.products[0]?._id === action.meta.arg._id) {
+                    state.unsaved.products = state.unsaved.products.slice(1);
+                }
+
+                // Unshift into saved if not saved from API response, and not already in our array (to avoid duplicates).
+                if (
+                    !action.meta.arg.deleted &&
+                    !alreadyExists(action.meta.arg._id, state.deleted.products)
+                ) {
+                    state.deleted.products.unshift({
+                        ...action.meta.arg,
+                        saved: false,
+                        deleted: true,
+                    });
+
+                    // Ensure we don't overload on memory by only storing DELETED_STORED_PRODUCTS_AMOUNT of products.
                     if (
                         state.deleted.products.length >
                         DELETED_STORED_PRODUCTS_AMOUNT
@@ -668,14 +686,20 @@ const productSlice = createSlice({
                 state.deleted.products = [];
             })
             .addCase(CLEAR_FILTERS.fulfilled, (state, action) => {
-                state.filters.gender = action.payload ? [action.payload] : [];
-                state.filters.category = [];
-                state.filters.color = [];
-                state.filters.searchText = '';
-                state.filters.excludeDeleted = true;
-                state.filters.excludeSaved = true;
+                state[action.meta.arg.obj].filters.category = [];
+                state[action.meta.arg.obj].filters.color = [];
+                state[action.meta.arg.obj].filters.searchText = '';
 
-                console.log('FILTERS:', state.filters);
+                if (action.meta.arg.obj === 'unsaved' && action.payload) {
+                    state.unsaved.filters.gender = [action.payload];
+                } else {
+                    state[action.meta.arg.obj].filters.gender = [];
+                }
+
+                if (action.meta.arg.obj === 'unsaved') {
+                    state.unsaved.filters.excludeDeleted = true;
+                    state.unsaved.filters.excludeSaved = true;
+                }
             });
     },
 });

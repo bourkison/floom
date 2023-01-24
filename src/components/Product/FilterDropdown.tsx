@@ -6,11 +6,9 @@ import {
     StyleSheet,
     TouchableOpacity,
     TextInput,
-    Platform,
     ScrollView,
     useWindowDimensions,
 } from 'react-native';
-import Constants from 'expo-constants';
 
 import {Ionicons} from '@expo/vector-icons';
 import {
@@ -26,6 +24,8 @@ import {
     TOGGLE_FILTER,
     LOAD_UNSAVED_PRODUCTS,
     UPDATE_SEARCH_FILTER,
+    LOAD_SAVED_PRODUCTS,
+    LOAD_DELETED_PRODUCTS,
 } from '@/store/slices/product';
 import AnimatedButton from '../Utility/AnimatedButton';
 
@@ -33,9 +33,10 @@ type FilterItemProps = {
     item: string;
     options: string[];
     type: 'gender' | 'category' | 'color';
+    obj: 'saved' | 'unsaved' | 'deleted';
 };
 
-const FilterItem: React.FC<FilterItemProps> = ({item, options, type}) => {
+const FilterItem: React.FC<FilterItemProps> = ({item, options, type, obj}) => {
     const [selected, setSelected] = useState(false);
     const dispatch = useAppDispatch();
 
@@ -44,7 +45,7 @@ const FilterItem: React.FC<FilterItemProps> = ({item, options, type}) => {
     }, [item, options]);
 
     const toggleFilter = () => {
-        dispatch(TOGGLE_FILTER({item, type}));
+        dispatch(TOGGLE_FILTER({item, type, obj}));
     };
 
     return (
@@ -59,7 +60,11 @@ const FilterItem: React.FC<FilterItemProps> = ({item, options, type}) => {
     );
 };
 
-const FilterDropdown = () => {
+type FilterDropdownProps = {
+    obj: 'saved' | 'unsaved' | 'deleted';
+};
+
+const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
     const [visible, setVisible] = useState(false);
     const [dropdownTop, setDropdownTop] = useState(0);
 
@@ -75,22 +80,22 @@ const FilterDropdown = () => {
     // keep a local reference within this component then only dispatch to store
     // on search button?
     const selectedGenders = useAppSelector(
-        state => state.product.filters.gender,
+        state => state.product[obj].filters.gender,
     );
     const selectedColours = useAppSelector(
-        state => state.product.filters.color,
+        state => state.product[obj].filters.color,
     );
     const selectedCategories = useAppSelector(
-        state => state.product.filters.category,
+        state => state.product[obj].filters.category,
     );
     const excludeDeleted = useAppSelector(
-        state => state.product.filters.excludeDeleted,
+        state => state.product.unsaved.filters.excludeDeleted,
     );
     const excludeSaved = useAppSelector(
-        state => state.product.filters.excludeSaved,
+        state => state.product.unsaved.filters.excludeSaved,
     );
     const searchText = useAppSelector(
-        state => state.product.filters.searchText,
+        state => state.product[obj].filters.searchText,
     );
 
     const dispatch = useAppDispatch();
@@ -110,25 +115,51 @@ const FilterDropdown = () => {
         setVisible(false);
     };
 
-    const toggleExclude = (type: 'saved' | 'deleted') => {
-        dispatch(TOGGLE_EXCLUDE(type));
+    const toggleExclude = (t: 'saved' | 'deleted') => {
+        dispatch(TOGGLE_EXCLUDE(t));
     };
 
-    const updateSearchText = (q: string) => {
-        dispatch(UPDATE_SEARCH_FILTER(q));
+    const updateSearchText = (pl: string) => {
+        dispatch(UPDATE_SEARCH_FILTER({obj, pl}));
     };
 
     const search = () => {
-        dispatch(
-            LOAD_UNSAVED_PRODUCTS({
-                queryStringParameters: {
-                    loadAmount: 10,
-                    type: 'unsaved',
-                },
-                loadType: 'initial',
-                filtered: true,
-            }),
-        );
+        if (obj === 'unsaved') {
+            dispatch(
+                LOAD_UNSAVED_PRODUCTS({
+                    queryStringParameters: {
+                        loadAmount: 10,
+                        type: 'unsaved',
+                    },
+                    loadType: 'initial',
+                    filtered: true,
+                }),
+            );
+        } else if (obj === 'saved') {
+            dispatch(
+                LOAD_SAVED_PRODUCTS({
+                    queryStringParameters: {
+                        loadAmount: 10,
+                        type: 'saved',
+                        reversed: true,
+                    },
+                    loadType: 'initial',
+                    filtered: true,
+                }),
+            );
+        } else if (obj === 'deleted') {
+            dispatch(
+                LOAD_DELETED_PRODUCTS({
+                    queryStringParameters: {
+                        loadAmount: 10,
+                        type: 'deleted',
+                        reversed: true,
+                    },
+                    loadType: 'initial',
+                    filtered: true,
+                }),
+            );
+        }
 
         closeDropdown();
     };
@@ -137,8 +168,6 @@ const FilterDropdown = () => {
         console.log(dropdownTop);
         if (DropdownButton && DropdownButton.current) {
             DropdownButton.current.measure((_fx, _fy, _w, h) => {
-                const statusBar =
-                    Platform.OS === 'ios' ? 0 : Constants.statusBarHeight;
                 setDropdownTop(h);
             });
 
@@ -193,9 +222,6 @@ const FilterDropdown = () => {
                         styles.pressable,
                         {
                             top: dropdownTop,
-                            shadowColor: PALETTE.neutral[9],
-                            shadowOpacity: 0.2,
-                            shadowOffset: {height: 5},
                         },
                     ]}>
                     <ScrollView
@@ -215,6 +241,7 @@ const FilterDropdown = () => {
                                 <Text style={styles.columnHeader}>Gender</Text>
                                 {GENDER_OPTIONS.map(g => (
                                     <FilterItem
+                                        obj={obj}
                                         item={g}
                                         type="gender"
                                         options={selectedGenders}
@@ -228,6 +255,7 @@ const FilterDropdown = () => {
                                 </Text>
                                 {CATEGORY_OPTIONS.map(c => (
                                     <FilterItem
+                                        obj={obj}
                                         item={c}
                                         type="category"
                                         options={selectedCategories}
@@ -239,6 +267,7 @@ const FilterDropdown = () => {
                                 <Text style={styles.columnHeader}>Colour</Text>
                                 {COLOUR_OPTIONS.map(c => (
                                     <FilterItem
+                                        obj={obj}
                                         item={c}
                                         type="color"
                                         options={selectedColours}
@@ -354,6 +383,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         flex: 1,
         flexDirection: 'column',
+        shadowColor: PALETTE.neutral[9],
+        shadowOpacity: 0.2,
+        shadowOffset: {height: 5, width: 0},
     },
     buttonsContainer: {
         backgroundColor: '#FFF',
