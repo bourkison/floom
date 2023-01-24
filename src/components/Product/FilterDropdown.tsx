@@ -186,7 +186,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
         return (
             selectedCategories.length +
             selectedGenders.length +
-            selectedCategories.length
+            selectedColours.length
         );
     }, [selectedCategories, selectedColours, obj, selectedGenders]);
 
@@ -320,76 +320,87 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
                                 ))}
                             </View>
                         </View>
-                        <View style={styles.columnsContainer}>
-                            <View style={styles.column}>
-                                <TouchableOpacity
-                                    style={
-                                        excludeDeleted
-                                            ? styles.activeExclude
-                                            : styles.inactiveExclude
-                                    }
-                                    onPress={() => {
-                                        toggleExclude('deleted');
-                                    }}>
-                                    <View
-                                        style={styles.excludeButtonEmptyCol}
-                                    />
-                                    <Text
+                        {obj === 'unsaved' ? (
+                            <View style={styles.columnsContainer}>
+                                <View style={styles.column}>
+                                    <TouchableOpacity
                                         style={
                                             excludeDeleted
-                                                ? styles.activeExcludeText
-                                                : styles.inactiveExcludeText
-                                        }>
-                                        Exclude Deleted
-                                    </Text>
-                                    {excludeDeleted ? (
-                                        <Ionicons
-                                            name="checkmark"
-                                            color="#f3fcfa"
-                                            style={styles.excludeButtonEmptyCol}
-                                        />
-                                    ) : (
+                                                ? styles.activeExclude
+                                                : styles.inactiveExclude
+                                        }
+                                        onPress={() => {
+                                            toggleExclude('deleted');
+                                        }}>
                                         <View
                                             style={styles.excludeButtonEmptyCol}
                                         />
-                                    )}
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.column}>
-                                <TouchableOpacity
-                                    style={
-                                        excludeSaved
-                                            ? styles.activeExclude
-                                            : styles.inactiveExclude
-                                    }
-                                    onPress={() => {
-                                        toggleExclude('saved');
-                                    }}>
-                                    <View
-                                        style={styles.excludeButtonEmptyCol}
-                                    />
-                                    <Text
+                                        <Text
+                                            style={
+                                                excludeDeleted
+                                                    ? styles.activeExcludeText
+                                                    : styles.inactiveExcludeText
+                                            }>
+                                            Exclude Deleted
+                                        </Text>
+                                        {excludeDeleted ? (
+                                            <Ionicons
+                                                name="checkmark"
+                                                color="#f3fcfa"
+                                                style={
+                                                    styles.excludeButtonEmptyCol
+                                                }
+                                            />
+                                        ) : (
+                                            <View
+                                                style={
+                                                    styles.excludeButtonEmptyCol
+                                                }
+                                            />
+                                        )}
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={styles.column}>
+                                    <TouchableOpacity
                                         style={
                                             excludeSaved
-                                                ? styles.activeExcludeText
-                                                : styles.inactiveExcludeText
-                                        }>
-                                        Exclude Liked
-                                    </Text>
-                                    {excludeSaved ? (
-                                        <Ionicons
-                                            name="checkmark"
-                                            color="#f3fcfa"
-                                            style={styles.excludeButtonEmptyCol}
-                                        />
-                                    ) : (
+                                                ? styles.activeExclude
+                                                : styles.inactiveExclude
+                                        }
+                                        onPress={() => {
+                                            toggleExclude('saved');
+                                        }}>
                                         <View
                                             style={styles.excludeButtonEmptyCol}
                                         />
-                                    )}
-                                </TouchableOpacity>
+                                        <Text
+                                            style={
+                                                excludeSaved
+                                                    ? styles.activeExcludeText
+                                                    : styles.inactiveExcludeText
+                                            }>
+                                            Exclude Liked
+                                        </Text>
+                                        {excludeSaved ? (
+                                            <Ionicons
+                                                name="checkmark"
+                                                color="#f3fcfa"
+                                                style={
+                                                    styles.excludeButtonEmptyCol
+                                                }
+                                            />
+                                        ) : (
+                                            <View
+                                                style={
+                                                    styles.excludeButtonEmptyCol
+                                                }
+                                            />
+                                        )}
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                        </View>
+                        ) : undefined}
+
                         <View style={styles.flexOne}>
                             <Pressable>
                                 <AnimatedButton

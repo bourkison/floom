@@ -24,7 +24,7 @@ import {
     LOCAL_KEY_SAVED_PRODUCTS,
     SAVED_STORED_PRODUCTS_AMOUNT,
 } from '@/constants';
-import {alreadyExists, buildInitWithFilters} from '@/services';
+import {alreadyExists, buildInitWithFilters, filtersApplied} from '@/services';
 
 const productAdapter = createEntityAdapter();
 
@@ -479,10 +479,11 @@ const productSlice = createSlice({
                     state.unsaved.products = state.unsaved.products.slice(1);
                 }
 
-                // Unshift into saved if not saved from API response, and not already in our array (to avoid duplicates).
+                // Unshift into saved if not saved from API response, and not already in our array (to avoid duplicates), and no filters applied.
                 if (
                     !action.meta.arg.saved &&
-                    !alreadyExists(action.meta.arg._id, state.saved.products)
+                    !alreadyExists(action.meta.arg._id, state.saved.products) &&
+                    !filtersApplied(state.saved.filters)
                 ) {
                     state.saved.products.unshift({
                         ...action.meta.arg,

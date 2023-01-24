@@ -125,12 +125,10 @@ const queryUnsavedProduct = async (
     }
 
     try {
-        const user = (
-            await User.findOne(
-                {email},
-                {email: 1, likedProducts: 1, deletedProducts: 1},
-            )
-        ).toObject();
+        const user = await User.findOne(
+            {email},
+            {email: 1, likedProducts: 1, deletedProducts: 1},
+        ).lean();
 
         if (!user) {
             response = {
@@ -146,6 +144,8 @@ const queryUnsavedProduct = async (
         }
 
         let excludedProductsArr: Types.ObjectId[] = [];
+
+        console.log('EXCLUDE DELETED:', excludeDeleted, user.deletedProducts);
 
         if (excludeDeleted) {
             excludedProductsArr = [
@@ -169,9 +169,9 @@ const queryUnsavedProduct = async (
         };
 
         if (startAt && ordered) {
-            const {rnd} = (
-                await Product.findById(new Types.ObjectId(startAt))
-            ).toObject();
+            const {rnd} = await Product.findById(
+                new Types.ObjectId(startAt),
+            ).lean();
 
             query = {
                 ...query,
@@ -227,43 +227,48 @@ const queryUnsavedProduct = async (
             };
         }
 
-        const products = ordered
-            ? await Product.find<ProductType>(query, {
-                  _id: 1,
-                  name: 1,
-                  vendorProductId: 1,
-                  brand: 1,
-                  categories: 1,
-                  colors: 1,
-                  gender: 1,
-                  images: 1,
-                  inStock: 1,
-                  link: 1,
-                  price: 1,
-                  availableCountries: 1,
-              })
-                  .sort({rnd: -1, _id: -1})
-                  .limit(loadAmount)
-            : await Product.aggregate<ProductType>([
-                  {$match: query},
-                  {$sample: {size: loadAmount}},
-                  {
-                      $project: {
-                          _id: 1,
-                          name: 1,
-                          vendorProductId: 1,
-                          brand: 1,
-                          categories: 1,
-                          colors: 1,
-                          gender: 1,
-                          images: 1,
-                          inStock: 1,
-                          link: 1,
-                          price: 1,
-                          availableCountries: 1,
-                      },
-                  },
-              ]);
+        let products: ProductType[] = [];
+
+        if (ordered) {
+            products = await Product.find<ProductType>(query, {
+                _id: 1,
+                name: 1,
+                vendorProductId: 1,
+                brand: 1,
+                categories: 1,
+                colors: 1,
+                gender: 1,
+                images: 1,
+                inStock: 1,
+                link: 1,
+                price: 1,
+                availableCountries: 1,
+            })
+                .sort({rnd: -1, _id: -1})
+                .limit(loadAmount)
+                .lean();
+        } else {
+            products = await Product.aggregate<ProductType>([
+                {$match: query},
+                {$sample: {size: loadAmount}},
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        vendorProductId: 1,
+                        brand: 1,
+                        categories: 1,
+                        colors: 1,
+                        gender: 1,
+                        images: 1,
+                        inStock: 1,
+                        link: 1,
+                        price: 1,
+                        availableCountries: 1,
+                    },
+                },
+            ]);
+        }
 
         if (!products || !products.length) {
             response = {
@@ -294,6 +299,12 @@ const queryUnsavedProduct = async (
             body: JSON.stringify({
                 success: true,
                 data: products.map(p => {
+                    console.log(
+                        'Checking excluded:',
+                        p._id,
+                        user.deletedProducts.includes(p._id),
+                    );
+
                     return {
                         ...p,
                         saved: !excludeSaved
@@ -426,25 +437,15 @@ const querySavedOrDeletedProduct = async (
             type === 'saved'
                 ? {
                       likedProducts: 1,
-                      __length: {
-                          $size: '$likedProducts',
-                      },
                   }
                 : {
                       deletedProducts: 1,
-                      __length: {
-                          $size: '$likedProducts',
-                      },
                   };
 
-        const {likedProducts, __length, deletedProducts} = (
-            await User.findOne({email}, aggregation)
-        ).toObject<{
-            likedProducts?: Types.ObjectId[];
-            deletedProducts?: Types.ObjectId[];
-            __length: number;
-            __startAtIndex?: number;
-        }>();
+        const {likedProducts, deletedProducts} = await User.findOne(
+            {email},
+            aggregation,
+        ).lean();
 
         productIds = type === 'saved' ? likedProducts : deletedProducts;
     } else if (!startAt) {
@@ -469,14 +470,11 @@ const querySavedOrDeletedProduct = async (
                       },
                   };
 
-        const {likedProducts, __length, deletedProducts} = (
-            await User.findOne({email: email}, aggregation)
-        ).toObject<{
-            likedProducts?: Types.ObjectId[];
-            deletedProducts?: Types.ObjectId[];
+        const {likedProducts, __length, deletedProducts} = await User.findOne<{
+            likedProducts: Types.ObjectId[];
+            deletedProducts: Types.ObjectId[];
             __length: number;
-            __startAtIndex?: number;
-        }>();
+        }>({email: email}, aggregation).lean();
 
         productIds = type === 'saved' ? likedProducts : deletedProducts;
         arrLength = __length;
@@ -799,7 +797,7 @@ const querySavedOrDeletedProduct = async (
         )[0];
 
         products = res.results;
-        arrLength = res.count[0].__length;
+        arrLength = res.count[0]?.__length || 0;
         moreToLoad = index + 1 + products.length < arrLength;
     } else {
         products = await Product.aggregate<ProductType>(aggregationArr);
@@ -814,7 +812,7 @@ const querySavedOrDeletedProduct = async (
             : arrStartAtIndex - loadAmount > 0;
     }
 
-    if (!products || !products.length) {
+    if (!products) {
         response = {
             statusCode: 500,
             headers: {
@@ -824,6 +822,22 @@ const querySavedOrDeletedProduct = async (
             body: JSON.stringify({
                 success: false,
                 message: 'Error getting products',
+            }),
+        };
+
+        return response;
+    }
+
+    if (!products.length) {
+        response = {
+            statusCode: 404,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: 'No products found',
             }),
         };
 
@@ -872,7 +886,7 @@ const getProduct = async (
         body: JSON.stringify({success: false}),
     };
 
-    const product = (await Product.findById(_id)).toObject();
+    const product = await Product.findById(_id).lean();
 
     if (!product) {
         response = {

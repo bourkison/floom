@@ -110,3 +110,18 @@ export function buildInitWithFilters<T extends FiltersType>(
 
     return response;
 }
+
+export function filtersApplied(
+    filters: RootState['product']['saved']['filters'],
+) {
+    if (
+        filters.category.length ||
+        filters.color.length ||
+        filters.gender.length ||
+        filters.searchText
+    ) {
+        return true;
+    }
+
+    return false;
+}
