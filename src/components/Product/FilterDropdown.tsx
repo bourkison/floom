@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
     Pressable,
     View,
@@ -26,6 +26,7 @@ import {
     UPDATE_SEARCH_FILTER,
     LOAD_SAVED_PRODUCTS,
     LOAD_DELETED_PRODUCTS,
+    CLEAR_FILTERS,
 } from '@/store/slices/product';
 import AnimatedButton from '../Utility/AnimatedButton';
 
@@ -177,6 +178,48 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
         return false;
     };
 
+    const clearIconNumber = useCallback(() => {
+        if (obj === 'unsaved') {
+            return selectedCategories.length + selectedColours.length;
+        }
+
+        return (
+            selectedCategories.length +
+            selectedGenders.length +
+            selectedCategories.length
+        );
+    }, [selectedCategories, selectedColours, obj, selectedGenders]);
+
+    const ClearIcon = () => {
+        const clearFilters = () => {
+            dispatch(CLEAR_FILTERS({obj}));
+        };
+
+        if (visible) {
+            return (
+                <View style={[styles.iconContainer, styles.noLeftMargin]}>
+                    <Pressable
+                        style={styles.clearIconContainer}
+                        onPress={clearFilters}>
+                        <Text style={styles.clearIconText}>
+                            {clearIconNumber()}
+                        </Text>
+                    </Pressable>
+                </View>
+            );
+        } else {
+            return (
+                <View style={[styles.iconContainer, styles.noLeftMargin]}>
+                    <View style={styles.clearIconContainer}>
+                        <Text style={styles.clearIconText}>
+                            {clearIconNumber()}
+                        </Text>
+                    </View>
+                </View>
+            );
+        }
+    };
+
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -214,6 +257,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
                             size={16}
                         />
                     </View>
+                    {clearIconNumber() > 0 ? <ClearIcon /> : undefined}
                 </View>
             </TouchableOpacity>
             {visible ? (
@@ -406,7 +450,8 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     iconContainer: {
-        flexBasis: 32,
+        flexBasis: 24,
+        marginHorizontal: 4,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -429,6 +474,9 @@ const styles = StyleSheet.create({
         flex: 1,
         marginBottom: 10,
         padding: 5,
+    },
+    noLeftMargin: {
+        marginLeft: 0,
     },
     columnHeader: {
         fontWeight: '500',
@@ -527,6 +575,19 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingVertical: 5,
         fontWeight: '500',
+    },
+    clearIconContainer: {
+        width: 24,
+        height: 24,
+        borderRadius: 24,
+        backgroundColor: PALETTE.neutral[8],
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    clearIconText: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

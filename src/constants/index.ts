@@ -55,6 +55,7 @@ export const COLOUR_OPTIONS = [
     'Multicolour',
     'Beige',
 ];
+export const BRAND_OPTIONS = ['H&M', 'Nike', 'Adidas', 'Aelfrice Eden'];
 
 export const LOCAL_KEY_SAVED_PRODUCTS = '@savedProducts';
 export const LOCAL_KEY_DELETED_PRODUCTS = '@deletedProducts';

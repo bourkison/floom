@@ -52,6 +52,7 @@ const SavedProducts = ({}: StackScreenProps<
                 LOAD_SAVED_PRODUCTS({
                     queryStringParameters: init.queryStringParameters,
                     loadType,
+                    filtered: true,
                 }),
             );
         },
