@@ -2,7 +2,7 @@ import aws from 'aws-sdk';
 import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 // @ts-ignore
 import MongooseModels from '/opt/nodejs/models';
-import {Model, Types, FilterQuery} from 'mongoose';
+import {Model, Types, FilterQuery, PipelineStage} from 'mongoose';
 
 let MONGODB_URI: string;
 
@@ -327,6 +327,37 @@ const querySavedOrDeletedProduct = async (
     const startAt = event.queryStringParameters.startAt || '';
     const reversed = event.queryStringParameters.reversed === 'true' || false;
 
+    // Get relevant filters and convert to lower case.
+    const filteredGenders: string[] = event.queryStringParameters
+        .filteredGenders
+        ? event.queryStringParameters.filteredGenders
+              .split(',')
+              .map(g => g.toLowerCase().trim())
+        : [];
+
+    const filteredCategories: string[] = event.queryStringParameters
+        .filteredCategories
+        ? event.queryStringParameters.filteredCategories
+              .split(',')
+              .map(c => c.toLowerCase().trim())
+        : [];
+
+    const filteredColors: string[] = event.queryStringParameters.filteredColors
+        ? event.queryStringParameters.filteredColors
+              .split(',')
+              .map(c => c.toLowerCase().trim())
+        : [];
+
+    const searchText: string = event.queryStringParameters.query || '';
+
+    const isFiltered =
+        filteredGenders.length ||
+        filteredCategories.length ||
+        filteredColors.length ||
+        searchText
+            ? true
+            : false;
+
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
     const Product: Model<ProductType> = await MongooseModels().Product(
         MONGODB_URI,
@@ -389,7 +420,34 @@ const querySavedOrDeletedProduct = async (
     let arrLength: number;
     let arrStartAtIndex: number;
 
-    if (!startAt) {
+    if (isFiltered) {
+        // If any filters, pull all productIds from user, and we will filter/limit when pulling from products.
+        let aggregation =
+            type === 'saved'
+                ? {
+                      likedProducts: 1,
+                      __length: {
+                          $size: '$likedProducts',
+                      },
+                  }
+                : {
+                      deletedProducts: 1,
+                      __length: {
+                          $size: '$likedProducts',
+                      },
+                  };
+
+        const {likedProducts, __length, deletedProducts} = (
+            await User.findOne({email}, aggregation)
+        ).toObject<{
+            likedProducts?: Types.ObjectId[];
+            deletedProducts?: Types.ObjectId[];
+            __length: number;
+            __startAtIndex?: number;
+        }>();
+
+        productIds = type === 'saved' ? likedProducts : deletedProducts;
+    } else if (!startAt) {
         // Change aggregation to $likedProducts or $deletedProducts based on
         // If we're palling saved or deleted.
         let aggregation =
@@ -624,15 +682,69 @@ const querySavedOrDeletedProduct = async (
         productIds.reverse();
     }
 
-    // Have to sort the products in how they are retrieved from the User
-    // In order to maintain order.
-    // https://stackoverflow.com/questions/22797768/does-mongodbs-in-clause-guarantee-order
-    const products = await Product.aggregate<ProductType>([
+    let matchQuery: FilterQuery<ProductType> = {
+        _id: {
+            $in: productIds,
+        },
+    };
+
+    if (filteredGenders.length) {
+        const regex = new RegExp(
+            filteredGenders.map(g => `^${g}$`).join('|'),
+            'gi',
+        );
+        matchQuery = {
+            ...matchQuery,
+            gender: {
+                $regex: regex,
+            },
+        };
+    }
+
+    if (filteredCategories.length) {
+        matchQuery = {
+            ...matchQuery,
+            categories: {
+                $in: filteredCategories,
+            },
+        };
+    }
+
+    if (filteredColors.length) {
+        const regex = new RegExp(filteredColors.join('|'), 'gi');
+
+        matchQuery = {
+            ...matchQuery,
+            colors: {
+                $regex: regex,
+            },
+        };
+    }
+
+    if (searchText) {
+        matchQuery = {
+            ...matchQuery,
+            $text: {
+                $search: searchText,
+            },
+        };
+    }
+
+    let aggregationArr: PipelineStage[] = [
+        {$match: matchQuery},
+        // Have to sort the products in how they are retrieved from the User
+        // In order to maintain order.
+        // https://stackoverflow.com/questions/22797768/does-mongodbs-in-clause-guarantee-order
         {
-            $match: {
-                _id: {
-                    $in: productIds,
+            $addFields: {
+                __order: {
+                    $indexOfArray: [productIds, '$_id'],
                 },
+            },
+        },
+        {
+            $sort: {
+                __order: 1,
             },
         },
         {
@@ -650,19 +762,57 @@ const querySavedOrDeletedProduct = async (
                 price: 1,
             },
         },
-        {
-            $addFields: {
-                __order: {
-                    $indexOfArray: [productIds, '$_id'],
-                },
+    ];
+
+    let products: ProductType[] = [];
+    let moreToLoad: boolean;
+
+    if (isFiltered) {
+        let resultsPipeline: PipelineStage.FacetPipelineStage[] = [];
+        let index = -1;
+
+        if (startAt) {
+            index = productIds.findIndex(id => startAt === id.toString());
+            resultsPipeline.push({$skip: index + 1});
+        }
+
+        resultsPipeline.push({
+            $limit: loadAmount,
+        });
+
+        aggregationArr.push({
+            $facet: {
+                count: [
+                    {
+                        $count: '__length',
+                    },
+                ],
+                results: resultsPipeline,
             },
-        },
-        {
-            $sort: {
-                __order: 1,
-            },
-        },
-    ]);
+        });
+
+        const res = (
+            await Product.aggregate<{
+                results: ProductType[];
+                count: {__length: number};
+            }>(aggregationArr)
+        )[0];
+
+        products = res.results;
+        arrLength = res.count[0].__length;
+        moreToLoad = index + 1 + products.length < arrLength;
+    } else {
+        products = await Product.aggregate<ProductType>(aggregationArr);
+
+        /*
+         * Non-reversed logic:
+         *   If number of previously loaded (arrStartAt + 1) + number loaded on this load
+         *   is equal to total array length, we know we have loaded everything, hence no more to load.
+         */
+        moreToLoad = !reversed
+            ? !(arrStartAtIndex + 1 + products.length >= arrLength)
+            : arrStartAtIndex - loadAmount > 0;
+    }
 
     if (!products || !products.length) {
         response = {
@@ -679,15 +829,6 @@ const querySavedOrDeletedProduct = async (
 
         return response;
     }
-
-    /*
-     * Non-reversed logic:
-     *   If number of previously loaded (arrStartAt + 1) + number loaded on this load
-     *   is equal to total array length, we know we have loaded everything, hence no more to load.
-     */
-    const moreToLoad = !reversed
-        ? !(arrStartAtIndex + 1 + products.length >= arrLength)
-        : arrStartAtIndex - loadAmount > 0;
 
     response = {
         statusCode: 200,

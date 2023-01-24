@@ -62,7 +62,7 @@ const ProductList = () => {
 
     const retry = async (clearFilters: boolean) => {
         if (clearFilters) {
-            await dispatch(CLEAR_FILTERS());
+            await dispatch(CLEAR_FILTERS({obj: 'unsaved'}));
         }
 
         let queryStringParameters: QueryProductInit['queryStringParameters'] = {
