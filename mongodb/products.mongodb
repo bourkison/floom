@@ -19,11 +19,44 @@
 //     userInDeleted: {$in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$deletedBy']}
 // });
 
-db.products.find({
-    gender: {
-        $regex: new RegExp(['^male$'].join('|'), 'gi')
+// db.products.find({
+//     gender: {
+//         $regex: new RegExp(['^male$'].join('|'), 'gi')
+//     },
+//     colors: {
+//         $regex: new RegExp(['green'].join('|'), 'gi')
+//     }
+// }).sort({rnd: -1, _id: -1}).limit(10)
+
+// db.products.find({_id: ObjectId('63a0a6cd06de14da3d1d5a16')}, {
+//     _id: 1,
+//     name: 1,
+//     likedBy: 1,
+//     deletedBy: 1,
+//     isDeleted: {
+//         $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$deletedBy']
+//     },
+//     isLiked: {
+//         $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$likedBy']
+//     }
+// })
+
+db.products.aggregate([
+    {
+        $match: {_id: ObjectId('63a0a6cd06de14da3d1d5a16')}
     },
-    colors: {
-        $regex: new RegExp(['green'].join('|'), 'gi')
+    {
+        $project: {
+            _id: 1,
+            name: 1,
+            likedBy: 1,
+            deletedBy: 1,
+            isDeleted: {
+                $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$deletedBy']
+            },
+            isLiked: {
+                $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$likedBy']
+            }
+        }
     }
-}).sort({rnd: -1, _id: -1}).limit(10)
+])
