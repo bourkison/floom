@@ -37,7 +37,7 @@ import {
 
 import * as WebBrowser from 'expo-web-browser';
 
-import BrandLogo from '@/components/Product/BrandLogo';
+import BrandLogo from '@/components/Utility/BrandLogo';
 import ActionButton from '@/components/Utility/ActionButton';
 
 const ProductView = ({

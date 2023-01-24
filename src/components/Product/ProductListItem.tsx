@@ -29,7 +29,7 @@ import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {BUY_COLOR, DELETE_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
 import {capitaliseString} from '@/services';
-import BrandLogo from './BrandLogo';
+import BrandLogo from '../Utility/BrandLogo';
 import * as WebBrowser from 'expo-web-browser';
 
 export type ProductListItemProps = {
@@ -137,22 +137,22 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
 
                 if (percentage < -ACTION_THRESHOLD && !isDeleting.value) {
                     isDeleting.value = true;
-                    runOnJS(Haptics.selectionAsync)();
+                    runOnJS(Haptics.impactAsync)();
                 } else if (percentage > -ACTION_THRESHOLD && isDeleting.value) {
                     isDeleting.value = false;
-                    runOnJS(Haptics.selectionAsync)();
+                    runOnJS(Haptics.impactAsync)();
                 } else if (
                     percentage > ACTION_THRESHOLD &&
                     !isRightSwipeActive.value
                 ) {
                     isRightSwipeActive.value = true;
-                    runOnJS(Haptics.selectionAsync)();
+                    runOnJS(Haptics.impactAsync)();
                 } else if (
                     percentage < ACTION_THRESHOLD &&
                     isRightSwipeActive.value
                 ) {
                     isRightSwipeActive.value = false;
-                    runOnJS(Haptics.selectionAsync)();
+                    runOnJS(Haptics.impactAsync)();
                 }
 
                 leftSwipeOpacity.value = percentage > 0 ? 1 : 0;

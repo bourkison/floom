@@ -2,7 +2,7 @@ import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {useAppSelector} from '@/store/hooks';
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {useState} from 'react';
-import {View, Text, TextInput, StyleSheet} from 'react-native';
+import {View, Text, TextInput, StyleSheet, ScrollView} from 'react-native';
 import {PALETTE} from '@/constants';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import Spinner from '@/components/Utility/Spinner';
@@ -32,7 +32,7 @@ const UpdateDetail: React.FC<
     };
 
     return (
-        <View>
+        <ScrollView>
             <View style={styles.section}>
                 <View style={styles.box}>
                     <TextInput
@@ -119,7 +119,7 @@ const UpdateDetail: React.FC<
                 <SectionHeader>Update Password</SectionHeader>
                 <UpdatePasswordWidget invertButton={true} />
             </View>
-        </View>
+        </ScrollView>
     );
 };
 

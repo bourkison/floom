@@ -7,7 +7,10 @@ import {
     Modal,
     TouchableOpacity,
     TextInput,
+    Platform,
 } from 'react-native';
+import Constants from 'expo-constants';
+
 import {Ionicons} from '@expo/vector-icons';
 import {GENDER_OPTIONS, CATEGORY_OPTIONS, COLOUR_OPTIONS} from '@/constants';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
@@ -112,10 +115,12 @@ const FilterDropdown = () => {
     };
 
     const measureDropdownTop = (): boolean => {
+        console.log(dropdownTop);
         if (DropdownButton && DropdownButton.current) {
             // @ts-ignore
             DropdownButton.current.measure((_fx, _fy, _w, h, _px, py) => {
-                setDropdownTop(py + h);
+                const statusBar = Platform.OS === 'ios' ? 0 : Constants.statusBarHeight;
+                setDropdownTop(py + h - statusBar);
             });
 
             return true;

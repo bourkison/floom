@@ -1,5 +1,8 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+    createStackNavigator,
+    CardStyleInterpolators,
+} from '@react-navigation/stack';
 import {useAppSelector} from '@/store/hooks';
 import {Product as ProductType} from '@/types/product';
 
@@ -83,7 +86,12 @@ const Navigator = () => {
     }
 
     return (
-        <MainStack.Navigator initialRouteName="Home">
+        <MainStack.Navigator
+            screenOptions={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                gestureEnabled: true,
+            }}
+            initialRouteName="Home">
             <MainStack.Screen
                 name="Home"
                 component={Home}
@@ -113,6 +121,8 @@ const Navigator = () => {
                 name="ProductView"
                 component={ProductView}
                 options={{
+                    cardStyleInterpolator:
+                        CardStyleInterpolators.forModalPresentationIOS,
                     presentation: 'modal',
                     gestureDirection: 'vertical',
                     headerShown: false,

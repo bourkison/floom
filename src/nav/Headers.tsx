@@ -181,6 +181,8 @@ const styles = StyleSheet.create({
             width: -1,
         },
         shadowOpacity: 0.3,
+        zIndex: 999,
+        elevation: 99,
     },
     headerRow: {
         flexBasis: 44,
@@ -192,6 +194,8 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+        zIndex: 999,
+        elevation: 99,
     },
     headerTitleContainer: {
         flex: 1,
