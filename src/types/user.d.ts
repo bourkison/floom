@@ -1,9 +1,11 @@
+import {COUNTRIES} from '@/constants/countries';
+
 export type UserDocData = {
     email: string;
     name: string;
-    gender: string;
+    gender: 'male' | 'female' | 'other';
     dob: Date;
-    country: string;
+    country: typeof COUNTRIES[keyof typeof COUNTRIES];
 };
 
 // API
