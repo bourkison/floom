@@ -482,7 +482,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
 };
 
 const styles = StyleSheet.create({
-    container: {zIndex: 20, elevation: 20},
+    container: {zIndex: -1, elevation: -1},
     saveTextContainer: {
         borderColor: SAVE_COLOR,
         borderWidth: 2,
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignContent: 'center',
         alignItems: 'center',
-        zIndex: 99,
+        zIndex: 40,
     },
 });
 

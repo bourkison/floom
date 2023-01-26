@@ -13,6 +13,9 @@ import {PALETTE} from '@/constants';
 import {useAppSelector} from '@/store/hooks';
 import SetGender from '@/components/User/Modals/SetGender';
 import SetCountry from './Modals/SetCountry';
+import {COUNTRIES} from '@/constants/countries';
+import SetDob from './Modals/SetDob';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 const UpdateDetailsWidget = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -25,11 +28,14 @@ const UpdateDetailsWidget = () => {
     const [gender, setGender] = useState(user?.gender || 'male');
     const [genderModalVisible, setGenderModalVisible] = useState(false);
 
-    const [country, setCountry] = useState(user?.country || 'United States');
+    const [country, setCountry] = useState(user?.country || 'GB');
     const [countryModalVisible, setCountryModalVisible] = useState(false);
 
-    const [dob, setDob] = useState(dayjs(user?.dob).format('YYYY-MM-DD'));
+    const DobTouchableRef = useRef<TouchableOpacity>(null);
+    const [dob, setDob] = useState(user?.dob || new Date());
     const [dobModalVisible, setDobModalVisible] = useState(false);
+
+    dayjs.extend(advancedFormat);
 
     const updateUser = () => {
         setIsLoading(!isLoading);
@@ -66,7 +72,9 @@ const UpdateDetailsWidget = () => {
                 <TouchableOpacity
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setCountryModalVisible(true)}>
-                    <Text>{country}</Text>
+                    <Text>
+                        {COUNTRIES[country].emoji} {COUNTRIES[country].name}
+                    </Text>
                 </TouchableOpacity>
                 <SetCountry
                     visible={countryModalVisible}
@@ -74,16 +82,18 @@ const UpdateDetailsWidget = () => {
                     setSelectedValue={setCountry}
                     selectedValue={country}
                 />
-                <TextInput
-                    placeholder="Country"
-                    placeholderTextColor={PALETTE.neutral[3]}
-                    onChangeText={setDob}
-                    autoCapitalize="sentences"
-                    autoComplete="name"
-                    autoCorrect={false}
-                    value={dob}
+                <TouchableOpacity
+                    ref={DobTouchableRef}
                     style={[styles.textInput, styles.borderTop]}
-                    editable={!isLoading}
+                    onPress={() => setDobModalVisible(true)}>
+                    <Text>{dayjs(dob).format('Do MMMM, YYYY')}</Text>
+                </TouchableOpacity>
+                <SetDob
+                    visible={dobModalVisible}
+                    setVisible={setDobModalVisible}
+                    selectedValue={dob}
+                    setSelectedValue={setDob}
+                    touchableRef={DobTouchableRef}
                 />
             </View>
             <View style={styles.buttonContainer}>

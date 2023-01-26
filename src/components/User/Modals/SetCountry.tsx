@@ -6,20 +6,19 @@ import {
     Text,
     TextInput,
     StyleSheet,
-    ScrollView,
     SafeAreaView,
     TouchableOpacity,
+    Pressable,
 } from 'react-native';
 import {COUNTRIES} from '@/constants/countries';
-import {Ionicons} from '@expo/vector-icons';
+import {Ionicons, Feather} from '@expo/vector-icons';
+import {FlashList} from '@shopify/flash-list';
 
 type SetCountryProps = {
     visible: boolean;
     setVisible: (visible: boolean) => void;
-    selectedValue: typeof COUNTRIES[keyof typeof COUNTRIES];
-    setSelectedValue: (
-        gender: typeof COUNTRIES[keyof typeof COUNTRIES],
-    ) => void;
+    selectedValue: keyof typeof COUNTRIES;
+    setSelectedValue: (country: keyof typeof COUNTRIES) => void;
 };
 
 const SetCountry: React.FC<SetCountryProps> = ({
@@ -32,8 +31,7 @@ const SetCountry: React.FC<SetCountryProps> = ({
 
     return (
         <Modal visible={visible} animationType="slide" transparent={true}>
-            <SafeAreaView
-                style={{backgroundColor: PALETTE.neutral[0], flex: 1}}>
+            <SafeAreaView style={styles.safeContainer}>
                 <View style={styles.buttonsContainer}>
                     <View style={styles.textInputContainer}>
                         <View style={styles.searchSection}>
@@ -51,42 +49,66 @@ const SetCountry: React.FC<SetCountryProps> = ({
                                 returnKeyType="search"
                                 selectTextOnFocus={true}
                             />
+                            {searchText.length > 0 ? (
+                                <Pressable onPress={() => setSearchText('')}>
+                                    <Feather
+                                        name="x-circle"
+                                        style={styles.searchIcon}
+                                        color={PALETTE.neutral[0]}
+                                        size={14}
+                                    />
+                                </Pressable>
+                            ) : undefined}
                         </View>
                     </View>
+                    <View style={styles.cancelButton}>
+                        <TouchableOpacity onPress={() => setVisible(false)}>
+                            <Text>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <ScrollView>
-                    {Object.values(COUNTRIES)
-                        .filter(country =>
-                            searchText ? country.includes(searchText) : true,
-                        )
-                        .map(country => (
-                            <View key={country}>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        setSelectedValue(country);
-                                        setVisible(false);
-                                    }}>
-                                    <Text>{country}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ))}
-                </ScrollView>
+                <FlashList
+                    data={Object.values(COUNTRIES)
+                        .filter(c => c.name.includes(searchText))
+                        .sort((a, b) => a.name.localeCompare(b.name))}
+                    estimatedItemSize={
+                        styles.countryText.fontSize +
+                        2 * styles.countryText.paddingVertical
+                    }
+                    keyExtractor={country => country.code}
+                    ItemSeparatorComponent={() => (
+                        <View style={styles.seperator} />
+                    )}
+                    renderItem={({item}) => (
+                        <View style={styles.countryOption}>
+                            <TouchableOpacity
+                                style={styles.touchableContainer}
+                                onPress={() => {
+                                    setSelectedValue(item.code);
+                                    setVisible(false);
+                                    setSearchText('');
+                                }}>
+                                <Text style={styles.countryText}>
+                                    {item.emoji + ' ' + item.name}
+                                </Text>
+                                {item.code === selectedValue ? (
+                                    <Ionicons
+                                        name="checkmark"
+                                        size={14}
+                                        style={styles.check}
+                                    />
+                                ) : undefined}
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                />
             </SafeAreaView>
         </Modal>
     );
 };
 
 const styles = StyleSheet.create({
-    pressableContainer: {
-        flex: 1,
-    },
-    modalContainer: {
-        backgroundColor: PALETTE.neutral[0],
-        position: 'absolute',
-        bottom: 0,
-        height: 500,
-        width: '100%',
-    },
+    safeContainer: {backgroundColor: PALETTE.neutral[0], flex: 1},
     buttonsContainer: {
         backgroundColor: '#FFF',
         height: 40,
@@ -117,6 +139,28 @@ const styles = StyleSheet.create({
     },
     searchIcon: {
         paddingHorizontal: 5,
+    },
+    countryOption: {},
+    cancelButton: {marginRight: 10},
+    countryText: {
+        fontSize: 16,
+        paddingVertical: 14,
+        paddingLeft: 8,
+    },
+    seperator: {
+        borderColor: PALETTE.gray[2],
+        borderTopWidth: 1,
+    },
+    touchableContainer: {
+        flexDirection: 'row',
+        flex: 1,
+        alignItems: 'center',
+        alignContent: 'center',
+    },
+    check: {
+        flex: 1,
+        textAlign: 'right',
+        paddingRight: 8,
     },
 });
 

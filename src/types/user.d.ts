@@ -5,7 +5,7 @@ export type UserDocData = {
     name: string;
     gender: 'male' | 'female' | 'other';
     dob: Date;
-    country: typeof COUNTRIES[keyof typeof COUNTRIES];
+    country: keyof typeof COUNTRIES;
 };
 
 // API

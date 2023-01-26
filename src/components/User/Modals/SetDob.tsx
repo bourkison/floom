@@ -1,17 +1,17 @@
-import React, {RefObject, useEffect, useState} from 'react';
-import {Modal, Pressable, StyleSheet, TouchableOpacity} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import React, {useState, useEffect, RefObject} from 'react';
+import {Modal, Pressable, TouchableOpacity, StyleSheet} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {PALETTE} from '@/constants';
 
-type SetGenderProps = {
+type SetDobProps = {
     visible: boolean;
     setVisible: (visible: boolean) => void;
-    selectedValue: 'male' | 'female' | 'other';
-    setSelectedValue: (gender: 'male' | 'female' | 'other') => void;
+    selectedValue: Date;
+    setSelectedValue: (d: Date) => void;
     touchableRef: RefObject<TouchableOpacity>;
 };
 
-const SetGender: React.FC<SetGenderProps> = ({
+const SetDob: React.FC<SetDobProps> = ({
     visible,
     setVisible,
     selectedValue,
@@ -36,13 +36,14 @@ const SetGender: React.FC<SetGenderProps> = ({
                 style={styles.pressableContainer}
                 onPress={() => setVisible(false)}>
                 <Pressable style={[styles.modalContainer, {top: modalTop}]}>
-                    <Picker
-                        selectedValue={selectedValue}
-                        onValueChange={setSelectedValue}>
-                        <Picker.Item value="male" label="Male" />
-                        <Picker.Item value="female" label="Female" />
-                        <Picker.Item value="other" label="Other" />
-                    </Picker>
+                    <DateTimePicker
+                        value={new Date(selectedValue)}
+                        display="spinner"
+                        onChange={(e, d) => {
+                            console.log('CHANGE:', d);
+                            setSelectedValue(d || new Date());
+                        }}
+                    />
                 </Pressable>
             </Pressable>
         </Modal>
@@ -71,4 +72,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SetGender;
+export default SetDob;

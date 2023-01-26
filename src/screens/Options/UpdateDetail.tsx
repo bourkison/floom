@@ -15,7 +15,7 @@ const UpdateDetail: React.FC<
     const user = useAppSelector(state => state.user.docData);
 
     return (
-        <ScrollView>
+        <ScrollView keyboardShouldPersistTaps="never">
             <View style={styles.section}>
                 <View style={styles.box}>
                     <TextInput
