@@ -26,7 +26,7 @@
         "floomUserHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomUserHandler-38677552475750734276-build.zip"
+          "s3Key": "amplify-builds/floomUserHandler-536175574d4b7075496e-build.zip"
         },
         "floomMongooseModels": {
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",

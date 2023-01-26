@@ -7,6 +7,8 @@ import dayjs from 'dayjs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {useNavigation} from '@react-navigation/native';
+import {COUNTRIES} from '@/constants/countries';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 type OptionProps = {
     header: string;
@@ -18,6 +20,8 @@ const AccountDetailsWidget = () => {
     const user = useAppSelector(state => state.user.docData);
     const navigation =
         useNavigation<StackNavigationProp<OptionsStackParamList>>();
+
+    dayjs.extend(advancedFormat);
 
     const Option: React.FC<OptionProps> = ({header, value, bottomBorder}) => {
         return (
@@ -61,12 +65,18 @@ const AccountDetailsWidget = () => {
             />
             <Option
                 header="Country"
-                value={user?.country || ''}
+                value={
+                    user?.country
+                        ? COUNTRIES[user.country].name +
+                          ' ' +
+                          COUNTRIES[user.country].emoji
+                        : ''
+                }
                 bottomBorder={true}
             />
             <Option
                 header="DOB"
-                value={dayjs(user?.dob).format('YYYY/MM/DD') || ''}
+                value={dayjs(user?.dob).format('Do MMMM, YYYY') || ''}
                 bottomBorder={false}
             />
         </TouchableOpacity>

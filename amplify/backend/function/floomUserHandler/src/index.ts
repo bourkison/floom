@@ -92,6 +92,62 @@ const getUser = async (
     return response;
 };
 
+const updateUser = async (
+    event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> => {
+    const authEmail = event.requestContext.authorizer.claims.email;
+    const userObject: UserDocData = JSON.parse(event.body)?.user;
+
+    let response: APIGatewayProxyResult = {
+        statusCode: 500,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({success: false}),
+    };
+
+    if (userObject.email !== authEmail) {
+        response = {
+            statusCode: 403,
+            headers: {
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                success: false,
+                message: `${authEmail} does not have permission to update ${userObject.email}`,
+            }),
+        };
+
+        return response;
+    }
+
+    const User: Model<UserDocData> = await MongooseModels().User(MONGODB_URI);
+
+    await User.findOneAndUpdate(
+        {email: authEmail},
+        {...userObject, dob: new Date(userObject.dob)},
+        {
+            upsert: false,
+        },
+    );
+
+    response = {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+            success: true,
+            message: `User updated with ${userObject}`,
+        }),
+    };
+
+    return response;
+};
+
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
@@ -112,6 +168,9 @@ exports.handler = async (
     switch (event.httpMethod) {
         case 'GET':
             response = await getUser(event);
+            break;
+        case 'PUT':
+            response = await updateUser(event);
             break;
     }
 

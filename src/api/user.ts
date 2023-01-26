@@ -1,5 +1,5 @@
 import {fetchJwtToken, API_NAME} from '@/api/utility';
-import {GetUserParams, UserDocData} from '@/types/user';
+import {GetUserParams, UpdateUserParams, UserDocData} from '@/types/user';
 import {API} from 'aws-amplify';
 
 export async function getUser(input: GetUserParams): Promise<UserDocData> {
@@ -22,4 +22,15 @@ export async function getUser(input: GetUserParams): Promise<UserDocData> {
         dob: data.data.dob,
         country: data.data.country,
     };
+}
+
+export async function updateUser(input: UpdateUserParams) {
+    const path = '/user';
+
+    let init = input.init;
+    init.headers = init.headers || {};
+    init.headers.Authorization =
+        init.headers.Authorization || (await fetchJwtToken());
+
+    await API.put(API_NAME, path, init);
 }

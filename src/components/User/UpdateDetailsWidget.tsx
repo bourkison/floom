@@ -10,17 +10,19 @@ import {
     Text,
 } from 'react-native';
 import {PALETTE} from '@/constants';
-import {useAppSelector} from '@/store/hooks';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import SetGender from '@/components/User/Modals/SetGender';
 import SetCountry from './Modals/SetCountry';
 import {COUNTRIES} from '@/constants/countries';
 import SetDob from './Modals/SetDob';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import {UPDATE_USER} from '@/store/slices/user';
 
 const UpdateDetailsWidget = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const user = useAppSelector(state => state.user.docData);
+    const dispatch = useAppDispatch();
 
     const [name, setName] = useState(user?.name || '');
 
@@ -37,9 +39,20 @@ const UpdateDetailsWidget = () => {
 
     dayjs.extend(advancedFormat);
 
-    const updateUser = () => {
-        setIsLoading(!isLoading);
-        console.log(name);
+    const updateUser = async () => {
+        setIsLoading(true);
+
+        await dispatch(
+            UPDATE_USER({
+                email: user?.email || '',
+                dob: dayjs(dob).format('yyyy-mm-dd'),
+                name,
+                gender,
+                country,
+            }),
+        );
+
+        setIsLoading(false);
     };
 
     return (

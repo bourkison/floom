@@ -22,3 +22,22 @@ export type GetUserInit = {
         view?: string;
     };
 };
+
+export type UpdateUserParams = {
+    init: UpdateUserInit;
+};
+
+export type UpdateUserInit = {
+    headers?: {
+        Authorization?: string;
+    };
+    body: {
+        user: {
+            email: string;
+            name: string;
+            gender: 'male' | 'female' | 'other';
+            dob: string;
+            country: keyof typeof COUNTRIES;
+        };
+    };
+};

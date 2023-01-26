@@ -1,4 +1,4 @@
-import {getUser} from '@/api/user';
+import {getUser, updateUser} from '@/api/user';
 import {UserDocData} from '@/types/user';
 import {
     createEntityAdapter,
@@ -8,6 +8,7 @@ import {
 import {Auth} from 'aws-amplify';
 import {TOGGLE_FILTER} from '@/store/slices/product';
 import {RootState} from '@/store';
+import {COUNTRIES} from '@/constants/countries';
 
 const userAdapter = createEntityAdapter();
 
@@ -56,6 +57,19 @@ export const FETCH_USER = createAsyncThunk(
     },
 );
 
+export const UPDATE_USER = createAsyncThunk<
+    void,
+    {
+        email: string;
+        name: string;
+        gender: 'male' | 'female' | 'other';
+        dob: string;
+        country: keyof typeof COUNTRIES;
+    }
+>('user/UPDATE_USER', async u => {
+    await updateUser({init: {body: {user: u}}});
+});
+
 export const LOGOUT = createAsyncThunk(
     'user/LOGOUT',
     async (): Promise<void> => {
@@ -90,6 +104,17 @@ const userSlice = createSlice({
                 state.loggedIn = false;
                 state.docData = null;
                 state.status = 'failed';
+            })
+            .addCase(UPDATE_USER.fulfilled, (state, action) => {
+                state.docData = {
+                    ...action.meta.arg,
+                    dob: new Date(action.meta.arg.dob),
+                };
+                console.log('user updated:', action.meta.arg);
+            })
+            .addCase(UPDATE_USER.rejected, () => {
+                // TODO: Handle error.
+                console.error('Error updating user');
             })
             .addCase(LOGOUT.pending, state => {
                 state.status = 'loading';
