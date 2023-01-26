@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {PALETTE} from '@/constants';
 import {
     Modal,
@@ -21,6 +21,35 @@ type SetCountryProps = {
     setSelectedValue: (country: keyof typeof COUNTRIES) => void;
 };
 
+const ALPHABET = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+];
+
 const SetCountry: React.FC<SetCountryProps> = ({
     visible,
     setVisible,
@@ -28,6 +57,22 @@ const SetCountry: React.FC<SetCountryProps> = ({
     setSelectedValue,
 }) => {
     const [searchText, setSearchText] = useState('');
+    const [sortedCountries, setSortedCountries] = useState(
+        Object.values(COUNTRIES)
+            .filter(c => c.name.includes(searchText))
+            .sort((a, b) => a.name.localeCompare(b.name)),
+    );
+
+    const FlashListRef =
+        useRef<FlashList<typeof COUNTRIES[keyof typeof COUNTRIES]>>(null);
+
+    useEffect(() => {
+        setSortedCountries(
+            Object.values(COUNTRIES)
+                .filter(c => c.name.includes(searchText))
+                .sort((a, b) => a.name.localeCompare(b.name)),
+        );
+    }, [searchText]);
 
     return (
         <Modal visible={visible} animationType="slide" transparent={true}>
@@ -67,10 +112,37 @@ const SetCountry: React.FC<SetCountryProps> = ({
                         </TouchableOpacity>
                     </View>
                 </View>
+                <View style={styles.alphabetScroller}>
+                    {ALPHABET.map(letter => (
+                        <TouchableOpacity
+                            style={styles.letterScroll}
+                            key={letter}
+                            onPressIn={() => {
+                                let index = sortedCountries.findIndex(c =>
+                                    c.name.startsWith(letter),
+                                );
+
+                                // If index not found, then user pressed X so scroll to W instead.
+                                if (index < -1) {
+                                    sortedCountries.findIndex(c =>
+                                        c.name.startsWith('W'),
+                                    );
+                                }
+
+                                if (FlashListRef && FlashListRef.current) {
+                                    FlashListRef.current.scrollToIndex({
+                                        animated: true,
+                                        index: index,
+                                    });
+                                }
+                            }}>
+                            <Text>{letter}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
                 <FlashList
-                    data={Object.values(COUNTRIES)
-                        .filter(c => c.name.includes(searchText))
-                        .sort((a, b) => a.name.localeCompare(b.name))}
+                    ref={FlashListRef}
+                    data={sortedCountries}
                     estimatedItemSize={
                         styles.countryText.fontSize +
                         2 * styles.countryText.paddingVertical
@@ -110,7 +182,6 @@ const SetCountry: React.FC<SetCountryProps> = ({
 const styles = StyleSheet.create({
     safeContainer: {backgroundColor: PALETTE.neutral[0], flex: 1},
     buttonsContainer: {
-        backgroundColor: '#FFF',
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
@@ -162,6 +233,17 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         paddingRight: 8,
     },
+    alphabetScroller: {
+        flexDirection: 'column',
+        position: 'absolute',
+        right: 5,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9,
+    },
+    letterScroll: {marginVertical: 2},
 });
 
 export default SetCountry;
