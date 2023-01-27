@@ -1,6 +1,6 @@
 import React from 'react';
 import ProductList from '@/components/Product/ProductList';
-import {View, StyleSheet, useWindowDimensions} from 'react-native';
+import {View, StyleSheet, useWindowDimensions, Text} from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
@@ -10,6 +10,8 @@ import FilterDropdown from '@/components/Product/FilterDropdown';
 
 import ActionButton from '@/components/Utility/ActionButton';
 import {useAppSelector} from '@/store/hooks';
+import SkiaButton from '@/components/Utility/SkiaButton';
+import {useValue} from '@shopify/react-native-skia';
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width} = useWindowDimensions();
@@ -25,6 +27,8 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
         state => state.product.unsaved.products.length,
     );
 
+    const pressed = useValue(0);
+
     return (
         <View style={styles.flexOne}>
             <FilterDropdown obj="unsaved" />
@@ -37,7 +41,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     <ProductList />
                 </View>
                 {/* Don't render action buttons if no products found. */}
-                <View
+                {/* <View
                     style={[
                         styles.buttonsContainer,
                         !isLoading &&
@@ -50,6 +54,20 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     <ActionButton type="delete" />
                     <ActionButton type="buy" />
                     <ActionButton type="save" />
+                </View> */}
+                <View
+                    style={{
+                        flex: 1,
+                        width: '100%',
+                    }}>
+                    <SkiaButton
+                        x={0}
+                        y={0}
+                        width={100}
+                        height={100}
+                        pressed={pressed}>
+                        <View />
+                    </SkiaButton>
                 </View>
             </View>
         </View>
