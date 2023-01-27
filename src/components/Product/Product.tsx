@@ -27,7 +27,7 @@ import {
     DELETE_COLOR,
     SAVE_COLOR,
 } from '@/constants';
-import {capitaliseString} from '@/services';
+import {capitaliseString, formatPrice} from '@/services';
 
 import BrandLogo from '@/components/Utility/BrandLogo';
 
@@ -165,7 +165,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                                 </View>
                                 <View style={styles.priceContainer}>
                                     <Text style={styles.priceText}>
-                                        ${product.price[0].saleAmount}
+                                        {formatPrice(product.price)}
                                     </Text>
                                 </View>
                             </View>

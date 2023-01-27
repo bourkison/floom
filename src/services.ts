@@ -1,5 +1,6 @@
 import {Product as ProductType, QueryProductInit} from '@/types/product';
 import {RootState} from './store';
+import {CURRENCIES} from '@/constants/countries';
 
 export const capitaliseString = (str: string): string => {
     const capitaliseFirstLetter = (s: string) => {
@@ -51,6 +52,13 @@ export const alreadyExists = (id: string, array: ProductType[]): boolean => {
     });
 
     return false;
+};
+
+export const formatPrice = (price: ProductType['price']): string => {
+    return (
+        CURRENCIES[price[0].currency].symbol +
+        (Math.round(price[0].saleAmount * 100) / 100).toFixed(2)
+    );
 };
 
 type FiltersType = 'saved' | 'unsaved' | 'deleted';

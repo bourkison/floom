@@ -1,11 +1,12 @@
-import {COUNTRIES} from '@/constants/countries';
+import {COUNTRIES, CURRENCIES} from '@/constants/countries';
 
 export type UserDocData = {
     email: string;
     name: string;
     gender: 'male' | 'female' | 'other';
-    dob: Date;
+    dob: string;
     country: keyof typeof COUNTRIES;
+    currency: keyof typeof CURRENCIES;
 };
 
 // API
@@ -32,12 +33,6 @@ export type UpdateUserInit = {
         Authorization?: string;
     };
     body: {
-        user: {
-            email: string;
-            name: string;
-            gender: 'male' | 'female' | 'other';
-            dob: string;
-            country: keyof typeof COUNTRIES;
-        };
+        user: UserDocData;
     };
 };

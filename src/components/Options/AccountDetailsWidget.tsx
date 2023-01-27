@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {useNavigation} from '@react-navigation/native';
-import {COUNTRIES} from '@/constants/countries';
+import {COUNTRIES, CURRENCIES} from '@/constants/countries';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 type OptionProps = {
@@ -70,6 +70,17 @@ const AccountDetailsWidget = () => {
                         ? COUNTRIES[user.country].name +
                           ' ' +
                           COUNTRIES[user.country].emoji
+                        : ''
+                }
+                bottomBorder={true}
+            />
+            <Option
+                header="Currency"
+                value={
+                    user?.currency
+                        ? CURRENCIES[user.currency].name +
+                          ' ' +
+                          CURRENCIES[user.currency].emoji
                         : ''
                 }
                 bottomBorder={true}

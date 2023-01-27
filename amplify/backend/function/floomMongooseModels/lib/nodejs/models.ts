@@ -1,6 +1,9 @@
 import mongoose, {Types} from 'mongoose';
 import mongooseConnect from './mongoose-connection';
-import {COUNTRY_CODES, CURRENCY_CODES} from './constants';
+import {COUNTRIES, CURRENCIES} from './constants';
+
+const COUNTRY_CODES = Object.values(COUNTRIES).map(c => c.code);
+const CURRENCY_CODES = Object.values(CURRENCIES).map(c => c.code);
 
 const userSchema = new mongoose.Schema(
     {
@@ -21,6 +24,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: COUNTRY_CODES,
+        },
+        currency: {
+            type: String,
+            required: true,
+            enum: CURRENCY_CODES,
         },
         email: {
             type: String,
@@ -110,9 +118,9 @@ const productSchema = new mongoose.Schema(
             type: [String],
             required: true,
             validate: {
-                validator: function (countries: string[]) {
+                validator: function (countries: typeof COUNTRY_CODES) {
                     countries.forEach(c => {
-                        if (!CURRENCY_CODES.includes(c)) {
+                        if (!COUNTRY_CODES.includes(c)) {
                             return false;
                         }
                     });

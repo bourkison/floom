@@ -25,7 +25,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import {IMAGE_RATIO, PALETTE} from '@/constants';
-import {capitaliseString, stringifyColors} from '@/services';
+import {capitaliseString, formatPrice, stringifyColors} from '@/services';
 
 import {useAppDispatch} from '@/store/hooks';
 import {
@@ -308,8 +308,7 @@ const ProductView = ({
                         <View style={styles.priceBrandCont}>
                             <View style={styles.priceContainer}>
                                 <Text style={styles.priceText}>
-                                    $
-                                    {route.params.product.price[0].amount.toString()}
+                                    {formatPrice(route.params.product.price)}
                                 </Text>
                             </View>
 

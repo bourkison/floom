@@ -8,7 +8,6 @@ import {
 import {Auth} from 'aws-amplify';
 import {TOGGLE_FILTER} from '@/store/slices/product';
 import {RootState} from '@/store';
-import {COUNTRIES} from '@/constants/countries';
 
 const userAdapter = createEntityAdapter();
 
@@ -57,18 +56,12 @@ export const FETCH_USER = createAsyncThunk(
     },
 );
 
-export const UPDATE_USER = createAsyncThunk<
-    void,
-    {
-        email: string;
-        name: string;
-        gender: 'male' | 'female' | 'other';
-        dob: string;
-        country: keyof typeof COUNTRIES;
-    }
->('user/UPDATE_USER', async u => {
-    await updateUser({init: {body: {user: u}}});
-});
+export const UPDATE_USER = createAsyncThunk<void, UserDocData>(
+    'user/UPDATE_USER',
+    async u => {
+        await updateUser({init: {body: {user: u}}});
+    },
+);
 
 export const LOGOUT = createAsyncThunk(
     'user/LOGOUT',
@@ -106,10 +99,7 @@ const userSlice = createSlice({
                 state.status = 'failed';
             })
             .addCase(UPDATE_USER.fulfilled, (state, action) => {
-                state.docData = {
-                    ...action.meta.arg,
-                    dob: new Date(action.meta.arg.dob),
-                };
+                state.docData = action.meta.arg;
                 console.log('user updated:', action.meta.arg);
             })
             .addCase(UPDATE_USER.rejected, () => {

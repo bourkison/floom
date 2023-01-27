@@ -54,6 +54,7 @@ const getUser = async (
                 gender: 1,
                 dob: 1,
                 country: 1,
+                currency: 1,
             },
         ).exec();
 
@@ -122,6 +123,8 @@ const updateUser = async (
 
         return response;
     }
+
+    // TODO: Update birthdate, email, gender, locale, name in Cognito first.
 
     const User: Model<UserDocData> = await MongooseModels().User(MONGODB_URI);
 

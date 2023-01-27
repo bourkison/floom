@@ -13,10 +13,11 @@ import {PALETTE} from '@/constants';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import SetGender from '@/components/User/Modals/SetGender';
 import SetCountry from './Modals/SetCountry';
-import {COUNTRIES} from '@/constants/countries';
+import {COUNTRIES, CURRENCIES} from '@/constants/countries';
 import SetDob from './Modals/SetDob';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import {UPDATE_USER} from '@/store/slices/user';
+import SetCurrency from './Modals/SetCurrency';
 
 const UpdateDetailsWidget = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -34,8 +35,12 @@ const UpdateDetailsWidget = () => {
     const [countryModalVisible, setCountryModalVisible] = useState(false);
 
     const DobTouchableRef = useRef<TouchableOpacity>(null);
-    const [dob, setDob] = useState(user?.dob || new Date());
+    const [dob, setDob] = useState(user?.dob ? new Date(user.dob) : new Date());
     const [dobModalVisible, setDobModalVisible] = useState(false);
+
+    const CurrencyTouchableRef = useRef<TouchableOpacity>(null);
+    const [currency, setCurrency] = useState(user?.currency || 'GBP');
+    const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
     dayjs.extend(advancedFormat);
 
@@ -45,14 +50,41 @@ const UpdateDetailsWidget = () => {
         await dispatch(
             UPDATE_USER({
                 email: user?.email || '',
-                dob: dayjs(dob).format('yyyy-mm-dd'),
+                dob: dayjs(dob).format('YYYY-MM-DD'),
                 name,
                 gender,
                 country,
+                currency,
             }),
         );
 
         setIsLoading(false);
+    };
+
+    const matchCountryAndCurrency = (c: keyof typeof COUNTRIES) => {
+        switch (c) {
+            case 'AU':
+                setCurrency('AUD');
+                break;
+            case 'GB':
+                setCurrency('GBP');
+                break;
+            case 'CA':
+                setCurrency('CAD');
+                break;
+            case 'US':
+                setCurrency('USD');
+                break;
+            case 'DE':
+                setCurrency('EUR');
+                break;
+            case 'FR':
+                setCurrency('EUR');
+                break;
+            // TODO: Countries within Euro.
+        }
+
+        setCountry(c);
     };
 
     return (
@@ -92,8 +124,24 @@ const UpdateDetailsWidget = () => {
                 <SetCountry
                     visible={countryModalVisible}
                     setVisible={() => setCountryModalVisible(false)}
-                    setSelectedValue={setCountry}
+                    setSelectedValue={matchCountryAndCurrency}
                     selectedValue={country}
+                />
+                <TouchableOpacity
+                    ref={CurrencyTouchableRef}
+                    style={[styles.textInput, styles.borderTop]}
+                    onPress={() => setCurrencyModalVisible(true)}>
+                    <Text>
+                        {CURRENCIES[currency].emoji} {CURRENCIES[currency].name}{' '}
+                        ({CURRENCIES[currency].symbol})
+                    </Text>
+                </TouchableOpacity>
+                <SetCurrency
+                    visible={currencyModalVisible}
+                    setVisible={() => setCurrencyModalVisible(false)}
+                    setSelectedValue={setCurrency}
+                    selectedValue={currency}
+                    touchableRef={CurrencyTouchableRef}
                 />
                 <TouchableOpacity
                     ref={DobTouchableRef}

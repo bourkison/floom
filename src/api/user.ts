@@ -1,6 +1,7 @@
 import {fetchJwtToken, API_NAME} from '@/api/utility';
 import {GetUserParams, UpdateUserParams, UserDocData} from '@/types/user';
 import {API} from 'aws-amplify';
+import dayjs from 'dayjs';
 
 export async function getUser(input: GetUserParams): Promise<UserDocData> {
     const path = '/user/' + input.username;
@@ -19,8 +20,9 @@ export async function getUser(input: GetUserParams): Promise<UserDocData> {
         email: data.data.email,
         name: data.data.name,
         gender: data.data.gender,
-        dob: data.data.dob,
+        dob: dayjs(data.data.dob).format('YYYY-MM-DD'),
         country: data.data.country,
+        currency: data.data.currency,
     };
 }
 

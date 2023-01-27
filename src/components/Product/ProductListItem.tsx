@@ -28,7 +28,7 @@ import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {BUY_COLOR, DELETE_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
-import {capitaliseString} from '@/services';
+import {capitaliseString, formatPrice} from '@/services';
 import BrandLogo from '../Utility/BrandLogo';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -243,7 +243,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                                 {capitaliseString(product.name)}
                             </Text>
                             <View style={styles.priceContainer}>
-                                <Text>${product.price[0].saleAmount} </Text>
+                                <Text>{formatPrice(product.price)} </Text>
                                 <BrandLogo brand={product.brand} />
                             </View>
                         </View>

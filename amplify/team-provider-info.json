@@ -26,11 +26,11 @@
         "floomUserHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomUserHandler-536175574d4b7075496e-build.zip"
+          "s3Key": "amplify-builds/floomUserHandler-4d42423341364c6d6f79-build.zip"
         },
         "floomMongooseModels": {
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersion27e68895-build.zip"
+          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersionc0eb6ab0-build.zip"
         },
         "floomSaveHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
