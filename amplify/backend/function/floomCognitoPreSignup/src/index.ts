@@ -1,5 +1,5 @@
 import aws from 'aws-sdk';
-import {PostConfirmationTriggerEvent} from 'aws-lambda';
+import {PreSignUpTriggerHandler} from 'aws-lambda';
 import {Model} from 'mongoose';
 // @ts-ignore
 import MongooseModels from '/opt/nodejs/models';
@@ -13,9 +13,7 @@ type TUser = {
     currency: string;
 };
 
-exports.handler = async (
-    event: PostConfirmationTriggerEvent,
-): Promise<PostConfirmationTriggerEvent> => {
+const handler: PreSignUpTriggerHandler = async (event, context, callback) => {
     const {Parameters} = await new aws.SSM()
         .getParameters({
             Names: ['MONGODB_URI'].map(secretName => process.env[secretName]),
@@ -38,8 +36,17 @@ exports.handler = async (
         country: event.request.userAttributes.locale,
         currency: event.request.userAttributes['custom:currency'],
     };
+
     const user = new User(userObj);
 
-    await user.save();
-    return event;
+    try {
+        await user.validate();
+    } catch (err) {
+        callback(err, event);
+        return;
+    }
+
+    callback(null, event);
 };
+
+exports.handler = handler;

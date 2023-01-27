@@ -21,7 +21,7 @@
         "floomCognitoPostConfirmation": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomCognitoPostConfirmation-522b664d6f337774466e-build.zip"
+          "s3Key": "amplify-builds/floomCognitoPostConfirmation-427453776e7267364752-build.zip"
         },
         "floomUserHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
@@ -51,6 +51,11 @@
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
           "s3Key": "amplify-builds/floomProductManager-6763786d4c5154316166-build.zip"
+        },
+        "floomCognitoPreSignup": {
+          "secretsPathAmplifyAppId": "d34lete8blzmed",
+          "deploymentBucketName": "amplify-floom-dev-20152-deployment",
+          "s3Key": "amplify-builds/floomCognitoPreSignup-79575047795035776c4b-build.zip"
         }
       },
       "api": {

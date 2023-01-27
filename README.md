@@ -9,3 +9,7 @@
 -   Login/Sign Up stages better designed
 -   Describe benefits of guest mode
 -   Guest mode working
+-   Share button
+-   Report button
+-   Fix zIndex bug on android
+-   Preload images

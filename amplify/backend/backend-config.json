@@ -51,6 +51,15 @@
           "category": "function",
           "resourceName": "floomCognitoPostConfirmation",
           "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "floomCognitoPreSignup",
+          "triggerProvider": "Cognito"
         }
       ],
       "frontendAuthConfig": {
@@ -83,6 +92,20 @@
   },
   "function": {
     "floomCognitoPostConfirmation": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "floomCognitoPreSignup": {
       "build": true,
       "dependsOn": [
         {
@@ -194,6 +217,30 @@
         {
           "category": "function",
           "resourceName": "floomCognitoPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomCognitoPreSignup_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomCognitoPreSignup"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomCognitoPreSignup_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomCognitoPreSignup"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomCognitoPreSignup_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomCognitoPreSignup"
         }
       ]
     },

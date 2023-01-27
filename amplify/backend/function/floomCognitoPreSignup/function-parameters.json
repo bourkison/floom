@@ -1,0 +1,29 @@
+{
+  "trigger": true,
+  "modules": [
+    "custom"
+  ],
+  "parentResource": "floomCognito",
+  "functionName": "floomCognitoPreSignup",
+  "resourceName": "floomCognitoPreSignup",
+  "parentStack": "auth",
+  "triggerEnvs": [],
+  "triggerDir": "/snapshot/repo/build/node_modules/@aws-amplify/amplify-category-auth/provider-utils/awscloudformation/triggers/PreSignup",
+  "triggerTemplate": "PreSignup.json.ejs",
+  "triggerEventPath": "PreSignup.event.json",
+  "roleName": "floomCognitoPreSignup",
+  "skipEdit": true,
+  "enableCors": false,
+  "lambdaLayers": [
+    {
+      "type": "ProjectLayer",
+      "resourceName": "floomMongooseModels",
+      "env": "dev",
+      "version": "Always choose latest version",
+      "isLatestVersionSelected": true
+    }
+  ],
+  "secretNames": [
+    "MONGODB_URI"
+  ]
+}
