@@ -646,6 +646,27 @@ const productSlice = createSlice({
                     state.deleted.isLoadingMore = true;
                 }
             })
+            .addCase(
+                LOAD_DELETED_PRODUCTS.rejected,
+                (state, {meta, payload}) => {
+                    // TODO: Handle rejections.
+                    // If initial load or refresh and 404
+                    if (
+                        (meta.arg.loadType === 'initial' ||
+                            meta.arg.loadType === 'refresh') &&
+                        meta.rejectedWithValue &&
+                        payload &&
+                        payload.code &&
+                        payload.code === 404
+                    ) {
+                        state.deleted.products = [];
+                    }
+
+                    state.deleted.isLoading = false;
+                    state.deleted.isLoadingMore = false;
+                    state.deleted.moreToLoad = false;
+                },
+            )
             .addCase(LOAD_DELETED_PRODUCTS.fulfilled, (state, action) => {
                 if (action.meta.arg.loadType === 'more') {
                     state.deleted.products = [
