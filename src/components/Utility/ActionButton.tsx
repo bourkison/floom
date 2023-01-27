@@ -1,5 +1,5 @@
-import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {Pressable, StyleSheet, View} from 'react-native';
 import {Feather, AntDesign, Ionicons} from '@expo/vector-icons';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {COMMENCE_ANIMATE, SET_ACTION} from '@/store/slices/product';
@@ -11,7 +11,11 @@ import {
     ACTION_BUTTON_SIZE_INACTIVE,
     PALETTE,
 } from '@/constants';
-import AnimatedButton from '@/components/Utility/AnimatedButton';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
 
 type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
@@ -21,6 +25,64 @@ type ActionButtonProps = {
 const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
     const dispatch = useAppDispatch();
     const action = useAppSelector(state => state.product.action);
+    const sScale = useSharedValue(1);
+
+    const rStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    scale: sScale.value,
+                },
+            ],
+            shadowOpacity: sScale.value / 2,
+        };
+    });
+
+    const activeColor = useCallback(() => {
+        if (type === 'save') {
+            return SAVE_COLOR;
+        } else if (type === 'buy') {
+            return BUY_COLOR;
+        } else {
+            return DELETE_COLOR;
+        }
+    }, [type]);
+
+    const icon = useCallback(() => {
+        if (type === 'save') {
+            return (
+                <Ionicons
+                    name="heart"
+                    color={action === type ? PALETTE.neutral[1] : activeColor()}
+                    size={ACTION_BUTTON_SIZE_INACTIVE / 2.5}
+                />
+            );
+        } else if (type === 'buy') {
+            return (
+                <AntDesign
+                    name="shoppingcart"
+                    size={ACTION_BUTTON_SIZE_ACTIVE / 2}
+                    color={action === type ? PALETTE.neutral[1] : activeColor()}
+                />
+            );
+        } else {
+            return (
+                <Feather
+                    name="x"
+                    size={ACTION_BUTTON_SIZE_ACTIVE / 2}
+                    color={action === type ? PALETTE.neutral[1] : activeColor()}
+                />
+            );
+        }
+    }, [type, activeColor, action]);
+
+    useEffect(() => {
+        if (action === type) {
+            sScale.value = withTiming(0.9, {duration: 150});
+        } else {
+            sScale.value = withTiming(1, {duration: 150});
+        }
+    }, [action, sScale, type]);
 
     const press = () => {
         dispatch(SET_ACTION(type));
@@ -32,154 +94,41 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
         }
     };
 
-    if (type === 'save') {
-        return (
-            <View
-                style={[
-                    styles.buttonContainer,
-                    action === type ? styles.noShadow : styles.shadow,
-                ]}>
-                <AnimatedButton
-                    scale={1}
-                    style={{
-                        ...styles.actionButton,
-                        borderRadius:
-                            action === type
-                                ? ACTION_BUTTON_SIZE_ACTIVE / 2
-                                : ACTION_BUTTON_SIZE_INACTIVE / 2,
-                        width:
-                            action === type
-                                ? ACTION_BUTTON_SIZE_ACTIVE
-                                : ACTION_BUTTON_SIZE_INACTIVE,
-                        height:
-                            action === type
-                                ? ACTION_BUTTON_SIZE_ACTIVE
-                                : ACTION_BUTTON_SIZE_INACTIVE,
-                        borderColor: PALETTE.lime[4],
-                        backgroundColor:
-                            action === type ? SAVE_COLOR : PALETTE.neutral[0],
-                    }}
-                    onPress={press}>
-                    <View style={styles.button}>
-                        <Ionicons
-                            name="heart"
-                            size={ACTION_BUTTON_SIZE_ACTIVE / 2}
-                            color={
-                                action === type ? PALETTE.slate[0] : SAVE_COLOR
-                            }
-                        />
-                    </View>
-                </AnimatedButton>
-            </View>
-        );
-    }
-
-    if (type === 'buy') {
-        return (
-            <View
-                style={[
-                    styles.buttonContainer,
-                    action === type ? styles.noShadow : styles.shadow,
-                ]}>
-                <AnimatedButton
-                    scale={1}
-                    style={{
-                        ...styles.actionButton,
-                        borderRadius:
-                            action === type
-                                ? ACTION_BUTTON_SIZE_ACTIVE / 2
-                                : ACTION_BUTTON_SIZE_INACTIVE / 2,
-                        width:
-                            action === type
-                                ? ACTION_BUTTON_SIZE_ACTIVE
-                                : ACTION_BUTTON_SIZE_INACTIVE,
-                        height:
-                            action === type
-                                ? ACTION_BUTTON_SIZE_ACTIVE
-                                : ACTION_BUTTON_SIZE_INACTIVE,
-                        borderColor: PALETTE.blue[4],
-                        backgroundColor:
-                            action === type ? BUY_COLOR : PALETTE.neutral[0],
-                    }}
-                    onPress={press}>
-                    <View style={styles.button}>
-                        <AntDesign
-                            name="shoppingcart"
-                            size={ACTION_BUTTON_SIZE_ACTIVE / 2}
-                            color={
-                                action === type ? PALETTE.slate[0] : BUY_COLOR
-                            }
-                        />
-                    </View>
-                </AnimatedButton>
-            </View>
-        );
-    }
-
     return (
-        <View
-            style={[
-                styles.buttonContainer,
-                action === type ? styles.noShadow : styles.shadow,
-            ]}>
-            <AnimatedButton
-                scale={1}
-                style={{
-                    ...styles.actionButton,
-                    borderRadius:
-                        action === type
-                            ? ACTION_BUTTON_SIZE_ACTIVE / 2
-                            : ACTION_BUTTON_SIZE_INACTIVE / 2,
-                    width:
-                        action === type
-                            ? ACTION_BUTTON_SIZE_ACTIVE
-                            : ACTION_BUTTON_SIZE_INACTIVE,
-                    height:
-                        action === type
-                            ? ACTION_BUTTON_SIZE_ACTIVE
-                            : ACTION_BUTTON_SIZE_INACTIVE,
-                    borderColor: PALETTE.rose[4],
-                    backgroundColor:
-                        action === type ? DELETE_COLOR : PALETTE.neutral[0],
-                }}
-                onPress={press}>
-                <View style={styles.button}>
-                    <Feather
-                        name="x"
-                        size={ACTION_BUTTON_SIZE_ACTIVE / 2}
-                        color={
-                            action === type ? PALETTE.slate[0] : DELETE_COLOR
-                        }
-                    />
+        <Animated.View style={[styles.buttonContainer, rStyle]}>
+            <Pressable onPress={press}>
+                <View
+                    style={[
+                        styles.button,
+                        // eslint-disable-next-line react-native/no-inline-styles
+                        {
+                            backgroundColor:
+                                action === type ? activeColor() : '#FFF',
+                        },
+                    ]}>
+                    {icon()}
                 </View>
-            </AnimatedButton>
-        </View>
+            </Pressable>
+        </Animated.View>
     );
 };
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        height: ACTION_BUTTON_SIZE_INACTIVE,
-        width: ACTION_BUTTON_SIZE_INACTIVE,
         marginHorizontal: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: PALETTE.slate[7],
-        shadowOffset: {
-            width: 0,
-            height: 0,
-        },
-    },
-    actionButton: {
-        zIndex: -1,
-        borderWidth: 1,
+        shadowColor: PALETTE.neutral[5],
     },
     button: {
-        flex: 1,
-        justifyContent: 'center',
-        alignContent: 'center',
-        alignItems: 'center',
         zIndex: -1,
+        width: ACTION_BUTTON_SIZE_INACTIVE,
+        height: ACTION_BUTTON_SIZE_INACTIVE,
+        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2,
+        flexBasis: ACTION_BUTTON_SIZE_INACTIVE,
+        flexGrow: 0,
+        flexShrink: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
     },
     noShadow: {
         shadowOpacity: 0,

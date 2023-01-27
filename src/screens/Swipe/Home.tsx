@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
         marginTop: 40,
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         zIndex: -1,
     },
     flexOne: {flex: 1},
