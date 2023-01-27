@@ -58,7 +58,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 30,
+        paddingTop: 20,
         flex: 1,
         alignItems: 'center',
         alignContent: 'center',

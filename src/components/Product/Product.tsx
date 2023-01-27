@@ -182,7 +182,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 <View style={styles.imageOverlayContainer}>
                     <View style={styles.gradientContainer}>
                         <LinearGradient
-                            colors={['#00000000', '#000000']}
+                            colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.6)']}
                             style={styles.linearGradient}>
                             <View style={styles.textContainer}>
                                 <View style={styles.leftContainer}>

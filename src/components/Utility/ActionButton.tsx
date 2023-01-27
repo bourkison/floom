@@ -130,12 +130,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1,
     },
-    noShadow: {
-        shadowOpacity: 0,
-    },
-    shadow: {
-        shadowOpacity: 0.4,
-    },
 });
 
 export default ActionButton;

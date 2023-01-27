@@ -1,5 +1,11 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Pressable,
+    TouchableOpacity,
+} from 'react-native';
 import Constants from 'expo-constants';
 import {StackHeaderProps} from '@react-navigation/stack';
 import {Entypo, Ionicons, Feather} from '@expo/vector-icons';
@@ -41,22 +47,22 @@ const HeaderTemplate: React.FC<HeaderProps> = ({
 export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
     <HeaderTemplate
         leftIcon={
-            <Pressable
+            <TouchableOpacity
                 onPress={() => {
                     navigation.navigate('Options');
                 }}
                 style={styles.headerIcon}>
                 <Entypo name="cog" size={24} />
-            </Pressable>
+            </TouchableOpacity>
         }
         rightIcon={
-            <Pressable
+            <TouchableOpacity
                 onPress={() => {
                     navigation.navigate('SavedProducts');
                 }}
                 style={styles.headerIcon}>
                 <Ionicons name="heart-outline" size={24} />
-            </Pressable>
+            </TouchableOpacity>
         }>
         Floom
     </HeaderTemplate>
