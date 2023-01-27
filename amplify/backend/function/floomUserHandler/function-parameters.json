@@ -10,5 +10,15 @@
   ],
   "secretNames": [
     "MONGODB_URI"
-  ]
+  ],
+  "permissions": {
+    "auth": {
+      "floomCognito": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  }
 }

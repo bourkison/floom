@@ -13,6 +13,7 @@
 -   Report button
 -   Fix zIndex bug on android
 -   ~Preload images~
+-   Price filters
 
 ## Out of Scope Ideas
 

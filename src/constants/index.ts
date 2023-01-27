@@ -25,7 +25,7 @@ import {
 } from '@/constants/colors';
 
 // PRODUCT IMAGE CONSTANTS
-export const IMAGE_RATIO = 0.65;
+export const IMAGE_RATIO = 0.7;
 export const IMAGE_PADDING = 20;
 export const IMAGE_GRADIENT_HEIGHT = 128;
 export const FALLBACK_IMAGE =

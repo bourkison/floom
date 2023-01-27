@@ -473,6 +473,7 @@ const productSlice = createSlice({
         builder
             .addCase(SAVE_PRODUCT.pending, (state, action) => {
                 state.animation = 'idle';
+                state.action = 'idle';
 
                 // Slice from unsaved if they are the same.
                 if (state.unsaved.products[0]?._id === action.meta.arg._id) {

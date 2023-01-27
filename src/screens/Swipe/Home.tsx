@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         flexShrink: 0,
     },
     buttonsContainer: {
-        marginTop: 40,
+        marginTop: 30,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
