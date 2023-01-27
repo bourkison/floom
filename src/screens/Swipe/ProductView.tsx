@@ -8,6 +8,7 @@ import {
     Image,
     useWindowDimensions,
     ViewStyle,
+    ActivityIndicator,
 } from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
@@ -62,6 +63,11 @@ const ProductView = ({
 
     const [containerHeight, setContainerHeight] = useState(0);
     const [contentHeight, setContentHeight] = useState(0);
+
+    const [isLoadingImage, setIsLoadingImage] = useState(true);
+    const [loadingImageTimeout, setLoadingImageTimeout] = useState<
+        NodeJS.Timer | undefined
+    >();
 
     useEffect(() => {
         const {routes} = navigation.getState();
@@ -197,6 +203,29 @@ const ProductView = ({
         }
     };
 
+    // Only set loader after a defined amount of seconds of loading
+    // To avoid loader showing up when  retrieving from cache
+    const setLoader = (loading: boolean) => {
+        const AMOUNT_TO_WAIT = 200;
+
+        if (loading) {
+            // Set image interval to a new timeout.
+            // In this timeout, we then set it to undefined once finished and clear the interval.
+            setLoadingImageTimeout(interval => {
+                return setTimeout(() => {
+                    setIsLoadingImage(true);
+                    clearTimeout(interval);
+                    setLoadingImageTimeout(undefined);
+                }, AMOUNT_TO_WAIT);
+            });
+        } else {
+            // Else just clear the current timeout and set interval to undefined
+            setIsLoadingImage(false);
+            clearTimeout(loadingImageTimeout);
+            setLoadingImageTimeout(undefined);
+        }
+    };
+
     const ActionSection = () => {
         const deleteProduct = () => {
             if (previousRoute === 'Home') {
@@ -249,7 +278,9 @@ const ProductView = ({
                     style={styles.imageBackground}
                     source={{
                         uri: route.params.product.images[imageIndex],
-                    }}>
+                    }}
+                    onLoadStart={() => setLoader(true)}
+                    onLoad={() => setLoader(false)}>
                     <View style={styles.selectedImageContainer}>
                         {route.params.product.images.map((s, index) => (
                             <View
@@ -278,6 +309,9 @@ const ProductView = ({
                             }}
                         />
                     </View>
+                    {isLoadingImage ? (
+                        <ActivityIndicator style={styles.loadingImage} />
+                    ) : undefined}
                 </ImageBackground>
             </View>
             <View
@@ -460,6 +494,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         marginVertical: 33,
+    },
+    loadingImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
     },
 });
 

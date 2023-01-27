@@ -7,6 +7,7 @@ import {
     View,
     ViewStyle,
     TextStyle,
+    ActivityIndicator,
 } from 'react-native';
 import {Product as ProductType} from '@/types/product';
 import {LinearGradient} from 'expo-linear-gradient';
@@ -24,10 +25,11 @@ import {
     IMAGE_RATIO,
     IMAGE_PADDING,
     IMAGE_GRADIENT_HEIGHT,
-    FALLBACK_IMAGE,
     DELETE_COLOR,
     SAVE_COLOR,
     IMAGE_PREFETCH_AMOUNT,
+    PALETTE,
+    IMAGE_ANIMATED_AMOUNT,
 } from '@/constants';
 import {capitaliseString, formatPrice} from '@/services';
 
@@ -46,6 +48,11 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
 
     const [imageIndex, setImageIndex] = useState(0);
     const [prefetchedImages, setPrefetchedImages] = useState<string[]>([]);
+
+    const [isLoadingImage, setIsLoadingImage] = useState(true);
+    const [loadingImageTimeout, setLoadingImageTimeout] = useState<
+        NodeJS.Timer | undefined
+    >();
 
     useEffect(() => {
         if (
@@ -115,6 +122,29 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         return response;
     };
 
+    // Only set loader after a defined amount of seconds of loading
+    // To avoid loader showing up when  retrieving from cache
+    const setLoader = (loading: boolean) => {
+        const AMOUNT_TO_WAIT = 200;
+
+        if (loading) {
+            // Set image interval to a new timeout.
+            // In this timeout, we then set it to undefined once finished and clear the interval.
+            setLoadingImageTimeout(interval => {
+                return setTimeout(() => {
+                    setIsLoadingImage(true);
+                    clearTimeout(interval);
+                    setLoadingImageTimeout(undefined);
+                }, AMOUNT_TO_WAIT);
+            });
+        } else {
+            // Else just clear the current timeout and set interval to undefined
+            setIsLoadingImage(false);
+            clearTimeout(loadingImageTimeout);
+            setLoadingImageTimeout(undefined);
+        }
+    };
+
     let baseComponent = (
         <View
             style={[
@@ -131,8 +161,10 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                     {zIndex: 20 - index, elevation: 20 - index},
                 ]}
                 source={{
-                    uri: product.images[imageIndex] || FALLBACK_IMAGE,
-                }}>
+                    uri: product.images[imageIndex],
+                }}
+                onLoadStart={() => setLoader(true)}
+                onLoad={() => setLoader(false)}>
                 <View style={styles.selectedImageContainer}>
                     {product.images.map((s, i) => (
                         <View style={calculateImageIndicator(i)} key={i} />
@@ -172,11 +204,15 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         </LinearGradient>
                     </View>
                 </View>
+                {isLoadingImage ? (
+                    <ActivityIndicator style={styles.loadingImage} />
+                ) : undefined}
             </ImageBackground>
         </View>
     );
 
-    if (index === 0) {
+    // Animated more images to prevent flickering on component change.
+    if (index < IMAGE_ANIMATED_AMOUNT) {
         return (
             <AnimatedProduct
                 imageIndex={imageIndex}
@@ -262,6 +298,7 @@ const styles = StyleSheet.create({
     },
     image: {
         borderRadius: 5,
+        backgroundColor: PALETTE.neutral[9],
         overflow: 'hidden',
     },
     leftContainer: {flex: 3},
@@ -299,6 +336,13 @@ const styles = StyleSheet.create({
     },
     deletedText: {
         color: DELETE_COLOR + 'b3',
+    },
+    loadingImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
     },
 });
 
