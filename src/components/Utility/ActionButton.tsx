@@ -12,6 +12,7 @@ import {
     PALETTE,
 } from '@/constants';
 import Animated, {
+    interpolateColor,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
@@ -22,21 +23,19 @@ type ActionButtonProps = {
     onPress?: () => void;
 };
 
+const SCALE_AMOUNT = 0.9;
+
+const BOX_SHADOW_START = 0.5;
+const BOX_SHADOW_END = 0.4;
+
+const PROGRESS_DURATION = 250;
+
 const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
     const dispatch = useAppDispatch();
     const action = useAppSelector(state => state.product.action);
-    const sScale = useSharedValue(1);
 
-    const rStyle = useAnimatedStyle(() => {
-        return {
-            transform: [
-                {
-                    scale: sScale.value,
-                },
-            ],
-            shadowOpacity: sScale.value / 2,
-        };
-    });
+    // Goes from 0 to 1 based on progress.
+    const sProgress = useSharedValue(0);
 
     const activeColor = useCallback(() => {
         if (type === 'save') {
@@ -48,12 +47,35 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
         }
     }, [type]);
 
+    const ACTIVE_COLOR = activeColor();
+
+    const rStyle = useAnimatedStyle(() => {
+        const backgroundColor = interpolateColor(
+            sProgress.value,
+            [0, 1],
+            [PALETTE.neutral[1], ACTIVE_COLOR],
+        );
+
+        return {
+            transform: [
+                {
+                    // Goes from 1 to SCALE_AMOUNT based on progress
+                    scale: 1 - (1 - SCALE_AMOUNT) * sProgress.value,
+                },
+            ],
+            // Goes from 0.5 to 0.4 based on progress
+            shadowOpacity:
+                BOX_SHADOW_START - (1 - BOX_SHADOW_END) * sProgress.value,
+            backgroundColor,
+        };
+    });
+
     const icon = useCallback(() => {
         if (type === 'save') {
             return (
                 <Ionicons
                     name="heart"
-                    color={action === type ? PALETTE.neutral[1] : activeColor()}
+                    color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
                     size={ACTION_BUTTON_SIZE_INACTIVE / 2.5}
                 />
             );
@@ -62,7 +84,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
                 <AntDesign
                     name="shoppingcart"
                     size={ACTION_BUTTON_SIZE_ACTIVE / 2}
-                    color={action === type ? PALETTE.neutral[1] : activeColor()}
+                    color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
                 />
             );
         } else {
@@ -70,19 +92,19 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
                 <Feather
                     name="x"
                     size={ACTION_BUTTON_SIZE_ACTIVE / 2}
-                    color={action === type ? PALETTE.neutral[1] : activeColor()}
+                    color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
                 />
             );
         }
-    }, [type, activeColor, action]);
+    }, [type, action, ACTIVE_COLOR]);
 
     useEffect(() => {
         if (action === type) {
-            sScale.value = withTiming(0.9, {duration: 150});
+            sProgress.value = withTiming(1, {duration: PROGRESS_DURATION});
         } else {
-            sScale.value = withTiming(1, {duration: 150});
+            sProgress.value = withTiming(0, {duration: PROGRESS_DURATION});
         }
-    }, [action, sScale, type]);
+    }, [action, sProgress, type]);
 
     const press = () => {
         dispatch(SET_ACTION(type));
@@ -97,17 +119,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
     return (
         <Animated.View style={[styles.buttonContainer, rStyle]}>
             <Pressable onPress={press}>
-                <View
-                    style={[
-                        styles.button,
-                        // eslint-disable-next-line react-native/no-inline-styles
-                        {
-                            backgroundColor:
-                                action === type ? activeColor() : '#FFF',
-                        },
-                    ]}>
-                    {icon()}
-                </View>
+                <View style={[styles.button]}>{icon()}</View>
             </Pressable>
         </Animated.View>
     );
@@ -117,13 +129,15 @@ const styles = StyleSheet.create({
     buttonContainer: {
         marginHorizontal: 8,
         shadowColor: PALETTE.neutral[5],
+        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2,
     },
     button: {
         zIndex: -1,
         width: ACTION_BUTTON_SIZE_INACTIVE,
         height: ACTION_BUTTON_SIZE_INACTIVE,
-        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2,
         flexBasis: ACTION_BUTTON_SIZE_INACTIVE,
+        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2,
+
         flexGrow: 0,
         flexShrink: 0,
         justifyContent: 'center',

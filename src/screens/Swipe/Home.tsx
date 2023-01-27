@@ -8,7 +8,9 @@ import {MainStackParamList} from '@/nav/Navigator';
 import {IMAGE_RATIO, IMAGE_PADDING, PALETTE} from '@/constants';
 import FilterDropdown from '@/components/Product/FilterDropdown';
 
-import ActionButton from '@/components/Utility/ActionButton';
+import {ACTION_BUTTON_SIZE_INACTIVE} from '@/constants';
+// import ActionButton from '@/components/Utility/ActionButton';
+import SkiaButton from '@/components/Utility/SkiaButton';
 import {useAppSelector} from '@/store/hooks';
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
@@ -47,9 +49,37 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                             ? styles.hidden
                             : undefined,
                     ]}>
-                    <ActionButton type="delete" />
+                    {/* <ActionButton type="delete" />
                     <ActionButton type="buy" />
-                    <ActionButton type="save" />
+                    <ActionButton type="save" /> */}
+                    <View
+                        style={{
+                            height: ACTION_BUTTON_SIZE_INACTIVE * 2,
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                        }}>
+                        <SkiaButton
+                            width={ACTION_BUTTON_SIZE_INACTIVE}
+                            height={ACTION_BUTTON_SIZE_INACTIVE}
+                            x={0}
+                            y={0}
+                            type="delete"
+                        />
+                        <SkiaButton
+                            width={ACTION_BUTTON_SIZE_INACTIVE}
+                            height={ACTION_BUTTON_SIZE_INACTIVE}
+                            x={0}
+                            y={0}
+                            type="buy"
+                        />
+                        <SkiaButton
+                            width={ACTION_BUTTON_SIZE_INACTIVE}
+                            height={ACTION_BUTTON_SIZE_INACTIVE}
+                            x={0}
+                            y={0}
+                            type="save"
+                        />
+                    </View>
                 </View>
             </View>
         </View>
