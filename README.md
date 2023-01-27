@@ -12,4 +12,4 @@
 -   Share button
 -   Report button
 -   Fix zIndex bug on android
--   Preload images
+-   ~Preload images~

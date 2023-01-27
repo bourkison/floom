@@ -5,6 +5,7 @@ import {
     StyleSheet,
     Pressable,
     ImageBackground,
+    Image,
     useWindowDimensions,
     ViewStyle,
 } from 'react-native';
@@ -24,7 +25,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 
-import {IMAGE_RATIO, PALETTE} from '@/constants';
+import {IMAGE_RATIO, PALETTE, IMAGE_PREFETCH_AMOUNT} from '@/constants';
 import {capitaliseString, formatPrice, stringifyColors} from '@/services';
 
 import {useAppDispatch} from '@/store/hooks';
@@ -45,6 +46,7 @@ const ProductView = ({
     navigation,
 }: StackScreenProps<MainStackParamList, 'ProductView'>) => {
     const [imageIndex, setImageIndex] = useState(route.params.imageIndex || 0);
+    const [prefetchedImages, setPrefetchedImages] = useState<string[]>([]);
     const {width} = useWindowDimensions();
 
     const context = useSharedValue(0);
@@ -68,6 +70,18 @@ const ProductView = ({
             setPreviousRoute(routes[routes.length - 2].name);
         }
     }, [navigation, setPreviousRoute]);
+
+    // Prefetch next images.
+    useEffect(() => {
+        for (let i = 1; i < IMAGE_PREFETCH_AMOUNT; i++) {
+            const img = route.params.product.images[imageIndex + i];
+
+            if (img && !prefetchedImages.includes(img)) {
+                Image.prefetch(img);
+                setPrefetchedImages(prefetched => [...prefetched, img]);
+            }
+        }
+    }, [imageIndex, prefetchedImages, route.params.product]);
 
     const rStyle = useAnimatedStyle(() => {
         return {

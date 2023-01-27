@@ -1,6 +1,7 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState} from 'react';
 import {
     ImageBackground,
+    Image,
     StyleSheet,
     Text,
     View,
@@ -26,6 +27,7 @@ import {
     FALLBACK_IMAGE,
     DELETE_COLOR,
     SAVE_COLOR,
+    IMAGE_PREFETCH_AMOUNT,
 } from '@/constants';
 import {capitaliseString, formatPrice} from '@/services';
 
@@ -36,8 +38,6 @@ type ProductComponentProps = {
     index: number;
 };
 
-const SCALE_AMOUNT = 0;
-
 const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
     const route = useRoute<RouteProp<MainStackParamList, 'Home'>>();
@@ -45,6 +45,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const {width, height: windowHeight} = useWindowDimensions();
 
     const [imageIndex, setImageIndex] = useState(0);
+    const [prefetchedImages, setPrefetchedImages] = useState<string[]>([]);
 
     useEffect(() => {
         if (
@@ -58,10 +59,17 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         }
     }, [route, index, imageIndex, navigation]);
 
-    const translateY = useMemo(() => {
-        const height = (width - IMAGE_PADDING) / IMAGE_RATIO;
-        return -Math.floor((height * SCALE_AMOUNT * index) / 4);
-    }, [index, width]);
+    // Prefetch next images.
+    useEffect(() => {
+        for (let i = 1; i < IMAGE_PREFETCH_AMOUNT; i++) {
+            const img = product.images[imageIndex + i];
+
+            if (img && !prefetchedImages.includes(img)) {
+                Image.prefetch(img);
+                setPrefetchedImages(prefetched => [...prefetched, img]);
+            }
+        }
+    }, [imageIndex, product, prefetchedImages]);
 
     const calculateImageIndicator = (i: number) => {
         let style: ViewStyle = JSON.parse(
@@ -111,14 +119,6 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         <View
             style={[
                 styles.container,
-                {
-                    transform: [
-                        {scale: 1 + index * SCALE_AMOUNT},
-                        {
-                            translateY: translateY,
-                        },
-                    ],
-                },
                 {zIndex: 20 - index, elevation: 20 - index},
             ]}>
             <ImageBackground
