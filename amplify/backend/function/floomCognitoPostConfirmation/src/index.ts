@@ -10,6 +10,7 @@ type TUser = {
     gender: 'male' | 'female' | 'other';
     dob: Date;
     country: string;
+    currency: string;
 };
 
 exports.handler = async (
@@ -36,6 +37,7 @@ exports.handler = async (
         dob: new Date(event.request.userAttributes.birthdate),
         email: event.request.userAttributes.email,
         country: event.request.userAttributes.locale,
+        currency: event.request.userAttributes['custom:currency'],
     };
     const user = new User(userObj);
 

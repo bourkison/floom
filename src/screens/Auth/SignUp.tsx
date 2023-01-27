@@ -2,30 +2,35 @@ import React, {useState} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {AuthStackParamList} from '@/nav/Navigator';
-import {SafeAreaView, StyleSheet, View, ScrollView} from 'react-native';
+import {SafeAreaView, StyleSheet, View, ScrollView, Text} from 'react-native';
 import {Auth} from 'aws-amplify';
 
 import TextInput from '@/components/Utility/TextInput';
 
-import DateTimePicker from '@react-native-community/datetimepicker';
-import {Picker} from '@react-native-picker/picker';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import Spinner from '@/components/Utility/Spinner';
 import dayjs from 'dayjs';
+import {PALETTE} from '@/constants';
+import SectionHeader from '@/components/Utility/SectionHeader';
+import UpdateDetailsWidget from '@/components/User/UpdateDetailsWidget';
+import {UserDocData} from '@/types/user';
+import UpdatePasswordWidget from '@/components/Options/UpdatePasswordWidget';
 
 const SignUp = ({
     navigation,
 }: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
-    const [secureText, setSecureText] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confPassword, setConfPassword] = useState('');
-    const [dob, setDob] = useState(new Date());
-    const [gender, setGender] = useState<'male' | 'female' | 'other'>('male');
 
     const [name, setName] = useState('');
+    const [dob, setDob] = useState(new Date());
+    const [gender, setGender] = useState<UserDocData['gender'] | ''>('');
+    const [country, setCountry] = useState<UserDocData['country'] | ''>('');
+    const [currency, setCurrency] = useState<UserDocData['currency'] | ''>('');
+
+    const [password, setPassword] = useState('');
+    const [confPassword, setConfPassword] = useState('');
 
     const validateForm = (): boolean => {
         if (password !== confPassword) {
@@ -47,7 +52,8 @@ const SignUp = ({
                     name: name,
                     birthdate: dayjs(dob).format('YYYY-MM-DD'),
                     gender: gender,
-                    locale: 'United Kingdom',
+                    locale: country,
+                    'custom:currency': currency,
                 },
             };
 
@@ -72,87 +78,66 @@ const SignUp = ({
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView>
-                <View style={styles.container}>
-                    <TextInput
-                        onChangeText={setEmail}
-                        placeholder="Email"
-                        placeholderTextColor="#343E4B"
-                        autoComplete="email"
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        selectionColor="#000"
-                        keyboardType="email-address"
-                        returnKeyType="next"
-                    />
-                    <TextInput
-                        placeholder="Password"
-                        placeholderTextColor="#343E4B"
-                        onChangeText={setPassword}
-                        autoCapitalize="none"
-                        autoComplete="off"
-                        autoCorrect={false}
-                        secureTextEntry={secureText}
-                        onFocus={() => {
-                            // Hacky way due to the below issue:
-                            // https://github.com/facebook/react-native/issues/21911
-                            setSecureText(true);
-                        }}
-                    />
-                    <TextInput
-                        placeholder="Confirm Password"
-                        placeholderTextColor="#343E4B"
-                        onChangeText={setConfPassword}
-                        autoCapitalize="none"
-                        autoComplete="off"
-                        autoCorrect={false}
-                        secureTextEntry={true}
-                    />
-                    <TextInput
-                        placeholder="Name"
-                        placeholderTextColor="#343E4B"
-                        onChangeText={setName}
-                        autoCapitalize="sentences"
-                        autoComplete="name"
-                        autoCorrect={false}
-                    />
-                    <View style={styles.dobInput}>
-                        <DateTimePicker
-                            value={dob}
-                            display="spinner"
-                            onChange={(e, d) => {
-                                setDob(d || new Date());
-                            }}
+                <View style={styles.section}>
+                    <View style={styles.box}>
+                        <TextInput
+                            placeholder="Email"
+                            placeholderTextColor={PALETTE.neutral[3]}
+                            autoCapitalize="none"
+                            autoComplete="email"
+                            autoCorrect={false}
+                            value={email}
+                            style={styles.textInput}
+                            onChangeText={setEmail}
                         />
                     </View>
-
-                    <View style={styles.genderInput}>
-                        <Picker
-                            selectedValue={gender}
-                            onValueChange={setGender}>
-                            <Picker.Item value="male" label="Male" />
-                            <Picker.Item value="female" label="Female" />
-                            <Picker.Item value="other" label="Other" />
-                        </Picker>
-                    </View>
-
-                    <View>
-                        <AnimatedButton
-                            style={styles.signUpButton}
-                            textStyle={styles.signUpButtonText}
-                            onPress={signUp}
-                            disabled={isLoading}>
-                            {isLoading ? (
-                                <Spinner
-                                    diameter={14}
-                                    spinnerWidth={2}
-                                    backgroundColor="#1a1f25"
-                                    spinnerColor="#f3fcfa"
-                                />
-                            ) : (
-                                'Sign Up'
-                            )}
-                        </AnimatedButton>
-                    </View>
+                    <Text style={styles.hintText}>
+                        Your email can not be changed later.
+                    </Text>
+                </View>
+                <View style={styles.section}>
+                    <SectionHeader>Details</SectionHeader>
+                    <UpdateDetailsWidget
+                        name={name}
+                        setName={setName}
+                        gender={gender}
+                        setGender={setGender}
+                        country={country}
+                        setCountry={setCountry}
+                        dob={dob}
+                        setDob={setDob}
+                        currency={currency}
+                        setCurrency={setCurrency}
+                        isUpdate={false}
+                    />
+                </View>
+                <View style={[styles.section, styles.topMargin]}>
+                    <SectionHeader>Password</SectionHeader>
+                    <UpdatePasswordWidget
+                        isUpdate={false}
+                        newPassword={password}
+                        setNewPassword={setPassword}
+                        confirmNewPassword={confPassword}
+                        setConfirmNewPassword={setConfPassword}
+                    />
+                </View>
+                <View style={styles.buttonContainer}>
+                    <AnimatedButton
+                        style={styles.signUpButton}
+                        textStyle={styles.signUpButtonText}
+                        onPress={signUp}
+                        disabled={isLoading}>
+                        {isLoading ? (
+                            <Spinner
+                                diameter={14}
+                                spinnerWidth={2}
+                                backgroundColor="#1a1f25"
+                                spinnerColor="#f3fcfa"
+                            />
+                        ) : (
+                            'Sign Up'
+                        )}
+                    </AnimatedButton>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -160,48 +145,63 @@ const SignUp = ({
 };
 
 const styles = StyleSheet.create({
-    safeContainer: {
+    container: {
         flex: 1,
     },
-    container: {
+    textInput: {
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        borderColor: PALETTE.neutral[2],
+    },
+    section: {marginTop: 10, width: '100%'},
+    box: {
+        marginTop: 10,
+        shadowColor: PALETTE.neutral[5],
+        shadowOpacity: 0.3,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        backgroundColor: PALETTE.neutral[0],
+    },
+    inputHeader: {
+        textTransform: 'uppercase',
+        color: PALETTE.rose[4],
         paddingHorizontal: 10,
+        fontWeight: '600',
+        borderColor: PALETTE.neutral[2],
     },
-    dobInput: {
-        marginTop: 25,
-        alignContent: 'center',
-        borderColor: '#1a1f25',
-        borderRadius: 5,
-        borderWidth: 1,
+    borderTop: {
+        borderTopWidth: 1,
     },
-    genderInput: {
-        borderColor: '#1a1f25',
-        marginTop: 25,
-        borderRadius: 5,
-        borderWidth: 1,
+    topMargin: {
+        marginTop: 20,
+    },
+    hintText: {
+        color: PALETTE.gray[4],
+        fontSize: 12,
+        paddingHorizontal: 5,
+        marginTop: 3,
     },
     signUpButton: {
-        padding: 15,
-        backgroundColor: '#1a1f25',
-        flex: 1,
+        padding: 7,
+        backgroundColor: PALETTE.neutral[8],
         justifyContent: 'center',
-        borderRadius: 25,
-        width: '50%',
-        flexGrow: 0,
-        flexShrink: 0,
-        marginTop: 25,
-        alignSelf: 'center',
         alignItems: 'center',
+        borderRadius: 10,
+        width: '100%',
+        alignSelf: 'center',
     },
     signUpButtonText: {
-        color: '#f3fcfa',
-        fontSize: 14,
+        color: PALETTE.gray[1],
+        fontSize: 12,
         fontWeight: 'bold',
         textAlign: 'center',
-        textTransform: 'uppercase',
         flexBasis: 14,
         flexShrink: 0,
         flexGrow: 0,
     },
+    buttonContainer: {paddingHorizontal: 10, marginTop: 10},
 });
 
 export default SignUp;

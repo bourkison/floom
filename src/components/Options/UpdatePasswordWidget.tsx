@@ -7,58 +7,73 @@ import {Auth} from 'aws-amplify';
 
 type UpdatePasswordWidgetProps = {
     invertButton?: boolean;
+    isUpdate: boolean;
+    currentPassword?: string;
+    setCurrentPassword?: (password: string) => void;
+    newPassword: string;
+    setNewPassword: (password: string) => void;
+    confirmNewPassword: string;
+    setConfirmNewPassword: (confirmPassword: string) => void;
 };
 
 const UpdatePasswordWidget: React.FC<UpdatePasswordWidgetProps> = ({
     invertButton = false,
+    isUpdate,
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    confirmNewPassword,
+    setConfirmNewPassword,
 }) => {
     const [secureTextP, setSecureTextP] = useState(false);
     const [secureTextNP, setSecureTextNP] = useState(false);
     const [secureTextCNP, setSecureTextCNP] = useState(false);
 
-    const [password, setPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confNewPassword, setConfNewPassword] = useState('');
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
     const updatePassword = async () => {
-        setIsUpdatingPassword(true);
+        if (isUpdate && currentPassword) {
+            setIsUpdatingPassword(true);
 
-        try {
-            if (newPassword !== confNewPassword) {
-                throw new Error("Passwords don't match!");
+            try {
+                if (newPassword !== confirmNewPassword) {
+                    throw new Error("Passwords don't match!");
+                }
+                const user = await Auth.currentAuthenticatedUser();
+                await Auth.changePassword(user, currentPassword, newPassword);
+            } catch (err) {
+                // TODO: Handle error.
+                console.error(err);
+            } finally {
+                setIsUpdatingPassword(false);
             }
-            const user = await Auth.currentAuthenticatedUser();
-            await Auth.changePassword(user, password, newPassword);
-        } catch (err) {
-            // TODO: Handle error.
-            console.error(err);
-        } finally {
-            setIsUpdatingPassword(false);
         }
     };
 
     return (
         <View>
             <View style={styles.box}>
+                {isUpdate ? (
+                    <TextInput
+                        placeholder="Current Password"
+                        placeholderTextColor={PALETTE.neutral[3]}
+                        onChangeText={setCurrentPassword}
+                        autoCapitalize="none"
+                        autoComplete="off"
+                        autoCorrect={false}
+                        secureTextEntry={secureTextP}
+                        editable={!isUpdatingPassword}
+                        onFocus={() => {
+                            // Hacky way due to the below issue:
+                            // https://github.com/facebook/react-native/issues/21911
+                            setSecureTextP(true);
+                        }}
+                        style={[styles.passwordInput, styles.bottomBorder]}
+                    />
+                ) : undefined}
                 <TextInput
-                    placeholder="Current Password"
-                    placeholderTextColor={PALETTE.neutral[3]}
-                    onChangeText={setPassword}
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect={false}
-                    secureTextEntry={secureTextP}
-                    editable={!isUpdatingPassword}
-                    onFocus={() => {
-                        // Hacky way due to the below issue:
-                        // https://github.com/facebook/react-native/issues/21911
-                        setSecureTextP(true);
-                    }}
-                    style={[styles.passwordInput, styles.bottomBorder]}
-                />
-                <TextInput
-                    placeholder="New Password"
+                    placeholder={isUpdate ? 'New Password' : 'Password'}
                     placeholderTextColor={PALETTE.neutral[3]}
                     onChangeText={setNewPassword}
                     autoCapitalize="none"
@@ -74,9 +89,11 @@ const UpdatePasswordWidget: React.FC<UpdatePasswordWidgetProps> = ({
                     style={[styles.passwordInput, styles.bottomBorder]}
                 />
                 <TextInput
-                    placeholder="Confirm New Password"
+                    placeholder={
+                        isUpdate ? 'Confirm New Password' : 'Confirm Password'
+                    }
                     placeholderTextColor={PALETTE.neutral[3]}
-                    onChangeText={setConfNewPassword}
+                    onChangeText={setConfirmNewPassword}
                     autoCapitalize="none"
                     autoComplete="off"
                     autoCorrect={false}
@@ -90,32 +107,34 @@ const UpdatePasswordWidget: React.FC<UpdatePasswordWidgetProps> = ({
                     style={styles.passwordInput}
                 />
             </View>
-            <View style={styles.buttonContainer}>
-                <AnimatedButton
-                    style={
-                        !invertButton
-                            ? styles.updatePasswordButton
-                            : styles.invertedUpdatePasswordButton
-                    }
-                    textStyle={
-                        !invertButton
-                            ? styles.updatePasswordButtonText
-                            : styles.invertedUpdatePasswordButtonText
-                    }
-                    onPress={updatePassword}
-                    disabled={isUpdatingPassword}>
-                    {isUpdatingPassword ? (
-                        <Spinner
-                            diameter={14}
-                            spinnerWidth={2}
-                            backgroundColor="#1a1f25"
-                            spinnerColor="#f3fcfa"
-                        />
-                    ) : (
-                        'Update Password'
-                    )}
-                </AnimatedButton>
-            </View>
+            {isUpdate ? (
+                <View style={styles.buttonContainer}>
+                    <AnimatedButton
+                        style={
+                            !invertButton
+                                ? styles.updatePasswordButton
+                                : styles.invertedUpdatePasswordButton
+                        }
+                        textStyle={
+                            !invertButton
+                                ? styles.updatePasswordButtonText
+                                : styles.invertedUpdatePasswordButtonText
+                        }
+                        onPress={updatePassword}
+                        disabled={isUpdatingPassword}>
+                        {isUpdatingPassword ? (
+                            <Spinner
+                                diameter={14}
+                                spinnerWidth={2}
+                                backgroundColor="#1a1f25"
+                                spinnerColor="#f3fcfa"
+                            />
+                        ) : (
+                            'Update Password'
+                        )}
+                    </AnimatedButton>
+                </View>
+            ) : undefined}
         </View>
     );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {useAppSelector} from '@/store/hooks';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -8,11 +8,28 @@ import {PALETTE} from '@/constants';
 import SectionHeader from '@/components/Utility/SectionHeader';
 import UpdateDetailsWidget from '@/components/User/UpdateDetailsWidget';
 import UpdatePasswordWidget from '@/components/Options/UpdatePasswordWidget';
+import {UserDocData} from '@/types/user';
 
 const UpdateDetail: React.FC<
     StackScreenProps<OptionsStackParamList, 'UpdateDetail'>
 > = () => {
     const user = useAppSelector(state => state.user.docData);
+
+    const [name, setName] = useState(user?.name || '');
+    const [gender, setGender] = useState<UserDocData['gender'] | ''>(
+        user?.gender || '',
+    );
+    const [country, setCountry] = useState<UserDocData['country'] | ''>(
+        user?.country || '',
+    );
+    const [currency, setCurrency] = useState<UserDocData['currency'] | ''>(
+        user?.currency || '',
+    );
+    const [dob, setDob] = useState(user?.dob ? new Date(user.dob) : new Date());
+
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
     return (
         <ScrollView keyboardShouldPersistTaps="never">
@@ -33,12 +50,33 @@ const UpdateDetail: React.FC<
             </View>
             <View style={styles.section}>
                 <SectionHeader>Update Details</SectionHeader>
-                <UpdateDetailsWidget />
+                <UpdateDetailsWidget
+                    name={name}
+                    setName={setName}
+                    gender={gender}
+                    setGender={setGender}
+                    country={country}
+                    setCountry={setCountry}
+                    currency={currency}
+                    setCurrency={setCurrency}
+                    dob={dob}
+                    setDob={setDob}
+                    isUpdate={true}
+                />
             </View>
 
             <View style={[styles.section, styles.topMargin]}>
                 <SectionHeader>Update Password</SectionHeader>
-                <UpdatePasswordWidget invertButton={true} />
+                <UpdatePasswordWidget
+                    invertButton={true}
+                    isUpdate={true}
+                    currentPassword={currentPassword}
+                    setCurrentPassword={setCurrentPassword}
+                    newPassword={newPassword}
+                    setNewPassword={setNewPassword}
+                    confirmNewPassword={confirmNewPassword}
+                    setConfirmNewPassword={setConfirmNewPassword}
+                />
             </View>
         </ScrollView>
     );

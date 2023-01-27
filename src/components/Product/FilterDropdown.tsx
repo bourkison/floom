@@ -10,7 +10,7 @@ import {
     useWindowDimensions,
 } from 'react-native';
 
-import {Ionicons} from '@expo/vector-icons';
+import {Ionicons, Feather} from '@expo/vector-icons';
 import {
     GENDER_OPTIONS,
     CATEGORY_OPTIONS,
@@ -248,6 +248,24 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
                                 returnKeyType="search"
                                 selectTextOnFocus={true}
                             />
+
+                            {searchText.length > 0 ? (
+                                <Pressable
+                                    onPress={() => {
+                                        updateSearchText('');
+
+                                        if (!visible) {
+                                            search();
+                                        }
+                                    }}>
+                                    <Feather
+                                        name="x-circle"
+                                        style={styles.searchIcon}
+                                        color={PALETTE.neutral[0]}
+                                        size={14}
+                                    />
+                                </Pressable>
+                            ) : undefined}
                         </View>
                     </View>
                     <View style={styles.iconContainer}>

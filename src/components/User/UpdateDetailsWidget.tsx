@@ -18,47 +18,70 @@ import SetDob from './Modals/SetDob';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import {UPDATE_USER} from '@/store/slices/user';
 import SetCurrency from './Modals/SetCurrency';
+import {UserDocData} from '@/types/user';
 
-const UpdateDetailsWidget = () => {
+type UpdateDetailsWidgetProps = {
+    name: string;
+    setName: (name: string) => void;
+    gender: UserDocData['gender'] | '';
+    setGender: (gender: UserDocData['gender']) => void;
+    country: UserDocData['country'] | '';
+    setCountry: (country: UserDocData['country']) => void;
+    dob: Date;
+    setDob: (dob: Date) => void;
+    currency: UserDocData['currency'] | '';
+    setCurrency: (currency: UserDocData['currency']) => void;
+    isUpdate: boolean;
+};
+
+const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
+    name,
+    setName,
+    gender,
+    setGender,
+    country,
+    setCountry,
+    dob,
+    setDob,
+    currency,
+    setCurrency,
+    isUpdate,
+}) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const user = useAppSelector(state => state.user.docData);
     const dispatch = useAppDispatch();
 
-    const [name, setName] = useState(user?.name || '');
-
     const GenderTouchableRef = useRef<TouchableOpacity>(null);
-    const [gender, setGender] = useState(user?.gender || 'male');
     const [genderModalVisible, setGenderModalVisible] = useState(false);
 
-    const [country, setCountry] = useState(user?.country || 'GB');
     const [countryModalVisible, setCountryModalVisible] = useState(false);
 
     const DobTouchableRef = useRef<TouchableOpacity>(null);
-    const [dob, setDob] = useState(user?.dob ? new Date(user.dob) : new Date());
     const [dobModalVisible, setDobModalVisible] = useState(false);
 
     const CurrencyTouchableRef = useRef<TouchableOpacity>(null);
-    const [currency, setCurrency] = useState(user?.currency || 'GBP');
     const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
     dayjs.extend(advancedFormat);
 
     const updateUser = async () => {
-        setIsLoading(true);
+        if (isUpdate && gender && country && currency) {
+            setIsLoading(true);
 
-        await dispatch(
-            UPDATE_USER({
-                email: user?.email || '',
-                dob: dayjs(dob).format('YYYY-MM-DD'),
-                name,
-                gender,
-                country,
-                currency,
-            }),
-        );
+            await dispatch(
+                UPDATE_USER({
+                    email: user?.email || '',
+                    dob: dayjs(dob).format('YYYY-MM-DD'),
+                    name,
+                    gender,
+                    country,
+                    currency,
+                }),
+            );
 
-        setIsLoading(false);
+            setIsLoading(false);
+        }
     };
 
     const matchCountryAndCurrency = (c: keyof typeof COUNTRIES) => {
@@ -105,7 +128,13 @@ const UpdateDetailsWidget = () => {
                     ref={GenderTouchableRef}
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setGenderModalVisible(true)}>
-                    <Text>{gender[0].toUpperCase() + gender.substring(1)}</Text>
+                    {gender ? (
+                        <Text>
+                            {gender[0].toUpperCase() + gender.substring(1)}
+                        </Text>
+                    ) : (
+                        <Text style={styles.placeholder}>Preferred Style</Text>
+                    )}
                 </TouchableOpacity>
                 <SetGender
                     visible={genderModalVisible}
@@ -117,9 +146,13 @@ const UpdateDetailsWidget = () => {
                 <TouchableOpacity
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setCountryModalVisible(true)}>
-                    <Text>
-                        {COUNTRIES[country].emoji} {COUNTRIES[country].name}
-                    </Text>
+                    {country ? (
+                        <Text>
+                            {COUNTRIES[country].emoji} {COUNTRIES[country].name}
+                        </Text>
+                    ) : (
+                        <Text style={styles.placeholder}>Country</Text>
+                    )}
                 </TouchableOpacity>
                 <SetCountry
                     visible={countryModalVisible}
@@ -131,10 +164,17 @@ const UpdateDetailsWidget = () => {
                     ref={CurrencyTouchableRef}
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setCurrencyModalVisible(true)}>
-                    <Text>
-                        {CURRENCIES[currency].emoji} {CURRENCIES[currency].name}{' '}
-                        ({CURRENCIES[currency].symbol})
-                    </Text>
+                    {currency ? (
+                        <Text>
+                            {CURRENCIES[currency].emoji}{' '}
+                            {CURRENCIES[currency].name}{' '}
+                            {CURRENCIES[currency].symbol}
+                        </Text>
+                    ) : (
+                        <Text style={styles.placeholder}>
+                            Preferred currency
+                        </Text>
+                    )}
                 </TouchableOpacity>
                 <SetCurrency
                     visible={currencyModalVisible}
@@ -157,24 +197,26 @@ const UpdateDetailsWidget = () => {
                     touchableRef={DobTouchableRef}
                 />
             </View>
-            <View style={styles.buttonContainer}>
-                <AnimatedButton
-                    onPress={updateUser}
-                    style={styles.updateButton}
-                    textStyle={styles.updateButtonText}
-                    disabled={isLoading}>
-                    {isLoading ? (
-                        <Spinner
-                            diameter={14}
-                            spinnerWidth={2}
-                            backgroundColor="#1a1f25"
-                            spinnerColor="#f3fcfa"
-                        />
-                    ) : (
-                        'Update Details'
-                    )}
-                </AnimatedButton>
-            </View>
+            {isUpdate ? (
+                <View style={styles.buttonContainer}>
+                    <AnimatedButton
+                        onPress={updateUser}
+                        style={styles.updateButton}
+                        textStyle={styles.updateButtonText}
+                        disabled={isLoading}>
+                        {isLoading ? (
+                            <Spinner
+                                diameter={14}
+                                spinnerWidth={2}
+                                backgroundColor="#1a1f25"
+                                spinnerColor="#f3fcfa"
+                            />
+                        ) : (
+                            'Update Details'
+                        )}
+                    </AnimatedButton>
+                </View>
+            ) : undefined}
         </View>
     );
 };
@@ -218,6 +260,9 @@ const styles = StyleSheet.create({
     },
     borderTop: {
         borderTopWidth: 1,
+    },
+    placeholder: {
+        color: PALETTE.neutral[3],
     },
 });
 

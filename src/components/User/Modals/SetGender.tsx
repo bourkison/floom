@@ -2,12 +2,13 @@ import React, {RefObject, useEffect, useState} from 'react';
 import {Modal, Pressable, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {PALETTE} from '@/constants';
+import {UserDocData} from '@/types/user';
 
 type SetGenderProps = {
     visible: boolean;
     setVisible: (visible: boolean) => void;
-    selectedValue: 'male' | 'female' | 'other';
-    setSelectedValue: (gender: 'male' | 'female' | 'other') => void;
+    selectedValue: UserDocData['gender'] | '';
+    setSelectedValue: (gender: UserDocData['gender']) => void;
     touchableRef: RefObject<TouchableOpacity>;
 };
 
@@ -30,6 +31,13 @@ const SetGender: React.FC<SetGenderProps> = ({
         }
     }, [touchableRef, visible]);
 
+    // Set to first value on open if nothing yet selected.
+    useEffect(() => {
+        if (!selectedValue && visible) {
+            setSelectedValue('male');
+        }
+    }, [selectedValue, setSelectedValue, visible]);
+
     return (
         <Modal visible={visible} transparent={true}>
             <Pressable
@@ -37,7 +45,7 @@ const SetGender: React.FC<SetGenderProps> = ({
                 onPress={() => setVisible(false)}>
                 <Pressable style={[styles.modalContainer, {top: modalTop}]}>
                     <Picker
-                        selectedValue={selectedValue}
+                        selectedValue={selectedValue || 'male'}
                         onValueChange={setSelectedValue}>
                         <Picker.Item value="male" label="Male" />
                         <Picker.Item value="female" label="Female" />

@@ -17,7 +17,7 @@ import {FlashList} from '@shopify/flash-list';
 type SetCountryProps = {
     visible: boolean;
     setVisible: (visible: boolean) => void;
-    selectedValue: keyof typeof COUNTRIES;
+    selectedValue: keyof typeof COUNTRIES | '';
     setSelectedValue: (country: keyof typeof COUNTRIES) => void;
 };
 

@@ -7,7 +7,7 @@ import {Picker} from '@react-native-picker/picker';
 type SetCurrencyProps = {
     visible: boolean;
     setVisible: (visible: boolean) => void;
-    selectedValue: keyof typeof CURRENCIES;
+    selectedValue: keyof typeof CURRENCIES | '';
     setSelectedValue: (currency: keyof typeof CURRENCIES) => void;
     touchableRef: RefObject<TouchableOpacity>;
 };
@@ -31,6 +31,13 @@ const SetCurrency: React.FC<SetCurrencyProps> = ({
         }
     }, [touchableRef, visible]);
 
+    // Set to first value on open if nothing yet selected.
+    useEffect(() => {
+        if (!selectedValue && visible) {
+            setSelectedValue('USD');
+        }
+    }, [selectedValue, setSelectedValue, visible]);
+
     return (
         <Modal visible={visible} transparent={true}>
             <Pressable
@@ -38,7 +45,7 @@ const SetCurrency: React.FC<SetCurrencyProps> = ({
                 onPress={() => setVisible(false)}>
                 <Pressable style={[styles.modalContainer, {top: modalTop}]}>
                     <Picker
-                        selectedValue={selectedValue}
+                        selectedValue={selectedValue || 'USD'}
                         onValueChange={setSelectedValue}>
                         {Object.values(CURRENCIES).map(c => (
                             <Picker.Item
