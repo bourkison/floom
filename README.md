@@ -1,6 +1,6 @@
 ## TODO
 
--   Loading image indicators
+-   ~Loading image indicators~
 -   New action buttons
 -   Deleted products styling update (include searcb and update button colour)
 -   Delete account button
@@ -13,3 +13,8 @@
 -   Report button
 -   Fix zIndex bug on android
 -   ~Preload images~
+
+## Out of Scope Ideas
+
+-   Purchase within app
+-   User folders/wishlists

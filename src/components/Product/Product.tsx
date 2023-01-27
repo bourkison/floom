@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     },
     image: {
         borderRadius: 5,
-        backgroundColor: PALETTE.neutral[9],
+        backgroundColor: PALETTE.neutral[2],
         overflow: 'hidden',
     },
     leftContainer: {flex: 3},

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
@@ -14,7 +14,7 @@ import ProductListItem, {
 } from '@/components/Product/ProductListItem';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
 import {LOAD_SAVED_PRODUCTS} from '@/store/slices/product';
-import {QueryProductInit} from '@/types/product';
+import {Product, QueryProductInit} from '@/types/product';
 import {FlashList} from '@shopify/flash-list';
 import FilterDropdown from '@/components/Product/FilterDropdown';
 
@@ -33,6 +33,8 @@ const SavedProducts = ({}: StackScreenProps<
     const isLoadingMore = useAppSelector(
         state => state.product.saved.isLoadingMore,
     );
+
+    const ListRef = useRef<FlashList<Product>>(null);
 
     const loadProducts = useCallback(
         async (loadType: 'initial' | 'refresh' | 'more', startAt?: string) => {
@@ -86,9 +88,11 @@ const SavedProducts = ({}: StackScreenProps<
                 <ActivityIndicator style={styles.activityIndicator} />
             ) : (
                 <FlashList
+                    ref={ListRef}
                     data={savedProducts}
                     renderItem={({item, index}) => (
                         <ProductListItem
+                            listRef={ListRef}
                             product={item}
                             index={index}
                             type="saved"

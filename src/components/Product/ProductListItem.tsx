@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState, RefObject} from 'react';
 import {
     View,
     Text,
@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     LayoutAnimation,
 } from 'react-native';
-import {Product as ProductType} from '@/types/product';
+import {Product, Product as ProductType} from '@/types/product';
 import * as Haptics from 'expo-haptics';
 
 import Animated, {
@@ -31,12 +31,14 @@ import {BUY_COLOR, DELETE_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
 import {capitaliseString, formatPrice} from '@/services';
 import BrandLogo from '../Utility/BrandLogo';
 import * as WebBrowser from 'expo-web-browser';
+import {FlashList} from '@shopify/flash-list';
 
 export type ProductListItemProps = {
     product: ProductType;
     index: number;
     type: 'saved' | 'deleted';
     onDelete?: (_id: string, index: number) => void;
+    listRef: RefObject<FlashList<Product>>;
 };
 
 export const PRODUCT_LIST_ITEM_HEIGHT = 108;
@@ -47,6 +49,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     index,
     type,
     onDelete,
+    listRef,
 }) => {
     const contextX = useSharedValue(0);
     const offsetX = useSharedValue(0);
@@ -65,6 +68,23 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     const [imageSize, setImageSize] = useState({width: 0, height: 0});
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+
+    // Reset shared values when _id changes (as view has been recycled) as per:
+    // https://shopify.github.io/flash-list/docs/guides/reanimated
+    useEffect(() => {
+        contextX.value = 0;
+        offsetX.value = 0;
+        rightSwipeOpacity.value = 0;
+        leftSwipeOpacity.value = 1;
+        percentageX.value = 0;
+    }, [
+        product._id,
+        contextX,
+        offsetX,
+        rightSwipeOpacity,
+        leftSwipeOpacity,
+        percentageX,
+    ]);
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -101,6 +121,9 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
             },
         };
 
+        // This must be called before `LayoutAnimation.configureNext` in order for the animation to run properly.
+        // As per: https://shopify.github.io/flash-list/docs/guides/layout-animation
+        listRef.current?.prepareForLayoutAnimationRender();
         LayoutAnimation.configureNext(layoutAnimConfig);
 
         if (type === 'saved') {
@@ -110,7 +133,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         if (onDelete) {
             onDelete(product._id, index);
         }
-    }, [dispatch, index, onDelete, type, product]);
+    }, [dispatch, index, onDelete, type, product, listRef]);
 
     const buyProduct = async () => {
         await WebBrowser.openBrowserAsync(product.link);

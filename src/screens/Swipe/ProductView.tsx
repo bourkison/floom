@@ -402,6 +402,7 @@ const styles = StyleSheet.create({
     },
     imageBackground: {
         flex: 1,
+        backgroundColor: PALETTE.neutral[2],
     },
     selectedImageContainer: {
         position: 'absolute',
