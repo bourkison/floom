@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import SectionHeader from '@/components/Utility/SectionHeader';
 import UpdatePasswordWidget from '@/components/Options/UpdatePasswordWidget';
@@ -9,6 +9,10 @@ import {useAppSelector} from '@/store/hooks';
 
 const Options = () => {
     const isGuest = useAppSelector(state => state.user.isGuest);
+
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confNewPassword, setConfNewPassword] = useState('');
 
     return (
         <ScrollView style={styles.container}>
@@ -24,7 +28,15 @@ const Options = () => {
                     </View>
                     <View style={styles.section}>
                         <SectionHeader>Password</SectionHeader>
-                        <UpdatePasswordWidget />
+                        <UpdatePasswordWidget
+                            isUpdate={true}
+                            currentPassword={currentPassword}
+                            setCurrentPassword={setCurrentPassword}
+                            newPassword={newPassword}
+                            setNewPassword={setNewPassword}
+                            confirmNewPassword={confNewPassword}
+                            setConfirmNewPassword={setConfNewPassword}
+                        />
                     </View>
                 </View>
             ) : (

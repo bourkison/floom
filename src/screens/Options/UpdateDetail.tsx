@@ -78,6 +78,10 @@ const UpdateDetail: React.FC<
                     setConfirmNewPassword={setConfirmNewPassword}
                 />
             </View>
+
+            <View style={[styles.section, styles.topMargin]}>
+                <SectionHeader>Delete Account</SectionHeader>
+            </View>
         </ScrollView>
     );
 };
