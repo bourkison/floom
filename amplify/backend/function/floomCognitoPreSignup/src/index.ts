@@ -14,6 +14,8 @@ type TUser = {
 };
 
 const handler: PreSignUpTriggerHandler = async (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = false;
+
     const {Parameters} = await new aws.SSM()
         .getParameters({
             Names: ['MONGODB_URI'].map(secretName => process.env[secretName]),
@@ -39,12 +41,9 @@ const handler: PreSignUpTriggerHandler = async (event, context, callback) => {
 
     const user = new User(userObj);
 
-    try {
-        await user.validate();
-    } catch (err) {
+    await user.validate().catch(err => {
         callback(err, event);
-        return;
-    }
+    });
 
     callback(null, event);
 };

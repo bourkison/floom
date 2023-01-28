@@ -21,12 +21,12 @@
         "floomCognitoPostConfirmation": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomCognitoPostConfirmation-427453776e7267364752-build.zip"
+          "s3Key": "amplify-builds/floomCognitoPostConfirmation-464144664e4a396d6743-build.zip"
         },
         "floomUserHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomUserHandler-454148725062526f546a-build.zip"
+          "s3Key": "amplify-builds/floomUserHandler-2b386d35566e6d656f31-build.zip"
         },
         "floomMongooseModels": {
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
@@ -55,7 +55,7 @@
         "floomCognitoPreSignup": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomCognitoPreSignup-79575047795035776c4b-build.zip"
+          "s3Key": "amplify-builds/floomCognitoPreSignup-57657232327349585148-build.zip"
         }
       },
       "api": {

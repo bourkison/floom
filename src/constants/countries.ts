@@ -289,4 +289,10 @@ export const CURRENCIES = {
         code: 'USD',
         emoji: '🇺🇸',
     },
+    TEST: {
+        name: 'TEST',
+        symbol: '$',
+        code: 'TEST',
+        emoji: '🇺🇸',
+    },
 } as const;

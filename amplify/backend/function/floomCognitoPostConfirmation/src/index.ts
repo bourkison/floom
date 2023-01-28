@@ -1,5 +1,5 @@
 import aws from 'aws-sdk';
-import {PostConfirmationTriggerEvent} from 'aws-lambda';
+import {PostConfirmationTriggerHandler} from 'aws-lambda';
 import {Model} from 'mongoose';
 // @ts-ignore
 import MongooseModels from '/opt/nodejs/models';
@@ -13,9 +13,9 @@ type TUser = {
     currency: string;
 };
 
-exports.handler = async (
-    event: PostConfirmationTriggerEvent,
-): Promise<PostConfirmationTriggerEvent> => {
+const handler: PostConfirmationTriggerHandler = async (event, context) => {
+    context.callbackWaitsForEmptyEventLoop = false;
+
     const {Parameters} = await new aws.SSM()
         .getParameters({
             Names: ['MONGODB_URI'].map(secretName => process.env[secretName]),
@@ -43,3 +43,5 @@ exports.handler = async (
     await user.save();
     return event;
 };
+
+exports.handler = handler;
