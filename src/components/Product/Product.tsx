@@ -55,12 +55,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     >();
 
     useEffect(() => {
-        if (
-            index === 0 &&
-            route.params &&
-            route.params.imageIndex &&
-            route.params.imageIndex !== imageIndex
-        ) {
+        if (index === 0 && route.params && route.params.imageIndex) {
             setImageIndex(route.params.imageIndex);
             navigation.setParams({imageIndex: undefined});
         }
