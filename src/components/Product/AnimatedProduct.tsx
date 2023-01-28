@@ -45,6 +45,7 @@ type AnimatedProductProps = {
     windowHeight: number;
     imageIndex: number;
     setImageIndex: (imageIndex: number) => void;
+    index: number;
 };
 
 const AnimatedProduct: React.FC<AnimatedProductProps> = ({
@@ -54,6 +55,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
     windowHeight,
     imageIndex,
     setImageIndex,
+    index,
 }) => {
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
@@ -193,10 +195,10 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
     );
 
     useEffect(() => {
-        if (animationAction !== 'idle') {
+        if (animationAction !== 'idle' && index === 0) {
             runOnUI(commenceAnimation)(animationAction);
         }
-    }, [animationAction, commenceAnimation]);
+    }, [animationAction, commenceAnimation, index]);
 
     useEffect(() => {
         return () => {

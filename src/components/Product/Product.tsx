@@ -215,6 +215,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     if (index < IMAGE_ANIMATED_AMOUNT) {
         return (
             <AnimatedProduct
+                index={index}
                 imageIndex={imageIndex}
                 setImageIndex={setImageIndex}
                 product={product}

@@ -3,8 +3,8 @@
 	ENV
 	REGION
 Amplify Params - DO NOT EDIT */
-
-const MongooseModels = require('/opt/nodejs/models');
+// @ts-ignore
+import MongooseModels from '/opt/nodejs/models';
 import aws from 'aws-sdk';
 import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 import {Model, Types} from 'mongoose';

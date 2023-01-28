@@ -1,21 +1,33 @@
-import React from 'react';
+import React, {useState} from 'react';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Text, Modal, Pressable} from 'react-native';
 import {PALETTE} from '@/constants';
 
 const DeleteAccountWidget = () => {
+    const [modalVisible, setModalVisible] = useState(false);
+
     return (
         <View>
-            <Text style={styles.hintText}>
-                WARNING: Deleted accounts can not be recovered.
-            </Text>
             <View style={styles.buttonContainer}>
                 <AnimatedButton
+                    onPress={() => setModalVisible(true)}
                     style={styles.deleteAccountButton}
                     textStyle={styles.deleteAccountButtonText}>
                     Delete Account
                 </AnimatedButton>
             </View>
+            <Text style={styles.hintText}>
+                WARNING: Deleted accounts can not be recovered.
+            </Text>
+            <Modal visible={modalVisible} transparent={true}>
+                <Pressable
+                    onPress={() => setModalVisible(false)}
+                    style={{flex: 1}}>
+                    <View>
+                        <Text>Modal</Text>
+                    </View>
+                </Pressable>
+            </Modal>
         </View>
     );
 };
@@ -46,7 +58,6 @@ const styles = StyleSheet.create({
         color: PALETTE.gray[4],
         fontSize: 12,
         paddingHorizontal: 5,
-        marginTop: 3,
     },
 });
 
