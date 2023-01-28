@@ -1,6 +1,8 @@
 {
   "version": "1",
   "cognitoConfig": {
+    "identityPoolName": "floomCognito_identitypool_cb5d6fed",
+    "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "floom56843300",
     "userPoolName": "floom56843300_userpool_56843300",
     "autoVerifiedAttributes": [
@@ -45,7 +47,7 @@
     "userpoolClientSetAttributes": false,
     "sharedId": "56843300",
     "resourceName": "floomCognito",
-    "authSelections": "userPoolOnly",
+    "authSelections": "identityPoolAndUserPool",
     "useDefault": "manual",
     "usernameAttributes": [
       "email"
@@ -101,7 +103,10 @@
     "parentStack": {
       "Ref": "AWS::StackId"
     },
-    "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PostConfirmation\",\n    \"lambdaFunctionName\": \"floomCognitoPostConfirmation\"\n  },\n  {\n    \"triggerType\": \"PreSignUp\",\n    \"lambdaFunctionName\": \"floomCognitoPreSignup\"\n  }\n]",
+    "authTriggerConnections": [
+      "{\"triggerType\":\"PostConfirmation\",\"lambdaFunctionName\":\"floomCognitoPostConfirmation\"}",
+      "{\"triggerType\":\"PreSignUp\",\"lambdaFunctionName\":\"floomCognitoPreSignup\"}"
+    ],
     "permissions": [],
     "authProviders": []
   }

@@ -13,7 +13,11 @@ type TUser = {
     currency: string;
 };
 
-const handler: PostConfirmationTriggerHandler = async (event, context) => {
+const handler: PostConfirmationTriggerHandler = async (
+    event,
+    context,
+    callback,
+) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
     const {Parameters} = await new aws.SSM()
@@ -41,7 +45,7 @@ const handler: PostConfirmationTriggerHandler = async (event, context) => {
     const user = new User(userObj);
 
     await user.save();
-    return event;
+    callback(null, event);
 };
 
 exports.handler = handler;

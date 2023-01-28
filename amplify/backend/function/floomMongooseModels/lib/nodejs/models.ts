@@ -195,6 +195,14 @@ const reportSchema = new mongoose.Schema(
             required: true,
             enum: ['inappropriate', 'broken'],
         },
+        reviewed: {
+            type: Boolean,
+            default: false,
+        },
+        resolved: {
+            type: Boolean,
+            default: false,
+        },
     },
     {timestamps: true},
 );

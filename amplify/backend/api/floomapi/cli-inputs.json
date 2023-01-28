@@ -46,6 +46,19 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/report": {
+      "name": "/report",
+      "lambdaFunction": "floomReportHandler",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
     }
   }
 }

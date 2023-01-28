@@ -33,6 +33,14 @@
           ],
           "category": "function",
           "resourceName": "floomPublicHandler"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomReportHandler"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -153,6 +161,20 @@
       "service": "Lambda"
     },
     "floomPublicHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "floomMongooseModels"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "floomReportHandler": {
       "build": true,
       "dependsOn": [
         {
@@ -336,6 +358,30 @@
         {
           "category": "function",
           "resourceName": "floomPublicHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomReportHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomReportHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomReportHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomReportHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_floomReportHandler_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "floomReportHandler"
         }
       ]
     },
