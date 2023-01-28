@@ -44,6 +44,7 @@ export type MainStackParamList = {
     SavedProducts: undefined;
     ProductView: {
         product: ProductType;
+        reference: 'swipe' | 'saved' | 'deleted' | 'featured';
         imageIndex?: number;
     };
 };

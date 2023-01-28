@@ -54,9 +54,6 @@ const ProductView = ({
     const translateY = useSharedValue(0);
     const minY = useSharedValue(0);
 
-    const [previousRoute, setPreviousRoute] =
-        useState<keyof MainStackParamList>('Home');
-
     const [isGoingBack, setIsGoingBack] = useState(false);
 
     const dispatch = useAppDispatch();
@@ -68,14 +65,6 @@ const ProductView = ({
     const [loadingImageTimeout, setLoadingImageTimeout] = useState<
         NodeJS.Timer | undefined
     >();
-
-    useEffect(() => {
-        const {routes} = navigation.getState();
-
-        if (routes.length > 1) {
-            setPreviousRoute(routes[routes.length - 2].name);
-        }
-    }, [navigation, setPreviousRoute]);
 
     // Prefetch next images.
     useEffect(() => {
@@ -146,13 +135,11 @@ const ProductView = ({
 
             // If last navigation was home, send the image index back
             // Else just pop.
-            const {routes} = navigation.getState();
 
-            if (
-                routes.length > 1 &&
-                routes[routes.length - 2].name === 'Home'
-            ) {
+            if (route.params.reference === 'swipe') {
                 navigation.navigate('Home', {imageIndex});
+            } else if (route.params.reference === 'featured') {
+                navigation.navigate('Home');
             } else {
                 dispatch(SET_ACTION('idle'));
                 navigation.pop();
@@ -228,7 +215,7 @@ const ProductView = ({
 
     const ActionSection = () => {
         const deleteProduct = () => {
-            if (previousRoute === 'Home') {
+            if (route.params.reference === 'swipe') {
                 dispatch(COMMENCE_ANIMATE('delete'));
             } else {
                 dispatch(DELETE_PRODUCT(route.params.product));
@@ -243,7 +230,7 @@ const ProductView = ({
         };
 
         const saveProduct = () => {
-            if (previousRoute === 'Home') {
+            if (route.params.reference === 'swipe') {
                 dispatch(COMMENCE_ANIMATE('save'));
             } else {
                 dispatch(SAVE_PRODUCT(route.params.product));

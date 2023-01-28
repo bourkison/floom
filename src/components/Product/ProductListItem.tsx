@@ -145,8 +145,9 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     const navigateToProduct = useCallback(() => {
         navigation.navigate('ProductView', {
             product: product,
+            reference: type,
         });
-    }, [navigation, product]);
+    }, [navigation, product, type]);
 
     const panGesture = Gesture.Pan()
         .activeOffsetX([-10, 10])

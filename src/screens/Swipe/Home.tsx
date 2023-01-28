@@ -1,5 +1,6 @@
 import React from 'react';
 import ProductList from '@/components/Product/ProductList';
+import FeaturedProduct from '@/components/Product/FeaturedProduct';
 import {View, StyleSheet, useWindowDimensions} from 'react-native';
 
 import {StackScreenProps} from '@react-navigation/stack';
@@ -36,6 +37,10 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     ]}>
                     <ProductList />
                 </View>
+                <View style={{width: '100%', marginTop: 10, zIndex: -1}}>
+                    <FeaturedProduct />
+                </View>
+
                 {/* Don't render action buttons if no products found. */}
                 <View
                     style={[
@@ -58,7 +63,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 20,
+        paddingTop: 10,
         flex: 1,
         alignItems: 'center',
         alignContent: 'center',
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
         flexShrink: 0,
     },
     buttonsContainer: {
-        marginTop: 30,
+        marginTop: 15,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

@@ -198,6 +198,12 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
         }
     }, [animationAction, commenceAnimation]);
 
+    useEffect(() => {
+        return () => {
+            dispatch(SET_ACTION('idle'));
+        };
+    }, [dispatch]);
+
     const rTileStyle = useAnimatedStyle(() => {
         return {
             opacity: tileOpacity.value,
@@ -376,6 +382,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
         navigation.navigate('ProductView', {
             product: product,
             imageIndex: imageIndex,
+            reference: 'swipe',
         });
     };
 

@@ -68,6 +68,8 @@ export const ACTION_BUTTON_SIZE_INACTIVE = 55;
 export const DELETED_STORED_PRODUCTS_AMOUNT = 100;
 export const SAVED_STORED_PRODUCTS_AMOUNT = 100;
 
+export const FEATURED_PRODUCT_SIZE = 64;
+
 export const PALETTE = {
     amber: COLOR_PALETTE_AMBER,
     blue: COLOR_PALETTE_BLUE,
