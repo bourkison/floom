@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
     View,
     TouchableOpacity,
@@ -14,32 +14,39 @@ import {Ionicons} from '@expo/vector-icons';
 import {Product} from '@/types/product';
 import CreateReport from '@/components/Report/CreateReport';
 
+import Feedback from '@/components/Utility/Feedback';
+
 type ShareReportWidgetProps = {
     product: Product;
 };
 
 const ShareReportWidget: React.FC<ShareReportWidgetProps> = ({product}) => {
     const [modalVisible, setModalVisible] = useState(false);
-    const [reportCreated, setReportCreated] = useState(false);
+
+    const [feedbackVisible, setFeedbackVisible] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState('');
+    const [feedbackType, setFeedbackType] = useState<
+        'success' | 'warning' | 'error'
+    >('success');
 
     const share = () => {
         Share.share({title: product.name, url: product.link});
     };
 
     const onReportCreate = () => {
-        setReportCreated(true);
+        setFeedbackMessage(
+            'Your report has been created and will be reviewed shortly. Thank you for your help in keeping Floom appropriate and relevant.',
+        );
+        setFeedbackType('success');
+        setFeedbackVisible(true);
+
         setModalVisible(false);
     };
-
-    useEffect(() => {
-        setReportCreated(false);
-    }, [product]);
 
     return (
         <View style={styles.container}>
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                    disabled={reportCreated}
                     style={styles.reportButton}
                     onPress={() => setModalVisible(true)}>
                     <Text style={styles.reportButtonText}>Report</Text>
@@ -50,15 +57,18 @@ const ShareReportWidget: React.FC<ShareReportWidgetProps> = ({product}) => {
                     <Ionicons name="share" color={PALETTE.neutral[1]} />
                 </TouchableOpacity>
             </View>
-            {reportCreated ? (
-                <View style={styles.reportCreatedContainer}>
-                    <Text style={styles.reportCreatedText}>
-                        Your report has been created and will be reviewed
-                        shortly. Thank you for your help in keeping Floom
-                        appropriate and relevant.
-                    </Text>
-                </View>
-            ) : undefined}
+            <Feedback
+                type={feedbackType}
+                message={feedbackMessage}
+                displayTime={30000}
+                visible={feedbackVisible}
+                onFinish={() => {
+                    setFeedbackMessage('');
+                    setFeedbackType('success');
+                    setFeedbackVisible(false);
+                }}
+                containerStyle={styles.feedbackStyle}
+            />
             <Modal visible={modalVisible} animationType="slide">
                 <SafeAreaView style={styles.flexOne}>
                     <ScrollView style={styles.flexOne}>
@@ -153,6 +163,7 @@ const styles = StyleSheet.create({
         borderRadius: 2,
     },
     reportCreatedText: {color: PALETTE.red[8], textAlign: 'center'},
+    feedbackStyle: {padding: 10},
 });
 
 export default ShareReportWidget;

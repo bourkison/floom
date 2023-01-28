@@ -4,6 +4,7 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 import Spinner from '@/components/Utility/Spinner';
 import {PALETTE} from '@/constants';
 import {Auth} from 'aws-amplify';
+import Feedback from '@/components/Utility/Feedback';
 
 type UpdatePasswordWidgetProps = {
     invertButton?: boolean;
@@ -32,23 +33,48 @@ const UpdatePasswordWidget: React.FC<UpdatePasswordWidgetProps> = ({
 
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
+    const [feedbackVisible, setFeedbackVisible] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState('');
+    const [feedbackType, setFeedbackType] = useState<
+        'success' | 'warning' | 'error'
+    >('success');
+
     const updatePassword = async () => {
         if (isUpdate && currentPassword) {
             setIsUpdatingPassword(true);
 
             try {
                 if (newPassword !== confirmNewPassword) {
-                    throw new Error("Passwords don't match!");
+                    throw new Error("Passwords don't match.");
                 }
                 const user = await Auth.currentAuthenticatedUser();
                 await Auth.changePassword(user, currentPassword, newPassword);
-            } catch (err) {
+
+                setFeedbackType('success');
+                setFeedbackMessage('Password changed successfully');
+                setFeedbackVisible(true);
+
+                if (setCurrentPassword) {
+                    setCurrentPassword('');
+                }
+
+                setNewPassword('');
+                setConfirmNewPassword('');
+            } catch (err: any) {
                 // TODO: Handle error.
-                console.error(err);
+                setFeedbackType('error');
+                setFeedbackMessage(err?.message || 'Error updating');
+                setFeedbackVisible(true);
             } finally {
                 setIsUpdatingPassword(false);
             }
         }
+    };
+
+    const feedbackDone = () => {
+        setFeedbackVisible(false);
+        setFeedbackMessage('');
+        setFeedbackType('success');
     };
 
     return (
@@ -108,31 +134,41 @@ const UpdatePasswordWidget: React.FC<UpdatePasswordWidgetProps> = ({
                 />
             </View>
             {isUpdate ? (
-                <View style={styles.buttonContainer}>
-                    <AnimatedButton
-                        style={
-                            !invertButton
-                                ? styles.updatePasswordButton
-                                : styles.invertedUpdatePasswordButton
-                        }
-                        textStyle={
-                            !invertButton
-                                ? styles.updatePasswordButtonText
-                                : styles.invertedUpdatePasswordButtonText
-                        }
-                        onPress={updatePassword}
-                        disabled={isUpdatingPassword}>
-                        {isUpdatingPassword ? (
-                            <Spinner
-                                diameter={14}
-                                spinnerWidth={2}
-                                backgroundColor="#1a1f25"
-                                spinnerColor="#f3fcfa"
-                            />
-                        ) : (
-                            'Update Password'
-                        )}
-                    </AnimatedButton>
+                <View>
+                    <View style={styles.buttonContainer}>
+                        <AnimatedButton
+                            style={
+                                !invertButton
+                                    ? styles.updatePasswordButton
+                                    : styles.invertedUpdatePasswordButton
+                            }
+                            textStyle={
+                                !invertButton
+                                    ? styles.updatePasswordButtonText
+                                    : styles.invertedUpdatePasswordButtonText
+                            }
+                            onPress={updatePassword}
+                            disabled={isUpdatingPassword}>
+                            {isUpdatingPassword ? (
+                                <Spinner
+                                    diameter={14}
+                                    spinnerWidth={2}
+                                    backgroundColor="#1a1f25"
+                                    spinnerColor="#f3fcfa"
+                                />
+                            ) : (
+                                'Update Password'
+                            )}
+                        </AnimatedButton>
+                    </View>
+                    <Feedback
+                        type={feedbackType}
+                        message={feedbackMessage}
+                        displayTime={5000}
+                        visible={feedbackVisible}
+                        onFinish={feedbackDone}
+                        containerStyle={styles.feedbackStyle}
+                    />
                 </View>
             ) : undefined}
         </View>
@@ -199,6 +235,7 @@ const styles = StyleSheet.create({
     bottomBorder: {
         borderBottomWidth: 1,
     },
+    feedbackStyle: {padding: 10},
 });
 
 export default UpdatePasswordWidget;

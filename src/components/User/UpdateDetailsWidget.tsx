@@ -20,6 +20,7 @@ import {UPDATE_USER} from '@/store/slices/user';
 import SetCurrency from './Modals/SetCurrency';
 import {UserDocData} from '@/types/user';
 import {FontAwesome5, Foundation} from '@expo/vector-icons';
+import Feedback from '@/components/Utility/Feedback';
 
 type UpdateDetailsWidgetProps = {
     name: string;
@@ -64,24 +65,43 @@ const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
     const CurrencyTouchableRef = useRef<TouchableOpacity>(null);
     const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
+    const [feedbackVisible, setFeedbackVisible] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState('');
+    const [feedbackType, setFeedbackType] = useState<
+        'success' | 'warning' | 'error'
+    >('success');
+
     dayjs.extend(advancedFormat);
 
     const updateUser = async () => {
         if (isUpdate && gender && country && currency) {
             setIsLoading(true);
 
-            await dispatch(
-                UPDATE_USER({
-                    email: user?.email || '',
-                    dob: dayjs(dob).format('YYYY-MM-DD'),
-                    name,
-                    gender,
-                    country,
-                    currency,
-                }),
-            );
+            try {
+                await dispatch(
+                    UPDATE_USER({
+                        email: user?.email || '',
+                        dob: dayjs(dob).format('YYYY-MM-DD'),
+                        name,
+                        gender,
+                        country,
+                        currency,
+                    }),
+                );
 
-            setIsLoading(false);
+                setFeedbackType('success');
+                setFeedbackMessage('Details updated.');
+                setFeedbackVisible(true);
+            } catch (err: any) {
+                console.error(err);
+                setFeedbackType('error');
+                setFeedbackMessage(
+                    err?.message || 'Error updating user details.',
+                );
+                setFeedbackVisible(true);
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -238,23 +258,37 @@ const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
                 />
             </View>
             {isUpdate ? (
-                <View style={styles.buttonContainer}>
-                    <AnimatedButton
-                        onPress={updateUser}
-                        style={styles.updateButton}
-                        textStyle={styles.updateButtonText}
-                        disabled={isLoading}>
-                        {isLoading ? (
-                            <Spinner
-                                diameter={14}
-                                spinnerWidth={2}
-                                backgroundColor="#1a1f25"
-                                spinnerColor="#f3fcfa"
-                            />
-                        ) : (
-                            'Update Details'
-                        )}
-                    </AnimatedButton>
+                <View>
+                    <View style={styles.buttonContainer}>
+                        <AnimatedButton
+                            onPress={updateUser}
+                            style={styles.updateButton}
+                            textStyle={styles.updateButtonText}
+                            disabled={isLoading}>
+                            {isLoading ? (
+                                <Spinner
+                                    diameter={14}
+                                    spinnerWidth={2}
+                                    backgroundColor="#1a1f25"
+                                    spinnerColor="#f3fcfa"
+                                />
+                            ) : (
+                                'Update Details'
+                            )}
+                        </AnimatedButton>
+                    </View>
+                    <Feedback
+                        type={feedbackType}
+                        message={feedbackMessage}
+                        displayTime={5000}
+                        visible={feedbackVisible}
+                        onFinish={() => {
+                            setFeedbackMessage('');
+                            setFeedbackType('success');
+                            setFeedbackVisible(false);
+                        }}
+                        containerStyle={styles.feedbackContainer}
+                    />
                 </View>
             ) : undefined}
         </View>
@@ -307,6 +341,7 @@ const styles = StyleSheet.create({
     caretIcon: {paddingRight: 5},
     fdRow: {flexDirection: 'row'},
     flexOne: {flex: 1},
+    feedbackContainer: {padding: 10},
 });
 
 export default UpdateDetailsWidget;

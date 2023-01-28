@@ -100,7 +100,6 @@ const userSlice = createSlice({
             })
             .addCase(UPDATE_USER.fulfilled, (state, action) => {
                 state.docData = action.meta.arg;
-                console.log('user updated:', action.meta.arg);
             })
             .addCase(UPDATE_USER.rejected, () => {
                 // TODO: Handle error.
