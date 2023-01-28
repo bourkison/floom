@@ -567,10 +567,20 @@ const productSlice = createSlice({
             })
             .addCase(LOAD_UNSAVED_PRODUCTS.fulfilled, (state, action) => {
                 if (action.meta.arg.loadType === 'more') {
-                    state.unsaved.products = [
-                        ...state.unsaved.products,
-                        ...action.payload.products,
-                    ];
+                    // Only add to local state if doesn't already exist (to avoid duplicactes).
+                    for (let i = 0; i < action.payload.products.length; i++) {
+                        if (
+                            !alreadyExists(
+                                action.payload.products[i]._id,
+                                state.unsaved.products,
+                            )
+                        ) {
+                            state.unsaved.products = [
+                                ...state.unsaved.products,
+                                action.payload.products[i],
+                            ];
+                        }
+                    }
                 } else {
                     state.unsaved.products = action.payload.products;
                 }

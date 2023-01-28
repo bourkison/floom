@@ -55,7 +55,9 @@ const Options = () => {
                 <View style={styles.section}>
                     <SectionHeader>Other</SectionHeader>
 
-                    <LogoutWidget />
+                    <View style={styles.logoutContainer}>
+                        <LogoutWidget />
+                    </View>
                 </View>
             ) : undefined}
         </ScrollView>
@@ -73,6 +75,9 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginVertical: 5,
         fontWeight: 'bold',
+    },
+    logoutContainer: {
+        marginTop: 10,
     },
 });
 
