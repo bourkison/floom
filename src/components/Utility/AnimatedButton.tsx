@@ -1,11 +1,10 @@
 import React, {useEffect} from 'react';
 import Animated, {
-    runOnJS,
     useAnimatedStyle,
     useSharedValue,
+    withTiming,
 } from 'react-native-reanimated';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {ViewStyle, Text, TextStyle, View} from 'react-native';
+import {ViewStyle, Text, TextStyle, Pressable} from 'react-native';
 import {Color} from '@/types';
 
 type AnimatedButtonProps = {
@@ -16,7 +15,6 @@ type AnimatedButtonProps = {
     scale?: number;
     disabled?: boolean;
     disabledColor?: Color;
-    maxDuration?: number;
 };
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({
@@ -27,7 +25,6 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     scale = 0.97,
     disabled,
     disabledColor,
-    maxDuration = 250,
 }) => {
     const sScale = useSharedValue(1);
     const initBackgroundColor = style.backgroundColor;
@@ -52,35 +49,30 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         }
     }, [disabled, disabledColor, initBackgroundColor, sBackgroundColor]);
 
-    const tapGesture = Gesture.Tap()
-        .maxDuration(maxDuration)
-        .onTouchesDown(() => {
-            if (!disabled) {
-                sScale.value = scale;
-                if (onPress) {
-                    runOnJS(onPress)();
-                }
-            }
-        })
-        .onFinalize(() => {
-            sScale.value = 1;
-            if (!disabled) {
-                sBackgroundColor.value = initBackgroundColor;
-            }
-        });
+    const pressIn = () => {
+        if (!disabled) {
+            sScale.value = withTiming(scale, {duration: 150});
+        }
+    };
+
+    const pressOut = () => {
+        sScale.value = withTiming(1, {duration: 150});
+
+        if (onPress) {
+            onPress();
+        }
+    };
 
     return (
-        <View>
-            <GestureDetector gesture={tapGesture}>
-                <Animated.View style={[style, rStyle]}>
-                    {typeof children === 'string' ? (
-                        <Text style={textStyle}>{children}</Text>
-                    ) : (
-                        children
-                    )}
-                </Animated.View>
-            </GestureDetector>
-        </View>
+        <Pressable onPressIn={pressIn} onPressOut={pressOut}>
+            <Animated.View style={[style, rStyle]}>
+                {typeof children === 'string' ? (
+                    <Text style={textStyle}>{children}</Text>
+                ) : (
+                    children
+                )}
+            </Animated.View>
+        </Pressable>
     );
 };
 
