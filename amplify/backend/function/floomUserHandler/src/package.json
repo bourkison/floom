@@ -8,6 +8,7 @@
     "@types/aws-lambda": "^8.10.92",
     "@types/mongoose": "^5.11.97",
     "aws-sdk": "^2.1216.0",
+    "dayjs": "^1.11.7",
     "mongoose": "^6.6.1"
   },
   "devDependencies": {

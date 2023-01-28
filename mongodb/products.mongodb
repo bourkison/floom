@@ -1,3 +1,4 @@
+
 // db.products.findOneAndUpdate({_id: ObjectId('63a0a6cd06de14da3d1d5a16')}, {
 //     $addToSet: {deletedBy: ObjectId('635ece3c42fb6b2e01a2c2a6')},
 //     $pull: {likedBy: ObjectId('635ece3c42fb6b2e01a2c2a6')},
@@ -41,22 +42,49 @@
 //     }
 // })
 
-db.products.aggregate([
-    {
-        $match: {_id: ObjectId('63a0a6cd06de14da3d1d5a16')}
-    },
-    {
-        $project: {
-            _id: 1,
-            name: 1,
-            likedBy: 1,
-            deletedBy: 1,
-            isDeleted: {
-                $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$deletedBy']
-            },
-            isLiked: {
-                $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$likedBy']
-            }
-        }
-    }
-])
+// db.products.aggregate([
+//     {
+//         $match: {_id: ObjectId('63a0a6cd06de14da3d1d5a16')}
+//     },
+//     {
+//         $project: {
+//             _id: 1,
+//             name: 1,
+//             likedBy: 1,
+//             deletedBy: 1,
+//             isDeleted: {
+//                 $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$deletedBy']
+//             },
+//             isLiked: {
+//                 $in: [ObjectId('635ece3c42fb6b2e01a2c2a6'), '$likedBy']
+//             }
+//         }
+//     }
+// ])
+
+// db.products.updateOne({_id: ObjectId('63a9e14c85de513e7ea578dd')}, {$set: {deletedCount: 1}})
+
+// db.products.findOne({_id: ObjectId('63a9e14c85de513e7ea578dd')})
+
+// db.products.find({likedBy: ObjectId('63cca2e2b64ecad46fd14d49')})
+
+// db.products.updateMany(
+//     {likedBy: ObjectId('63cca2e2b64ecad46fd14d49')}, 
+//     {
+//         $pull: {likedBy: ObjectId('63cca2e2b64ecad46fd14d49')},
+//         $inc: {deletedCount: -1}
+//     }
+// )
+
+// db.products.find({ likedBy: {$type: 3}})
+
+// db.products.updateMany({likedBy: {$type: 3}}, {
+//     $set: {
+//         likedBy: [ObjectId('63cca2e2b64ecad46fd14d49')],
+//     },
+//     $unset: {
+//         likedAmount: ""
+//     }
+// })
+
+// db.products.find({_id: ObjectId('63a9e14c85de513e7ea578dd')})

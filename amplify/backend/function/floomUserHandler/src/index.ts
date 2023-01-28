@@ -8,6 +8,7 @@ const MongooseModels = require('/opt/nodejs/models');
 import aws from 'aws-sdk';
 import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 import {Model, Types} from 'mongoose';
+import dayjs from 'dayjs';
 
 let MONGODB_URI: string;
 
@@ -17,6 +18,7 @@ type UserDocData = {
     gender: string;
     dob: Date;
     country: string;
+    currency: string;
     likedProducts?: Types.ObjectId[];
     deletedProducts?: Types.ObjectId[];
 };
@@ -157,8 +159,6 @@ const updateUser = async (
         return response;
     }
 
-    // TODO: Update birthdate, email, gender, locale, name in Cognito first.
-
     const User: Model<UserDocData> = await MongooseModels().User(MONGODB_URI);
 
     await User.findOneAndUpdate(
@@ -168,6 +168,33 @@ const updateUser = async (
             upsert: false,
         },
     );
+
+    const cognito = new aws.CognitoIdentityServiceProvider();
+    await cognito
+        .adminUpdateUserAttributes({
+            Username: authEmail,
+            UserPoolId: process.env.AUTH_FLOOMCOGNITO_USERPOOLID,
+            UserAttributes: [
+                {Name: 'name', Value: userObject.name},
+                {
+                    Name: 'birthdate',
+                    Value: dayjs(userObject.dob).format('YYYY-MM-DD'),
+                },
+                {
+                    Name: 'locale',
+                    Value: userObject.country,
+                },
+                {
+                    Name: 'gender',
+                    Value: userObject.gender,
+                },
+                {
+                    Name: 'custom:currency',
+                    Value: userObject.currency,
+                },
+            ],
+        })
+        .promise();
 
     response = {
         statusCode: 200,
@@ -248,22 +275,28 @@ const deleteUser = async (
     // Next delete user in MongoDB.
     try {
         // Get liked and deleted products so we can pull this user from array
-        const {likedProducts, deletedProducts, _id} = await User.findOne(
+        const {_id} = await User.findOne(
             {email: authEmail},
             {likedProducts: 1, deletedProducts: 1, _id: 1},
         ).lean();
 
         const pullFromLiked = async () => {
             return await Product.updateMany(
-                {_id: {$in: likedProducts}},
-                {likedBy: {$pull: _id}, likedAmount: {$inc: -1}},
+                {likedBy: _id},
+                {
+                    $pull: {likedBy: _id},
+                    $inc: {likedCount: -1},
+                },
             );
         };
 
         const pullFromDeleted = async () => {
             return await Product.updateMany(
-                {_id: {$in: deletedProducts}},
-                {deletedBy: {$pull: _id}, deletedAmount: {$inc: -1}},
+                {deletedBy: _id},
+                {
+                    $pull: {deletedBy: _id},
+                    $inc: {deletedCount: -1},
+                },
             );
         };
 
