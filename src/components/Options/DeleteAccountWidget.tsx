@@ -2,15 +2,24 @@ import React, {useState} from 'react';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {View, StyleSheet, Text, Modal, Pressable} from 'react-native';
 import {PALETTE} from '@/constants';
-import SectionHeader from '../Utility/SectionHeader';
-import Spinner from '../Utility/Spinner';
+import SectionHeader from '@/components/Utility/SectionHeader';
+import Spinner from '@/components/Utility/Spinner';
+import {deleteUser} from '@/api/user';
+import {useAppDispatch} from '@/store/hooks';
+import {LOGOUT} from '@/store/slices/user';
 
 const DeleteAccountWidget = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const deleteAccount = () => {
+    const dispatch = useAppDispatch();
+
+    const deleteAccount = async () => {
         setIsLoading(true);
+        await deleteUser({init: {}});
+        await dispatch(LOGOUT());
+        setIsLoading(false);
+        setModalVisible(false);
     };
 
     return (
@@ -20,7 +29,16 @@ const DeleteAccountWidget = () => {
                     onPress={() => setModalVisible(true)}
                     style={styles.deleteAccountButton}
                     textStyle={styles.deleteAccountButtonText}>
-                    Delete Account
+                    {isLoading ? (
+                        <Spinner
+                            diameter={14}
+                            spinnerWidth={2}
+                            backgroundColor="rgba(255, 255, 255, 0.2)"
+                            spinnerColor={PALETTE.neutral[1]}
+                        />
+                    ) : (
+                        'Delete Account'
+                    )}
                 </AnimatedButton>
             </View>
             <Text style={styles.hintText}>
@@ -30,7 +48,7 @@ const DeleteAccountWidget = () => {
                 <Pressable
                     onPress={() => setModalVisible(false)}
                     style={styles.modalPressable}>
-                    <View style={styles.modalContainer}>
+                    <Pressable style={styles.modalContainer}>
                         <View>
                             <SectionHeader>Delete Account</SectionHeader>
                             <Text style={styles.modalText}>
@@ -56,8 +74,8 @@ const DeleteAccountWidget = () => {
                                         <Spinner
                                             diameter={14}
                                             spinnerWidth={2}
-                                            backgroundColor="#1a1f25"
-                                            spinnerColor="#f3fcfa"
+                                            backgroundColor="rgba(255, 255, 255, 0.2)"
+                                            spinnerColor={PALETTE.neutral[1]}
                                         />
                                     ) : (
                                         'Delete'
@@ -65,7 +83,7 @@ const DeleteAccountWidget = () => {
                                 </AnimatedButton>
                             </View>
                         </View>
-                    </View>
+                    </Pressable>
                 </Pressable>
             </Modal>
         </View>

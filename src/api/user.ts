@@ -1,5 +1,10 @@
 import {fetchJwtToken, API_NAME} from '@/api/utility';
-import {GetUserParams, UpdateUserParams, UserDocData} from '@/types/user';
+import {
+    DeleteUserParams,
+    GetUserParams,
+    UpdateUserParams,
+    UserDocData,
+} from '@/types/user';
 import {API} from 'aws-amplify';
 import dayjs from 'dayjs';
 
@@ -35,4 +40,15 @@ export async function updateUser(input: UpdateUserParams) {
         init.headers.Authorization || (await fetchJwtToken());
 
     await API.put(API_NAME, path, init);
+}
+
+export async function deleteUser(input: DeleteUserParams) {
+    const path = '/user';
+
+    let init = input.init;
+    init.headers = init.headers || {};
+    init.headers.Authorization =
+        init.headers.Authorization || (await fetchJwtToken());
+
+    await API.del(API_NAME, path, init);
 }

@@ -36,3 +36,13 @@ export type UpdateUserInit = {
         user: UserDocData;
     };
 };
+
+export type DeleteUserParams = {
+    init: DeleteUserInit;
+};
+
+export type DeleteUserInit = {
+    headers?: {
+        Authorization?: string;
+    };
+};
