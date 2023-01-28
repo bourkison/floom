@@ -19,9 +19,10 @@ type ReportType = {
     createdBy: Types.ObjectId;
     product: Types.ObjectId;
     message: string;
-    reportType: 'inappropriate' | 'broken';
+    type: 'inappropriate' | 'broken' | 'other';
 };
 
+// TODO: Could add some logic preventing users from creating too many reports on the same product.
 const createReport = async (
     event: APIGatewayEvent,
     MONGODB_URI: string,

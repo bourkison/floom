@@ -16,18 +16,9 @@ export async function queryProduct(
     init.headers.Authorization =
         init.headers.Authorization || (await fetchJwtToken());
 
-    console.log(await fetchJwtToken());
-
     const data = await API.get(API_NAME, path, init);
 
     let response: ProductType[] = [];
-
-    console.log(
-        'RESPONSE:',
-        data.data.length,
-        data.__loaded,
-        data.__moreToLoad,
-    );
 
     for (let i = 0; i < data.data.length; i++) {
         response.push({

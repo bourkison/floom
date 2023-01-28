@@ -42,7 +42,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import BrandLogo from '@/components/Utility/BrandLogo';
 import ActionButton from '@/components/Utility/ActionButton';
-import ShareReportWidget from '@/components/Product/ShareReportWidget';
+import ShareReportWidget from '@/components/Report/ShareReportWidget';
 
 const ProductView = ({
     route,
@@ -416,7 +416,7 @@ const ProductView = ({
                             )}
                         </View>
                         <ActionSection />
-                        <ShareReportWidget />
+                        <ShareReportWidget product={route.params.product} />
                     </Animated.View>
                 </GestureDetector>
             </View>

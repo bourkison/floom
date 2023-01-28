@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
         name: {
             type: String,
             required: true,
+            maxLength: 256,
         },
         gender: {
             type: String,
@@ -189,11 +190,12 @@ const reportSchema = new mongoose.Schema(
         message: {
             type: String,
             required: true,
+            maxLength: 1000,
         },
-        reportType: {
+        type: {
             type: String,
             required: true,
-            enum: ['inappropriate', 'broken'],
+            enum: ['inappropriate', 'broken', 'other'],
         },
         reviewed: {
             type: Boolean,

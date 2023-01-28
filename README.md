@@ -9,13 +9,14 @@
 -   Login/Sign Up stages better designed
 -   Describe benefits of guest mode
 -   Guest mode working
--   Share button
--   Report button
+-   ~Share button~
+-   ~Report button~
 -   ~Fix zIndex bug on android~
 -   ~Preload images~
--   Price filters
+-   Filters: Price, Brand
 
 ## Out of Scope Ideas
 
 -   Purchase within app
 -   User folders/wishlists
+-   Logic preventing users from adding too many reports

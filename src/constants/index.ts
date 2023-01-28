@@ -70,6 +70,21 @@ export const SAVED_STORED_PRODUCTS_AMOUNT = 100;
 
 export const FEATURED_PRODUCT_SIZE = 64;
 
+export const REPORT_TYPES = [
+    {
+        id: 'inappropriate',
+        name: 'Inappropriate content',
+    },
+    {
+        id: 'broken',
+        name: 'Something is broken',
+    },
+    {
+        id: 'other',
+        name: 'Other',
+    },
+] as const;
+
 export const PALETTE = {
     amber: COLOR_PALETTE_AMBER,
     blue: COLOR_PALETTE_BLUE,

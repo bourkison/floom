@@ -22,11 +22,13 @@ export async function queryPublicProduct(
         response.push({
             name: data.data[i].name,
             images: data.data[i].images,
-            price: {
-                amount: data.data[i].price.amount,
-                saleAmount: data.data[i].price.saleAmount,
-                currency: data.data[i].price.currency,
-            },
+            price: data.data[i].price.map((p: any) => {
+                return {
+                    currency: p.currency,
+                    amount: p.amount,
+                    saleAmount: p.saleAmount,
+                };
+            }),
             link: data.data[i].link,
             _id: data.data[i]._id,
             colors: data.data[i].colors,
@@ -36,6 +38,9 @@ export async function queryPublicProduct(
             vendorProductId: data.data[i].vendorProductId,
             inStock: data.data[i].inStock,
             description: data.data[i].description || '',
+            availableCountries: data.data[i].availableCountries,
+            saved: data.data[i].saved,
+            deleted: data.data[i].deleted,
         });
     }
 
@@ -66,11 +71,13 @@ export async function getPublicProduct(
         response.push({
             name: data.data[i].name,
             images: data.data[i].images,
-            price: {
-                amount: data.data[i].price.amount,
-                saleAmount: data.data[i].price.saleAmount,
-                currency: data.data[i].price.currency,
-            },
+            price: data.data[i].price.map((p: any) => {
+                return {
+                    currency: p.currency,
+                    amount: p.amount,
+                    saleAmount: p.saleAmount,
+                };
+            }),
             link: data.data[i].link,
             _id: data.data[i]._id,
             colors: data.data[i].colors,
@@ -80,6 +87,9 @@ export async function getPublicProduct(
             vendorProductId: data.data[i].vendorProductId,
             inStock: data.data[i].inStock,
             description: data.data[i].description || '',
+            availableCountries: data.data[i].availableCountries,
+            saved: data.data[i].saved,
+            deleted: data.data[i].deleted,
         });
     }
 
