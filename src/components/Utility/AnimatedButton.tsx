@@ -57,14 +57,10 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 
     const pressOut = () => {
         sScale.value = withTiming(1, {duration: 150});
-
-        if (onPress) {
-            onPress();
-        }
     };
 
     return (
-        <Pressable onPressIn={pressIn} onPressOut={pressOut}>
+        <Pressable onPressIn={pressIn} onPressOut={pressOut} onPress={onPress}>
             <Animated.View style={[style, rStyle]}>
                 {typeof children === 'string' ? (
                     <Text style={textStyle}>{children}</Text>

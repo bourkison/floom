@@ -1,5 +1,5 @@
 import AnimatedButton from '@/components/Utility/AnimatedButton';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     View,
     ActivityIndicator,
@@ -21,6 +21,7 @@ import {
     LOAD_DELETED_PRODUCTS,
 } from '@/store/slices/product';
 import {FlashList} from '@shopify/flash-list';
+import {Product} from '@/types/product';
 
 const INITIAL_LOAD_AMOUNT = 10;
 const SUBSEQUENT_LOAD_AMOUNT = 10;
@@ -42,6 +43,8 @@ const DeletedProducts = () => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [isDeletingAll, setIsDeletingAll] = useState(false);
+
+    const ListRef = useRef<FlashList<Product>>(null);
 
     const dispatch = useAppDispatch();
 
@@ -120,6 +123,7 @@ const DeletedProducts = () => {
     return (
         <View style={styles.container}>
             <FlashList
+                ref={ListRef}
                 data={products}
                 keyExtractor={item => item._id}
                 renderItem={({item, index}) => (
@@ -128,6 +132,7 @@ const DeletedProducts = () => {
                         index={index}
                         type="deleted"
                         onDelete={removeProduct}
+                        listRef={ListRef}
                     />
                 )}
                 onEndReached={() => {

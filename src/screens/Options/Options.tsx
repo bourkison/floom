@@ -6,6 +6,7 @@ import DeletedProductsWidget from '@/components/Options/DeletedProductsWidget';
 import AccountDetailsWidget from '@/components/Options/AccountDetailsWidget';
 import LogoutWidget from '@/components/Options/LogoutWidget';
 import {useAppSelector} from '@/store/hooks';
+import AppInfoWidget from '@/components/Options/AppInfoWidget';
 
 const Options = () => {
     const isGuest = useAppSelector(state => state.user.isGuest);
@@ -47,6 +48,7 @@ const Options = () => {
 
             <View style={styles.section}>
                 <SectionHeader>App Info</SectionHeader>
+                <AppInfoWidget />
             </View>
 
             {!isGuest ? (
