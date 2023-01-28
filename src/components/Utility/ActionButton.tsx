@@ -27,6 +27,7 @@ const SCALE_AMOUNT = 0.9;
 
 const BOX_SHADOW_START = 0.5;
 const BOX_SHADOW_END = 0.4;
+const BORDER_WIDTH = 4;
 
 const PROGRESS_DURATION = 250;
 
@@ -53,7 +54,13 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
         const backgroundColor = interpolateColor(
             sProgress.value,
             [0, 1],
-            [PALETTE.neutral[1], ACTIVE_COLOR],
+            ['#FFF', ACTIVE_COLOR],
+        );
+
+        const borderColor = interpolateColor(
+            sProgress.value,
+            [0, 1],
+            [PALETTE.neutral[0], ACTIVE_COLOR],
         );
 
         return {
@@ -66,6 +73,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
             // Goes from 0.5 to 0.4 based on progress
             shadowOpacity:
                 BOX_SHADOW_START - (1 - BOX_SHADOW_END) * sProgress.value,
+            elevation: 5 - sProgress.value * 5,
+            borderColor,
             backgroundColor,
         };
     });
@@ -129,15 +138,16 @@ const styles = StyleSheet.create({
     buttonContainer: {
         marginHorizontal: 8,
         shadowColor: PALETTE.neutral[5],
-        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2,
+        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2 + BORDER_WIDTH,
+        borderWidth: BORDER_WIDTH,
+        elevation: 5,
     },
     button: {
         zIndex: -1,
-        width: ACTION_BUTTON_SIZE_INACTIVE,
-        height: ACTION_BUTTON_SIZE_INACTIVE,
-        flexBasis: ACTION_BUTTON_SIZE_INACTIVE,
-        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2,
-
+        width: ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2,
+        height: ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2,
+        flexBasis: ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2,
+        borderRadius: (ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2) / 2,
         flexGrow: 0,
         flexShrink: 0,
         justifyContent: 'center',

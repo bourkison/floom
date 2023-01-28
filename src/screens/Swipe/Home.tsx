@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     buttonsContainer: {
-        marginTop: 15,
+        marginTop: 10,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
