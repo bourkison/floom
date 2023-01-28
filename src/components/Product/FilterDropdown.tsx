@@ -304,10 +304,10 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
                                 {GENDER_OPTIONS.map(g => (
                                     <FilterItem
                                         obj={obj}
-                                        item={g}
+                                        item={g.label}
                                         type="gender"
                                         options={selectedGenders}
-                                        key={g}
+                                        key={g.value}
                                     />
                                 ))}
                             </View>

@@ -1,7 +1,7 @@
 import React, {RefObject, useEffect, useState} from 'react';
 import {Modal, Pressable, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {PALETTE} from '@/constants';
+import {GENDER_OPTIONS, PALETTE} from '@/constants';
 import {UserDocData} from '@/types/user';
 
 type SetGenderProps = {
@@ -47,9 +47,13 @@ const SetGender: React.FC<SetGenderProps> = ({
                     <Picker
                         selectedValue={selectedValue || 'male'}
                         onValueChange={setSelectedValue}>
-                        <Picker.Item value="male" label="Male" />
-                        <Picker.Item value="female" label="Female" />
-                        <Picker.Item value="other" label="Other" />
+                        {GENDER_OPTIONS.map(g => (
+                            <Picker.Item
+                                value={g.value}
+                                label={g.label}
+                                key={g.value}
+                            />
+                        ))}
                     </Picker>
                 </Pressable>
             </Pressable>

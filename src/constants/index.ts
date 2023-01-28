@@ -34,7 +34,11 @@ export const IMAGE_PREFETCH_AMOUNT = 3;
 export const IMAGE_ANIMATED_AMOUNT = 2;
 
 // PRODUCT FILTER CONSTANTS
-export const GENDER_OPTIONS = ['Male', 'Female', 'Unisex'];
+export const GENDER_OPTIONS = [
+    {value: 'male', label: 'Male'},
+    {value: 'female', label: 'Female'},
+    {value: 'other', label: 'Both'},
+] as const;
 export const CATEGORY_OPTIONS = [
     'T-shirts',
     'Shirts',

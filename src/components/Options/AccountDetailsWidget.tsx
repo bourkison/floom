@@ -1,8 +1,7 @@
 import React from 'react';
 import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import {useAppSelector} from '@/store/hooks';
-import {PALETTE} from '@/constants';
-import {capitaliseString} from '@/services';
+import {GENDER_OPTIONS, PALETTE} from '@/constants';
 import dayjs from 'dayjs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {OptionsStackParamList} from '@/nav/OptionsNavigator';
@@ -60,7 +59,10 @@ const AccountDetailsWidget = () => {
             />
             <Option
                 header="Gender"
-                value={capitaliseString(user?.gender || '')}
+                value={
+                    GENDER_OPTIONS.filter(g => g.value === user?.gender)[0]
+                        ?.label || ''
+                }
                 bottomBorder={true}
             />
             <Option

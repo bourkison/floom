@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     Text,
 } from 'react-native';
-import {PALETTE} from '@/constants';
+import {PALETTE, GENDER_OPTIONS} from '@/constants';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import SetGender from '@/components/User/Modals/SetGender';
 import SetCountry from './Modals/SetCountry';
@@ -152,7 +152,9 @@ const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
                     <View style={styles.fdRow}>
                         {gender ? (
                             <Text style={styles.flexOne}>
-                                {gender[0].toUpperCase() + gender.substring(1)}
+                                {GENDER_OPTIONS.filter(
+                                    g => g.value === gender,
+                                )[0]?.label || ''}
                             </Text>
                         ) : (
                             <Text style={[styles.placeholder, styles.flexOne]}>
