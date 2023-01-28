@@ -20,6 +20,7 @@ import {FontAwesome5} from '@expo/vector-icons';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
+    runOnJS,
     runOnUI,
     useAnimatedStyle,
     useSharedValue,
@@ -41,6 +42,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import BrandLogo from '@/components/Utility/BrandLogo';
 import ActionButton from '@/components/Utility/ActionButton';
+import ShareReportWidget from '@/components/Product/ShareReportWidget';
 
 const ProductView = ({
     route,
@@ -133,16 +135,26 @@ const ProductView = ({
             setIsGoingBack(true);
             Haptics.selectionAsync();
 
-            // If last navigation was home, send the image index back
-            // Else just pop.
+            const navigateOut = () => {
+                // If last navigation was home, send the image index back
+                // Else just pop.
 
-            if (route.params.reference === 'swipe') {
-                navigation.navigate('Home', {imageIndex});
-            } else if (route.params.reference === 'featured') {
-                navigation.navigate('Home');
+                if (route.params.reference === 'swipe') {
+                    navigation.navigate('Home', {imageIndex});
+                } else if (route.params.reference === 'featured') {
+                    navigation.navigate('Home');
+                } else {
+                    dispatch(SET_ACTION('idle'));
+                    navigation.pop();
+                }
+            };
+
+            if (translateY.value !== 0) {
+                translateY.value = withTiming(0, {duration: 100}, () =>
+                    runOnJS(navigateOut)(),
+                );
             } else {
-                dispatch(SET_ACTION('idle'));
-                navigation.pop();
+                navigateOut();
             }
         }
     };
@@ -214,9 +226,21 @@ const ProductView = ({
     };
 
     const ActionSection = () => {
+        const commenceAnimate = (type: 'save' | 'delete') => {
+            dispatch(COMMENCE_ANIMATE(type));
+        };
+
         const deleteProduct = () => {
             if (route.params.reference === 'swipe') {
-                dispatch(COMMENCE_ANIMATE('delete'));
+                if (translateY.value !== 0) {
+                    translateY.value = withTiming(0, {duration: 150}, () => {
+                        runOnJS(commenceAnimate)('delete');
+                        runOnJS(goBack)();
+                    });
+                    return;
+                } else {
+                    commenceAnimate('delete');
+                }
             } else {
                 dispatch(DELETE_PRODUCT(route.params.product));
             }
@@ -231,7 +255,15 @@ const ProductView = ({
 
         const saveProduct = () => {
             if (route.params.reference === 'swipe') {
-                dispatch(COMMENCE_ANIMATE('save'));
+                if (translateY.value !== 0) {
+                    translateY.value = withTiming(0, {duration: 150}, () => {
+                        runOnJS(commenceAnimate)('save');
+                        runOnJS(goBack)();
+                        return;
+                    });
+                } else {
+                    commenceAnimate('save');
+                }
             } else {
                 dispatch(SAVE_PRODUCT(route.params.product));
             }
@@ -363,12 +395,28 @@ const ProductView = ({
                             {route.params.product.description ? (
                                 <Text>{route.params.product.description}</Text>
                             ) : (
-                                <Text style={styles.noDescriptionText}>
-                                    No description provided
-                                </Text>
+                                <View>
+                                    <Text style={styles.noDescriptionText}>
+                                        Lorem ipsum dolor sit amet consectetur
+                                        adipisicing elit. Voluptatem minus ex
+                                        pariatur a libero ipsa tenetur explicabo
+                                        cum distinctio maiores suscipit tempore,
+                                        repudiandae iure neque deserunt numquam.
+                                        Exercitationem, similique distinctio?
+                                    </Text>
+                                    <Text style={styles.noDescriptionText}>
+                                        Lorem ipsum dolor sit amet consectetur
+                                        adipisicing elit. Voluptatem minus ex
+                                        pariatur a libero ipsa tenetur explicabo
+                                        cum distinctio maiores suscipit tempore,
+                                        repudiandae iure neque deserunt numquam.
+                                        Exercitationem, similique distinctio?
+                                    </Text>
+                                </View>
                             )}
                         </View>
                         <ActionSection />
+                        <ShareReportWidget />
                     </Animated.View>
                 </GestureDetector>
             </View>
@@ -481,6 +529,7 @@ const styles = StyleSheet.create({
     actionButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center',
         marginVertical: 33,
     },
     loadingImage: {
