@@ -7,6 +7,7 @@ import {
     DeletedProductsHeader,
     OptionsHeader,
     UpdateDetailHeader,
+    HEADER_HEIGHT_W_STATUS_BAR,
 } from '@/nav/Headers';
 import DeletedProducts from '@/screens/Options/DeletedProducts';
 import AppInfo from '@/screens/Options/AppInfo';
@@ -23,7 +24,13 @@ const OptionsStack = createStackNavigator<OptionsStackParamList>();
 
 const OptionsNavigator = () => {
     return (
-        <OptionsStack.Navigator initialRouteName="OptionsHome">
+        <OptionsStack.Navigator
+            initialRouteName="OptionsHome"
+            screenOptions={{
+                headerStyle: {
+                    height: HEADER_HEIGHT_W_STATUS_BAR,
+                },
+            }}>
             <OptionsStack.Screen
                 name="OptionsHome"
                 component={Options}

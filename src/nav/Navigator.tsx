@@ -17,6 +17,7 @@ import VerifyEmail from '@/screens/Auth/VerifyEmail';
 import Login from '@/screens/Auth/Login';
 
 import {
+    HEADER_HEIGHT_W_STATUS_BAR,
     HomeHeader,
     LoginHeader,
     SavedProductsHeader,
@@ -91,6 +92,11 @@ const Navigator = () => {
             screenOptions={{
                 cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
                 gestureEnabled: true,
+                headerStyle: {
+                    height: HEADER_HEIGHT_W_STATUS_BAR,
+                    elevation: 999,
+                    zIndex: 999,
+                },
             }}
             initialRouteName="Home">
             <MainStack.Screen

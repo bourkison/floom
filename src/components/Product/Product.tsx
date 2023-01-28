@@ -149,7 +149,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
         <View
             style={[
                 styles.container,
-                {zIndex: 20 - index, elevation: 20 - index},
+                {zIndex: 5 - index, elevation: 5 - index},
             ]}>
             <ImageBackground
                 style={[
@@ -158,7 +158,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         width: width - IMAGE_PADDING,
                         height: (width - IMAGE_PADDING) / IMAGE_RATIO,
                     },
-                    {zIndex: 20 - index, elevation: 20 - index},
+                    {zIndex: 5 - index, elevation: 5 - index},
                 ]}
                 source={{
                     uri: product.images[imageIndex],

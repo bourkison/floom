@@ -16,6 +16,10 @@ type HeaderProps = {
     rightIcon?: JSX.Element;
 };
 
+export const HEADER_HEIGHT = 44;
+export const HEADER_HEIGHT_W_STATUS_BAR =
+    HEADER_HEIGHT + Constants.statusBarHeight;
+
 const HeaderTemplate: React.FC<HeaderProps> = ({
     children,
     leftIcon,
@@ -25,8 +29,7 @@ const HeaderTemplate: React.FC<HeaderProps> = ({
         style={[
             styles.headerContainer,
             {
-                flexBasis:
-                    Constants.statusBarHeight + styles.headerRow.flexBasis,
+                flexBasis: HEADER_HEIGHT_W_STATUS_BAR,
             },
         ]}>
         <View style={styles.statusBarEmpty} />
@@ -195,7 +198,7 @@ const styles = StyleSheet.create({
         elevation: 99,
     },
     headerRow: {
-        flexBasis: 44,
+        flexBasis: HEADER_HEIGHT,
         flexGrow: 0,
         flexShrink: 0,
         width: '100%',

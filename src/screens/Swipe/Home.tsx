@@ -37,7 +37,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     ]}>
                     <ProductList />
                 </View>
-                <View style={{width: '100%', marginTop: 10, zIndex: -1}}>
+                <View style={styles.featuredProductContainer}>
                     <FeaturedProduct />
                 </View>
 
@@ -67,12 +67,15 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         alignContent: 'center',
-        zIndex: 1,
+        zIndex: -1,
+        elevation: -1,
     },
     productContainer: {
         flex: 1,
         flexGrow: 0,
         flexShrink: 0,
+        zIndex: 2,
+        elevation: 2,
     },
     buttonsContainer: {
         marginTop: 15,
@@ -92,6 +95,12 @@ const styles = StyleSheet.create({
     },
     hidden: {
         opacity: 0,
+    },
+    featuredProductContainer: {
+        width: '100%',
+        marginTop: 10,
+        zIndex: -1,
+        elevation: -1,
     },
 });
 

@@ -11,7 +11,7 @@
 -   Guest mode working
 -   Share button
 -   Report button
--   Fix zIndex bug on android
+-   ~Fix zIndex bug on android~
 -   ~Preload images~
 -   Price filters
 

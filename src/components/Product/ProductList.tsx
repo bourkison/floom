@@ -135,6 +135,7 @@ const ProductList = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        zIndex: -1,
     },
     loadingContainer: {
         flex: 1,
