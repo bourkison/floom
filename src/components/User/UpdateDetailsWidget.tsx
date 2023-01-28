@@ -19,6 +19,7 @@ import advancedFormat from 'dayjs/plugin/advancedFormat';
 import {UPDATE_USER} from '@/store/slices/user';
 import SetCurrency from './Modals/SetCurrency';
 import {UserDocData} from '@/types/user';
+import {FontAwesome5, Foundation} from '@expo/vector-icons';
 
 type UpdateDetailsWidgetProps = {
     name: string;
@@ -128,13 +129,24 @@ const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
                     ref={GenderTouchableRef}
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setGenderModalVisible(true)}>
-                    {gender ? (
-                        <Text>
-                            {gender[0].toUpperCase() + gender.substring(1)}
-                        </Text>
-                    ) : (
-                        <Text style={styles.placeholder}>Preferred Style</Text>
-                    )}
+                    <View style={styles.fdRow}>
+                        {gender ? (
+                            <Text style={styles.flexOne}>
+                                {gender[0].toUpperCase() + gender.substring(1)}
+                            </Text>
+                        ) : (
+                            <Text style={[styles.placeholder, styles.flexOne]}>
+                                Preferred Style
+                            </Text>
+                        )}
+                        <View style={styles.caretIcon}>
+                            {genderModalVisible ? (
+                                <FontAwesome5 name="caret-up" />
+                            ) : (
+                                <FontAwesome5 name="caret-down" />
+                            )}
+                        </View>
+                    </View>
                 </TouchableOpacity>
                 <SetGender
                     visible={genderModalVisible}
@@ -146,13 +158,21 @@ const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
                 <TouchableOpacity
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setCountryModalVisible(true)}>
-                    {country ? (
-                        <Text>
-                            {COUNTRIES[country].emoji} {COUNTRIES[country].name}
-                        </Text>
-                    ) : (
-                        <Text style={styles.placeholder}>Country</Text>
-                    )}
+                    <View style={styles.fdRow}>
+                        {country ? (
+                            <Text style={styles.flexOne}>
+                                {COUNTRIES[country].emoji}{' '}
+                                {COUNTRIES[country].name}
+                            </Text>
+                        ) : (
+                            <Text style={[styles.placeholder, styles.flexOne]}>
+                                Country
+                            </Text>
+                        )}
+                        <View style={styles.caretIcon}>
+                            <Foundation name="list" />
+                        </View>
+                    </View>
                 </TouchableOpacity>
                 <SetCountry
                     visible={countryModalVisible}
@@ -164,17 +184,26 @@ const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
                     ref={CurrencyTouchableRef}
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setCurrencyModalVisible(true)}>
-                    {currency ? (
-                        <Text>
-                            {CURRENCIES[currency].emoji}{' '}
-                            {CURRENCIES[currency].name}{' '}
-                            {CURRENCIES[currency].symbol}
-                        </Text>
-                    ) : (
-                        <Text style={styles.placeholder}>
-                            Preferred currency
-                        </Text>
-                    )}
+                    <View style={styles.fdRow}>
+                        {currency ? (
+                            <Text style={styles.flexOne}>
+                                {CURRENCIES[currency].emoji}{' '}
+                                {CURRENCIES[currency].name}{' '}
+                                {CURRENCIES[currency].symbol}
+                            </Text>
+                        ) : (
+                            <Text style={[styles.placeholder, styles.flexOne]}>
+                                Preferred currency
+                            </Text>
+                        )}
+                        <View style={styles.caretIcon}>
+                            {currencyModalVisible ? (
+                                <FontAwesome5 name="caret-up" />
+                            ) : (
+                                <FontAwesome5 name="caret-down" />
+                            )}
+                        </View>
+                    </View>
                 </TouchableOpacity>
                 <SetCurrency
                     visible={currencyModalVisible}
@@ -187,7 +216,18 @@ const UpdateDetailsWidget: React.FC<UpdateDetailsWidgetProps> = ({
                     ref={DobTouchableRef}
                     style={[styles.textInput, styles.borderTop]}
                     onPress={() => setDobModalVisible(true)}>
-                    <Text>{dayjs(dob).format('Do MMMM, YYYY')}</Text>
+                    <View style={styles.fdRow}>
+                        <Text style={styles.flexOne}>
+                            {dayjs(dob).format('Do MMMM, YYYY')}
+                        </Text>
+                        <View style={styles.caretIcon}>
+                            {dobModalVisible ? (
+                                <FontAwesome5 name="caret-up" />
+                            ) : (
+                                <FontAwesome5 name="caret-down" />
+                            )}
+                        </View>
+                    </View>
                 </TouchableOpacity>
                 <SetDob
                     visible={dobModalVisible}
@@ -264,6 +304,9 @@ const styles = StyleSheet.create({
     placeholder: {
         color: PALETTE.neutral[3],
     },
+    caretIcon: {paddingRight: 5},
+    fdRow: {flexDirection: 'row'},
+    flexOne: {flex: 1},
 });
 
 export default UpdateDetailsWidget;
