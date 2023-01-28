@@ -9,6 +9,7 @@ import SectionHeader from '@/components/Utility/SectionHeader';
 import UpdateDetailsWidget from '@/components/User/UpdateDetailsWidget';
 import UpdatePasswordWidget from '@/components/Options/UpdatePasswordWidget';
 import {UserDocData} from '@/types/user';
+import DeleteAccountWidget from '@/components/Options/DeleteAccountWidget';
 
 const UpdateDetail: React.FC<
     StackScreenProps<OptionsStackParamList, 'UpdateDetail'>
@@ -81,6 +82,7 @@ const UpdateDetail: React.FC<
 
             <View style={[styles.section, styles.topMargin]}>
                 <SectionHeader>Delete Account</SectionHeader>
+                <DeleteAccountWidget />
             </View>
         </ScrollView>
     );
