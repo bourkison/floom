@@ -15,12 +15,15 @@ import {Product} from '@/types/product';
 import CreateReport from '@/components/Report/CreateReport';
 
 import Feedback from '@/components/Utility/Feedback';
+import {useAppSelector} from '@/store/hooks';
 
 type ShareReportWidgetProps = {
     product: Product;
 };
 
 const ShareReportWidget: React.FC<ShareReportWidgetProps> = ({product}) => {
+    const isGuest = useAppSelector(state => state.user.isGuest);
+
     const [modalVisible, setModalVisible] = useState(false);
 
     const [feedbackVisible, setFeedbackVisible] = useState(false);
@@ -46,12 +49,14 @@ const ShareReportWidget: React.FC<ShareReportWidgetProps> = ({product}) => {
     return (
         <View style={styles.container}>
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                    style={styles.reportButton}
-                    onPress={() => setModalVisible(true)}>
-                    <Text style={styles.reportButtonText}>Report</Text>
-                    <Ionicons name="warning" color={PALETTE.red[7]} />
-                </TouchableOpacity>
+                {!isGuest ? (
+                    <TouchableOpacity
+                        style={styles.reportButton}
+                        onPress={() => setModalVisible(true)}>
+                        <Text style={styles.reportButtonText}>Report</Text>
+                        <Ionicons name="warning" color={PALETTE.red[7]} />
+                    </TouchableOpacity>
+                ) : undefined}
                 <TouchableOpacity style={styles.shareButton} onPress={share}>
                     <Text style={styles.shareButtonText}>Share</Text>
                     <Ionicons name="share" color={PALETTE.neutral[1]} />

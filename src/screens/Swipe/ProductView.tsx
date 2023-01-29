@@ -33,7 +33,7 @@ import {capitaliseString, formatPrice, stringifyColors} from '@/services';
 import {useAppDispatch} from '@/store/hooks';
 import {
     COMMENCE_ANIMATE,
-    DELETE_PRODUCT,
+    DELETE_SAVED_PRODUCT,
     SAVE_PRODUCT,
     SET_ACTION,
 } from '@/store/slices/product';
@@ -242,7 +242,7 @@ const ProductView = ({
                     commenceAnimate('delete');
                 }
             } else {
-                dispatch(DELETE_PRODUCT(route.params.product));
+                dispatch(DELETE_SAVED_PRODUCT({product: route.params.product}));
             }
 
             goBack();
@@ -274,11 +274,23 @@ const ProductView = ({
         return (
             <View style={styles.actionButtonContainer}>
                 {!route.params.product.deleted ? (
-                    <ActionButton type="delete" onPress={deleteProduct} />
+                    <ActionButton
+                        type="delete"
+                        onPress={deleteProduct}
+                        disabled={false}
+                    />
                 ) : undefined}
-                <ActionButton type="buy" onPress={buyProduct} />
+                <ActionButton
+                    type="buy"
+                    onPress={buyProduct}
+                    disabled={false}
+                />
                 {!route.params.product.saved ? (
-                    <ActionButton type="save" onPress={saveProduct} />
+                    <ActionButton
+                        type="save"
+                        onPress={saveProduct}
+                        disabled={false}
+                    />
                 ) : undefined}
             </View>
         );

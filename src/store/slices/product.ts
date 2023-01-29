@@ -201,10 +201,10 @@ export const DELETE_PRODUCT = createAsyncThunk<void, ProductType>(
 
 export const DELETE_SAVED_PRODUCT = createAsyncThunk<
     void,
-    {_id: string; index: number}
->('product/DELETE_SAVED_PRODUCT', async input => {
+    {product: ProductType}
+>('product/DELETE_SAVED_PRODUCT', async ({product}) => {
     await deleteSaveOrDelete({
-        productId: input._id,
+        productId: product._id,
         init: {queryStringParameters: {type: 'save'}},
     });
 });
@@ -707,10 +707,15 @@ const productSlice = createSlice({
                 state.deleted.moreToLoad = action.payload.__moreToLoad;
             })
             .addCase(DELETE_SAVED_PRODUCT.pending, (state, action) => {
-                state.saved.products = [
-                    ...state.saved.products.slice(0, action.meta.arg.index),
-                    ...state.saved.products.slice(action.meta.arg.index + 1),
-                ];
+                const index = state.saved.products.findIndex(
+                    x => x._id === action.meta.arg.product._id,
+                );
+                if (index > -1) {
+                    state.saved.products = [
+                        ...state.saved.products.slice(0, index),
+                        ...state.saved.products.slice(index + 1),
+                    ];
+                }
             })
             .addCase(DELETE_SAVED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.

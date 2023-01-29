@@ -131,7 +131,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         prepAnimation();
 
         if (type === 'saved') {
-            dispatch(DELETE_SAVED_PRODUCT({_id: product._id, index}));
+            dispatch(DELETE_SAVED_PRODUCT({product}));
         }
 
         if (onDelete) {
