@@ -21,6 +21,7 @@ import * as SplashScreen from 'expo-splash-screen';
 SplashScreen.preventAutoHideAsync();
 
 const App = () => {
+    console.log(process.env.NODE_ENV);
     const [appIsReady, setAppIsReady] = useState(false);
 
     useEffect(() => {

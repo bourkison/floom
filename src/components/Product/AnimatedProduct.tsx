@@ -29,6 +29,9 @@ import {
     BUY_COLOR,
     IMAGE_PADDING,
     IMAGE_RATIO,
+    BUY_TEXT,
+    SAVE_TEXT,
+    DELETE_TEXT,
 } from '@/constants';
 
 const OPACITY_MINIMUM = 0.2;
@@ -434,7 +437,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
                                             OVERLAY_PERCENTAGE,
                                     },
                                 ]}>
-                                <Text style={styles.saveText}>SAVE</Text>
+                                <Text style={styles.saveText}>{SAVE_TEXT}</Text>
                             </Animated.View>
                         </View>
 
@@ -455,7 +458,9 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
                                             OVERLAY_PERCENTAGE,
                                     },
                                 ]}>
-                                <Text style={styles.deleteText}>DELETE</Text>
+                                <Text style={styles.deleteText}>
+                                    {DELETE_TEXT}
+                                </Text>
                             </Animated.View>
                         </View>
 
@@ -476,7 +481,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
                                             OVERLAY_PERCENTAGE,
                                     },
                                 ]}>
-                                <Text style={styles.buyText}>BUY</Text>
+                                <Text style={styles.buyText}>{BUY_TEXT}</Text>
                             </Animated.View>
                         </View>
                         {children}
@@ -501,6 +506,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 24,
         textAlign: 'center',
+        textTransform: 'uppercase',
     },
     deleteTextContainer: {
         borderColor: DELETE_COLOR,
@@ -514,6 +520,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 24,
         textAlign: 'center',
+        textTransform: 'uppercase',
     },
     buyTextContainer: {
         borderColor: BUY_COLOR,
@@ -527,6 +534,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 24,
         textAlign: 'center',
+        textTransform: 'uppercase',
     },
     actionContainer: {
         position: 'absolute',

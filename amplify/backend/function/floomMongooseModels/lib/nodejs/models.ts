@@ -82,6 +82,8 @@ const productSchema = new mongoose.Schema(
         link: {
             type: String,
             required: true,
+            // Max length of a URL.
+            maxLength: 2048,
         },
         images: {
             type: [String],

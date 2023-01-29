@@ -1,5 +1,11 @@
-import React, {useState, useEffect, RefObject} from 'react';
-import {TouchableOpacity, Modal, Pressable, StyleSheet} from 'react-native';
+import React, {useState, useEffect, RefObject, useCallback} from 'react';
+import {
+    TouchableOpacity,
+    Modal,
+    Pressable,
+    StyleSheet,
+    View,
+} from 'react-native';
 import {CURRENCIES} from '@/constants/countries';
 import {PALETTE} from '@/constants';
 import {Picker} from '@react-native-picker/picker';
@@ -19,17 +25,24 @@ const SetCurrency: React.FC<SetCurrencyProps> = ({
     setSelectedValue,
     touchableRef,
 }) => {
+    const BORDER_WIDTH = 1;
     const [modalTop, setModalTop] = useState(0);
 
-    useEffect(() => {
+    const measureModalTop = useCallback(() => {
         if (touchableRef && touchableRef.current) {
             touchableRef.current.measure(
                 (x, y, width, height, pageX, pageY) => {
-                    setModalTop(pageY + height + 1);
+                    setModalTop(pageY + height + BORDER_WIDTH);
                 },
             );
         }
-    }, [touchableRef, visible]);
+    }, [touchableRef]);
+
+    useEffect(() => {
+        if (visible && modalTop <= BORDER_WIDTH) {
+            measureModalTop();
+        }
+    }, [visible, modalTop, measureModalTop]);
 
     // Set to first value on open if nothing yet selected.
     useEffect(() => {
@@ -39,25 +52,27 @@ const SetCurrency: React.FC<SetCurrencyProps> = ({
     }, [selectedValue, setSelectedValue, visible]);
 
     return (
-        <Modal visible={visible} transparent={true}>
-            <Pressable
-                style={styles.pressableContainer}
-                onPress={() => setVisible(false)}>
-                <Pressable style={[styles.modalContainer, {top: modalTop}]}>
-                    <Picker
-                        selectedValue={selectedValue || 'USD'}
-                        onValueChange={setSelectedValue}>
-                        {Object.values(CURRENCIES).map(c => (
-                            <Picker.Item
-                                key={c.code}
-                                value={c.code}
-                                label={c.emoji + ' ' + c.name}
-                            />
-                        ))}
-                    </Picker>
+        <View onLayout={measureModalTop}>
+            <Modal visible={visible} transparent={true}>
+                <Pressable
+                    style={styles.pressableContainer}
+                    onPress={() => setVisible(false)}>
+                    <Pressable style={[styles.modalContainer, {top: modalTop}]}>
+                        <Picker
+                            selectedValue={selectedValue || 'USD'}
+                            onValueChange={setSelectedValue}>
+                            {Object.values(CURRENCIES).map(c => (
+                                <Picker.Item
+                                    key={c.code}
+                                    value={c.code}
+                                    label={c.emoji + ' ' + c.name}
+                                />
+                            ))}
+                        </Picker>
+                    </Pressable>
                 </Pressable>
-            </Pressable>
-        </Modal>
+            </Modal>
+        </View>
     );
 };
 

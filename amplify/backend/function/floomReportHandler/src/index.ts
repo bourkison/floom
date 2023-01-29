@@ -157,6 +157,7 @@ const createReport = async (
         await Product.updateOne(
             {_id: productId},
             {$push: {reports: report._id}, $inc: {reportsCount: 1}},
+            {runValidators: true},
         );
     };
 

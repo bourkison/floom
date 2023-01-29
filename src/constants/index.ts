@@ -116,3 +116,7 @@ export const PALETTE = {
 export const DELETE_COLOR: Color = PALETTE.rose[6];
 export const SAVE_COLOR: Color = PALETTE.lime[6];
 export const BUY_COLOR: Color = PALETTE.amber[5];
+
+export const DELETE_TEXT = 'Hide';
+export const SAVE_TEXT = 'Save';
+export const BUY_TEXT = 'Buy';

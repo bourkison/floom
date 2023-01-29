@@ -1,5 +1,11 @@
-import React, {useState, useEffect, RefObject} from 'react';
-import {Modal, Pressable, TouchableOpacity, StyleSheet} from 'react-native';
+import React, {useState, useEffect, RefObject, useCallback} from 'react';
+import {
+    Modal,
+    Pressable,
+    TouchableOpacity,
+    StyleSheet,
+    View,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {PALETTE} from '@/constants';
 
@@ -18,34 +24,43 @@ const SetDob: React.FC<SetDobProps> = ({
     setSelectedValue,
     touchableRef,
 }) => {
+    const BORDER_WIDTH = 1;
     const [modalTop, setModalTop] = useState(0);
 
-    useEffect(() => {
+    const measureModalTop = useCallback(() => {
         if (touchableRef && touchableRef.current) {
             touchableRef.current.measure(
                 (x, y, width, height, pageX, pageY) => {
-                    setModalTop(pageY + height + 1);
+                    setModalTop(pageY + height + BORDER_WIDTH);
                 },
             );
         }
-    }, [touchableRef, visible]);
+    }, [touchableRef]);
+
+    useEffect(() => {
+        if (visible && modalTop <= BORDER_WIDTH) {
+            measureModalTop();
+        }
+    }, [visible, modalTop, measureModalTop]);
 
     return (
-        <Modal visible={visible} transparent={true}>
-            <Pressable
-                style={styles.pressableContainer}
-                onPress={() => setVisible(false)}>
-                <Pressable style={[styles.modalContainer, {top: modalTop}]}>
-                    <DateTimePicker
-                        value={new Date(selectedValue)}
-                        display="spinner"
-                        onChange={(e, d) => {
-                            setSelectedValue(d || new Date());
-                        }}
-                    />
+        <View onLayout={measureModalTop}>
+            <Modal visible={visible} transparent={true}>
+                <Pressable
+                    style={styles.pressableContainer}
+                    onPress={() => setVisible(false)}>
+                    <Pressable style={[styles.modalContainer, {top: modalTop}]}>
+                        <DateTimePicker
+                            value={new Date(selectedValue)}
+                            display="spinner"
+                            onChange={(e, d) => {
+                                setSelectedValue(d || new Date());
+                            }}
+                        />
+                    </Pressable>
                 </Pressable>
-            </Pressable>
-        </Modal>
+            </Modal>
+        </View>
     );
 };
 

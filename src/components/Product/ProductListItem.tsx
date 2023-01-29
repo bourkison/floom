@@ -27,7 +27,7 @@ import {DELETE_SAVED_PRODUCT, SAVE_PRODUCT} from '@/store/slices/product';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {BUY_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
+import {BUY_COLOR, PALETTE, SAVE_COLOR, SAVE_TEXT, BUY_TEXT} from '@/constants';
 import {capitaliseString, formatPrice} from '@/services';
 import BrandLogo from '../Utility/BrandLogo';
 import * as WebBrowser from 'expo-web-browser';
@@ -207,12 +207,13 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         .onEnd(e => {
             if (isDeleting.value && e.state === 5) {
                 // Run delete animation and remove from the store.
-                offsetX.value = withTiming(-width, {duration: 100}, () => {
-                    runOnJS(deleteProduct)();
-                });
+                offsetX.value = withTiming(-width, {duration: 100}, () =>
+                    runOnJS(deleteProduct)(),
+                );
             } else if (isRightSwipeActive.value && e.state === 5) {
-                offsetX.value = withTiming(width, {duration: 500});
-                runOnJS(rightSwipe)();
+                offsetX.value = withTiming(width, {duration: 100}, () =>
+                    runOnJS(rightSwipe)(),
+                );
             } else {
                 offsetX.value = withTiming(0, {
                     easing: Easing.inOut(Easing.quad),
@@ -223,7 +224,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     return (
         <View style={styles.container}>
             <Animated.View style={[styles.deleteContainer, rLeftSwipeStyle]}>
-                <Text style={styles.deleteText}>Delete</Text>
+                <Text style={styles.deleteText}>Remove</Text>
             </Animated.View>
             <Animated.View
                 style={[
@@ -235,7 +236,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                     rRightSwipeStyle,
                 ]}>
                 <Text style={styles.deleteText}>
-                    {type === 'saved' ? 'Buy' : 'Save'}
+                    {type === 'saved' ? BUY_TEXT : SAVE_TEXT}
                 </Text>
             </Animated.View>
             <Animated.View
