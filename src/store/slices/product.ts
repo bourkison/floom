@@ -830,10 +830,20 @@ const productSlice = createSlice({
             })
             .addCase(LOAD_SAVED_PRODUCTS.fulfilled, (state, action) => {
                 if (action.meta.arg.loadType === 'more') {
-                    state.saved.products = [
-                        ...state.saved.products,
-                        ...action.payload.products,
-                    ];
+                    // Only add to local state if doesn't already exist (to avoid duplicactes).
+                    for (let i = 0; i < action.payload.products.length; i++) {
+                        if (
+                            !alreadyExists(
+                                action.payload.products[i]._id,
+                                state.saved.products,
+                            )
+                        ) {
+                            state.saved.products = [
+                                ...state.saved.products,
+                                action.payload.products[i],
+                            ];
+                        }
+                    }
                 } else {
                     state.saved.products = action.payload.products;
                 }
@@ -890,10 +900,20 @@ const productSlice = createSlice({
             )
             .addCase(LOAD_DELETED_PRODUCTS.fulfilled, (state, action) => {
                 if (action.meta.arg.loadType === 'more') {
-                    state.deleted.products = [
-                        ...state.deleted.products,
-                        ...action.payload.products,
-                    ];
+                    // Only add to local state if doesn't already exist (to avoid duplicactes).
+                    for (let i = 0; i < action.payload.products.length; i++) {
+                        if (
+                            !alreadyExists(
+                                action.payload.products[i]._id,
+                                state.deleted.products,
+                            )
+                        ) {
+                            state.deleted.products = [
+                                ...state.deleted.products,
+                                action.payload.products[i],
+                            ];
+                        }
+                    }
                 } else {
                     state.deleted.products = action.payload.products;
                 }

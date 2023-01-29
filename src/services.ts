@@ -45,11 +45,11 @@ export const stringifyColors = (colors: string[]): string => {
 };
 
 export const alreadyExists = (id: string, array: ProductType[]): boolean => {
-    array.forEach(product => {
-        if (id === product._id) {
+    for (let i = 0; i < array.length; i++) {
+        if (id === array[i]._id) {
             return true;
         }
-    });
+    }
 
     return false;
 };
