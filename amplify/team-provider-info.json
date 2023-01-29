@@ -30,7 +30,7 @@
         },
         "floomMongooseModels": {
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersionea1b7451-build.zip"
+          "s3Key": "amplify-builds/floomMongooseModels-LambdaLayerVersiond84370a0-build.zip"
         },
         "floomSaveHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
@@ -40,12 +40,12 @@
         "floomProductHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomProductHandler-336a7972736a4579726f-build.zip"
+          "s3Key": "amplify-builds/floomProductHandler-32634e446643585a7861-build.zip"
         },
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomPublicHandler-42633975545a72565735-build.zip"
+          "s3Key": "amplify-builds/floomPublicHandler-4c34672b74573931592b-build.zip"
         },
         "floomProductManager": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
@@ -60,7 +60,7 @@
         "floomReportHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomReportHandler-54597252316146492f62-build.zip"
+          "s3Key": "amplify-builds/floomReportHandler-69493544753565485455-build.zip"
         }
       },
       "api": {

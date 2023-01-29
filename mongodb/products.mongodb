@@ -88,3 +88,5 @@
 // })
 
 // db.products.find({_id: ObjectId('63a9e14c85de513e7ea578dd')})
+
+db.products.find({gender: 'male'}).sort({likedCount: -1}).limit(10)

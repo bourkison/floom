@@ -3,28 +3,12 @@ import {APIGatewayEvent, APIGatewayProxyResult} from 'aws-lambda';
 // @ts-ignore
 import MongooseModels from '/opt/nodejs/models';
 import {Model, FilterQuery, Types} from 'mongoose';
-let MONGODB_URI: string;
-
-type ProductType = {
-    name: string;
-    price: {
-        amount: number;
-        saleAmount: number;
-        currency: string;
-    };
-    link: string;
-    images: string[];
-    colors: string[];
-    categories: string[];
-    gender: string;
-    brand: string;
-    vendorProductId: string;
-    inStock: boolean;
-    description: string;
-};
+import {getFeaturedProduct} from './featured';
+import {ProductType} from './types';
 
 const queryProducts = async (
     event: APIGatewayEvent,
+    MONGODB_URI: string,
 ): Promise<APIGatewayProxyResult> => {
     const excludedProducts: string[] =
         JSON.parse(event.body)?.excludedProducts || [];
@@ -153,6 +137,7 @@ const queryProducts = async (
 
 const getProducts = async (
     event: APIGatewayEvent,
+    MONGODB_URI: string,
 ): Promise<APIGatewayProxyResult> => {
     const productIds: string[] = JSON.parse(event.body)?.products || [];
 
@@ -223,16 +208,19 @@ exports.handler = async (
         })
         .promise();
 
-    MONGODB_URI = Parameters[0].Value;
+    const MONGODB_URI = Parameters[0].Value;
 
     let response: APIGatewayProxyResult;
 
     switch (JSON.parse(event.body)?.method || '') {
         case 'QUERY_PRODUCTS':
-            response = await queryProducts(event);
+            response = await queryProducts(event, MONGODB_URI);
             break;
         case 'GET_PRODUCTS':
-            response = await getProducts(event);
+            response = await getProducts(event, MONGODB_URI);
+            break;
+        case 'FEATURED':
+            response = await getFeaturedProduct(event, MONGODB_URI);
             break;
         default:
             response = {
@@ -246,6 +234,7 @@ exports.handler = async (
                     message: 'Unrecognised method in body',
                 }),
             };
+            break;
     }
 
     return response;

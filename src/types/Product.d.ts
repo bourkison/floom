@@ -89,3 +89,21 @@ export type GetProductInit = {
         Authorization?: string;
     };
 };
+
+export type GetFeaturedProductParams = {
+    init: {
+        body?: {
+            method?: 'FEATURED';
+            filteredGender?: string;
+        };
+    };
+};
+
+export type FeaturedProductType = 'topliked' | 'hot' | 'sponsored' | 'featured';
+export type FeaturedProductFilter = 'male' | 'female';
+
+export type GetFeaturedProductResponse = {
+    product: ProductType;
+    type: FeaturedProductType;
+    filter: FeaturedProductFilter;
+};

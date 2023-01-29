@@ -1,6 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {queryProduct} from '@/api/product';
-import {Product} from '@/types/product';
+import React, {useCallback, useEffect, useState} from 'react';
+import {getFeaturedProduct} from '@/api/product';
+import {
+    Product,
+    FeaturedProductType,
+    FeaturedProductFilter,
+} from '@/types/product';
 import {
     ActivityIndicator,
     Text,
@@ -14,36 +18,63 @@ import {capitaliseString, formatPrice} from '@/services';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
+import {useAppSelector} from '@/store/hooks';
 
 const FeaturedProduct = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [product, setProduct] = useState<Product>();
+    const [type, setType] = useState<FeaturedProductType>('topliked');
+    const [filter, setFilter] = useState<FeaturedProductFilter>('male');
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+
+    const userGender = useAppSelector(
+        state => state.user.docData?.gender || '',
+    );
 
     useEffect(() => {
         const fetchProduct = async () => {
             setIsLoading(true);
 
-            const p = (
-                await queryProduct({
-                    init: {
-                        queryStringParameters: {
-                            loadAmount: 1,
-                            type: 'unsaved',
-                            excludeDeleted: true,
-                            excludeSaved: true,
-                        },
-                    },
-                })
-            ).products[0];
+            const response = await getFeaturedProduct({
+                init: {body: {method: 'FEATURED', filteredGender: 'male'}},
+            });
 
+            setProduct(response.product);
+            setType(response.type);
+            setFilter(response.filter);
             setIsLoading(false);
-            setProduct(p);
         };
 
         fetchProduct();
-    }, []);
+    }, [userGender]);
+
+    const headerString = useCallback(() => {
+        let response: string = '';
+
+        switch (type) {
+            case 'topliked':
+                response += 'Top Liked in ';
+                break;
+            case 'featured':
+                response += 'Featured in ';
+                break;
+            case 'featured':
+                response += 'Featured in ';
+                break;
+            case 'sponsored':
+                response += 'Sponsored';
+                return response;
+        }
+
+        if (filter === 'male') {
+            response += 'Men';
+        } else if (filter === 'female') {
+            response += 'Women';
+        }
+
+        return response;
+    }, [type, filter]);
 
     const press = () => {
         if (product) {
@@ -69,7 +100,7 @@ const FeaturedProduct = () => {
                         <View style={styles.textContainer}>
                             <View style={styles.headerContainer}>
                                 <Text style={styles.headerText}>
-                                    Top Liked in Mens
+                                    {headerString()}
                                 </Text>
                                 <View style={styles.headerLine} />
                             </View>

@@ -5,6 +5,8 @@ import {
     Product as ProductType,
     QueryProductParams,
     QueryProductResponse,
+    GetFeaturedProductParams,
+    GetFeaturedProductResponse,
 } from '@/types/product';
 
 export async function queryProduct(
@@ -95,5 +97,49 @@ export async function getProduct(
         description: data.data.description,
         saved: data.data.saved,
         deleted: data.data.deleted,
+    };
+}
+
+export async function getFeaturedProduct(
+    input: GetFeaturedProductParams,
+): Promise<GetFeaturedProductResponse> {
+    const path = '/public';
+
+    const data = await API.post(API_NAME, path, input.init).catch(err => {
+        console.error(err);
+        throw err;
+    });
+
+    if (!data.success) {
+        console.error(data.message);
+        throw new Error(data.message);
+    }
+
+    return {
+        product: {
+            name: data.data.name,
+            images: data.data.images,
+            price: data.data.price.map((p: any) => {
+                return {
+                    currency: p.currency,
+                    amount: p.amount,
+                    saleAmount: p.saleAmount,
+                };
+            }),
+            availableCountries: data.data.availableCountries,
+            link: data.data.link,
+            _id: data.data._id,
+            colors: data.data.colors,
+            categories: data.data.categories,
+            gender: data.data.gender,
+            brand: data.data.brand,
+            vendorProductId: data.data.vendorProductId,
+            inStock: data.data.inStock,
+            description: data.data.description,
+            saved: false,
+            deleted: false,
+        },
+        type: data.type,
+        filter: data.filter,
     };
 }
