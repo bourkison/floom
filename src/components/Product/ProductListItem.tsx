@@ -37,7 +37,7 @@ export type ProductListItemProps = {
     product: ProductType;
     index: number;
     type: 'saved' | 'deleted';
-    onDelete?: (_id: string, index: number) => void;
+    onDelete?: (product: ProductType) => void;
     listRef: RefObject<FlashList<Product>>;
 };
 
@@ -131,11 +131,11 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         prepAnimation();
 
         if (type === 'saved') {
-            dispatch(DELETE_SAVED_PRODUCT({product}));
+            dispatch(DELETE_SAVED_PRODUCT(product));
         }
 
         if (onDelete) {
-            onDelete(product._id, index);
+            onDelete(product);
         }
     };
 

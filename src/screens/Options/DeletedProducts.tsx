@@ -136,8 +136,8 @@ const DeletedProducts = () => {
         }
     };
 
-    const removeProduct = (_id: string, index: number) => {
-        dispatch(DELETE_DELETED_PRODUCT({_id, index}));
+    const removeProduct = (product: Product) => {
+        dispatch(DELETE_DELETED_PRODUCT(product));
     };
 
     const deleteAllProducts = async () => {

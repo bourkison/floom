@@ -60,7 +60,10 @@ const queryProducts = async (
         };
 
         if (filteredGenders.length) {
-            const regex = new RegExp(filteredGenders.join('|'), 'gi');
+            const regex = new RegExp(
+                filteredGenders.map(g => `^${g}$`).join('|'),
+                'gi',
+            );
             query = {
                 ...query,
                 gender: {
@@ -173,7 +176,21 @@ const getProducts = async (
             _id: {
                 $in: productIds.map(id => new Types.ObjectId(id)),
             },
-        });
+        }).lean();
+
+        if (!products.length) {
+            response = {
+                statusCode: 404,
+                headers: {
+                    'Access-Control-Allow-Headers': '*',
+                    'Access-Control-Allow-Origin': '*',
+                },
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Products not found',
+                }),
+            };
+        }
 
         response = {
             statusCode: 200,
@@ -183,7 +200,11 @@ const getProducts = async (
             },
             body: JSON.stringify({
                 success: true,
-                data: products,
+                data: products.sort(
+                    (a, b) =>
+                        productIds.indexOf(a._id.toString()) -
+                        productIds.indexOf(b._id.toString()),
+                ),
             }),
         };
 

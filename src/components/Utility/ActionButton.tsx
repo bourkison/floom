@@ -16,6 +16,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 
 type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
@@ -120,6 +121,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({
     }, [action, sProgress, type]);
 
     const press = () => {
+        Haptics.impactAsync();
+
         dispatch(SET_ACTION(type));
 
         if (onPress) {

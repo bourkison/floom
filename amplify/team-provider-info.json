@@ -45,7 +45,7 @@
         "floomPublicHandler": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",
           "deploymentBucketName": "amplify-floom-dev-20152-deployment",
-          "s3Key": "amplify-builds/floomPublicHandler-4c34672b74573931592b-build.zip"
+          "s3Key": "amplify-builds/floomPublicHandler-596e2f756e5864645153-build.zip"
         },
         "floomProductManager": {
           "secretsPathAmplifyAppId": "d34lete8blzmed",

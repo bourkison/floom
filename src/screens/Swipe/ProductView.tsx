@@ -242,7 +242,7 @@ const ProductView = ({
                     commenceAnimate('delete');
                 }
             } else {
-                dispatch(DELETE_SAVED_PRODUCT({product: route.params.product}));
+                dispatch(DELETE_SAVED_PRODUCT(route.params.product));
             }
 
             goBack();

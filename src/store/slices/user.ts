@@ -6,7 +6,7 @@ import {
     createAsyncThunk,
 } from '@reduxjs/toolkit';
 import {Auth} from 'aws-amplify';
-import {TOGGLE_FILTER} from '@/store/slices/product';
+import {TOGGLE_FILTER, RESET_PRODUCT_SLICE} from '@/store/slices/product';
 import {RootState} from '@/store';
 
 const userAdapter = createEntityAdapter();
@@ -65,8 +65,9 @@ export const UPDATE_USER = createAsyncThunk<void, UserDocData>(
 
 export const LOGOUT = createAsyncThunk(
     'user/LOGOUT',
-    async (): Promise<void> => {
+    async (_, {dispatch}): Promise<void> => {
         await Auth.signOut();
+        dispatch(RESET_PRODUCT_SLICE());
     },
 );
 

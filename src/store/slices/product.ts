@@ -22,6 +22,8 @@ import {
     DELETED_STORED_PRODUCTS_AMOUNT,
     LOCAL_KEY_DELETED_PRODUCTS,
     LOCAL_KEY_SAVED_PRODUCTS,
+    MAX_LOCAL_DELETED_PRODUCTS,
+    MAX_LOCAL_SAVED_PRODUCTS,
     SAVED_STORED_PRODUCTS_AMOUNT,
 } from '@/constants';
 import {alreadyExists, buildInitWithFilters, filtersApplied} from '@/services';
@@ -163,10 +165,21 @@ export const SAVE_PRODUCT = createAsyncThunk<void, ProductType>(
                 init: {queryStringParameters: {type: 'save'}},
             });
         } else {
-            const currentSavedProducts: string[] = JSON.parse(
+            let currentSavedProducts: string[] = JSON.parse(
                 (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
             );
-            currentSavedProducts.push(p._id);
+
+            currentSavedProducts.unshift(p._id);
+
+            if (currentSavedProducts.length > MAX_LOCAL_SAVED_PRODUCTS) {
+                currentSavedProducts = currentSavedProducts.slice(
+                    0,
+                    MAX_LOCAL_SAVED_PRODUCTS,
+                );
+
+                // TODO: Display warning to user announcing they have gone over their deleted amount
+            }
+
             await AsyncStorage.setItem(
                 LOCAL_KEY_SAVED_PRODUCTS,
                 JSON.stringify(currentSavedProducts),
@@ -186,11 +199,22 @@ export const DELETE_PRODUCT = createAsyncThunk<void, ProductType>(
                 init: {queryStringParameters: {type: 'delete'}},
             });
         } else {
-            const currentDeletedProducts: string[] = JSON.parse(
+            let currentDeletedProducts: string[] = JSON.parse(
                 (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
                     '[]',
             );
-            currentDeletedProducts.push(p._id);
+
+            currentDeletedProducts.unshift(p._id);
+
+            if (currentDeletedProducts.length > MAX_LOCAL_DELETED_PRODUCTS) {
+                currentDeletedProducts = currentDeletedProducts.slice(
+                    0,
+                    MAX_LOCAL_DELETED_PRODUCTS,
+                );
+
+                // TODO: Display warning to user announcing they have gone over their deleted amount
+            }
+
             await AsyncStorage.setItem(
                 LOCAL_KEY_DELETED_PRODUCTS,
                 JSON.stringify(currentDeletedProducts),
@@ -199,15 +223,41 @@ export const DELETE_PRODUCT = createAsyncThunk<void, ProductType>(
     },
 );
 
-export const DELETE_SAVED_PRODUCT = createAsyncThunk<
-    void,
-    {product: ProductType}
->('product/DELETE_SAVED_PRODUCT', async ({product}) => {
-    await deleteSaveOrDelete({
-        productId: product._id,
-        init: {queryStringParameters: {type: 'save'}},
-    });
-});
+export const DELETE_SAVED_PRODUCT = createAsyncThunk<void, ProductType>(
+    'product/DELETE_SAVED_PRODUCT',
+    async (product, {getState}) => {
+        const state = getState() as RootState;
+
+        if (!state.user.isGuest) {
+            await deleteSaveOrDelete({
+                productId: product._id,
+                init: {queryStringParameters: {type: 'save'}},
+            });
+        } else {
+            let currentSavedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+            );
+
+            const index = currentSavedProducts.findIndex(
+                p => p === product._id,
+            );
+
+            if (index > -1) {
+                currentSavedProducts = [
+                    ...currentSavedProducts.slice(0, index),
+                    ...currentSavedProducts.slice(index + 1),
+                ];
+
+                await AsyncStorage.setItem(
+                    LOCAL_KEY_SAVED_PRODUCTS,
+                    JSON.stringify(currentSavedProducts),
+                );
+            } else {
+                throw new Error('Product not found');
+            }
+        }
+    },
+);
 
 type RejectWithValueType = {
     message?: string;
@@ -353,22 +403,55 @@ export const LOAD_DELETED_PRODUCTS = createAsyncThunk<
     },
 );
 
-export const DELETE_DELETED_PRODUCT = createAsyncThunk<
-    void,
-    {_id: string; index: number}
->('product/DELETE_DELETED_PRODUCT', async input => {
-    await deleteSaveOrDelete({
-        productId: input._id,
-        init: {queryStringParameters: {type: 'delete'}},
-    });
-});
+export const DELETE_DELETED_PRODUCT = createAsyncThunk<void, ProductType>(
+    'product/DELETE_DELETED_PRODUCT',
+    async (product, {getState}) => {
+        const state = getState() as RootState;
+
+        if (!state.user.isGuest) {
+            await deleteSaveOrDelete({
+                productId: product._id,
+                init: {queryStringParameters: {type: 'delete'}},
+            });
+        } else {
+            let currentDeletedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
+                    '[]',
+            );
+
+            const index = currentDeletedProducts.findIndex(
+                p => p === product._id,
+            );
+
+            if (index > -1) {
+                currentDeletedProducts = [
+                    ...currentDeletedProducts.slice(0, index),
+                    ...currentDeletedProducts.slice(index + 1),
+                ];
+
+                await AsyncStorage.setItem(
+                    LOCAL_KEY_DELETED_PRODUCTS,
+                    JSON.stringify(currentDeletedProducts),
+                );
+            } else {
+                throw new Error('Product not found');
+            }
+        }
+    },
+);
 
 export const DELETE_ALL_DELETED_PRODUCTS = createAsyncThunk<void, undefined>(
     'product/DELETE_ALL_DELETED_PRODUCTS',
-    async () => {
-        await deleteAllDeletes({
-            init: {queryStringParameters: {deleteAll: 'true'}},
-        });
+    async (_, {getState}) => {
+        const state = getState() as RootState;
+
+        if (!state.user.isGuest) {
+            await deleteAllDeletes({
+                init: {queryStringParameters: {deleteAll: 'true'}},
+            });
+        } else {
+            await AsyncStorage.setItem(LOCAL_KEY_DELETED_PRODUCTS, '[]');
+        }
     },
 );
 
@@ -482,6 +565,51 @@ const productSlice = createSlice({
             action: PayloadAction<'idle' | 'save' | 'buy' | 'delete'>,
         ) {
             state.action = action.payload;
+        },
+        RESET_PRODUCT_SLICE(state) {
+            state.saved = {
+                products: [],
+                isLoading: false,
+                moreToLoad: true,
+                isLoadingMore: false,
+                filters: {
+                    gender: [],
+                    category: [],
+                    color: [],
+                    searchText: '',
+                },
+            };
+
+            state.unsaved = {
+                products: [],
+                isLoading: false,
+                moreToLoad: true,
+                isLoadingMore: false,
+                filters: {
+                    gender: [],
+                    category: [],
+                    color: [],
+                    searchText: '',
+                    excludeDeleted: true,
+                    excludeSaved: true,
+                },
+            };
+
+            state.deleted = {
+                products: [],
+                isLoading: false,
+                moreToLoad: true,
+                isLoadingMore: false,
+                filters: {
+                    gender: [],
+                    category: [],
+                    color: [],
+                    searchText: '',
+                },
+            };
+
+            state.animation = 'idle';
+            state.action = 'idle';
         },
     },
     extraReducers: builder => {
@@ -708,7 +836,7 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_SAVED_PRODUCT.pending, (state, action) => {
                 const index = state.saved.products.findIndex(
-                    x => x._id === action.meta.arg.product._id,
+                    x => x._id === action.meta.arg._id,
                 );
                 if (index > -1) {
                     state.saved.products = [
@@ -722,10 +850,16 @@ const productSlice = createSlice({
                 console.error('Delete saved product rejected');
             })
             .addCase(DELETE_DELETED_PRODUCT.pending, (state, action) => {
-                state.deleted.products = [
-                    ...state.deleted.products.slice(0, action.meta.arg.index),
-                    ...state.deleted.products.slice(action.meta.arg.index + 1),
-                ];
+                const index = state.deleted.products.findIndex(
+                    x => x._id === action.meta.arg._id,
+                );
+
+                if (index > -1) {
+                    state.deleted.products = [
+                        ...state.deleted.products.slice(0, index),
+                        ...state.deleted.products.slice(index + 1),
+                    ];
+                }
             })
             .addCase(DELETE_DELETED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
@@ -760,5 +894,6 @@ export const {
     UPDATE_SEARCH_FILTER,
     BUY_PRODUCT,
     SET_ACTION,
+    RESET_PRODUCT_SLICE,
 } = productSlice.actions;
 export default productSlice.reducer;

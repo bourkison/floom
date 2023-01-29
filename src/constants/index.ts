@@ -120,3 +120,6 @@ export const BUY_COLOR: Color = PALETTE.amber[5];
 export const DELETE_TEXT = 'Hide';
 export const SAVE_TEXT = 'Save';
 export const BUY_TEXT = 'Buy';
+
+export const MAX_LOCAL_SAVED_PRODUCTS = 100;
+export const MAX_LOCAL_DELETED_PRODUCTS = 100;

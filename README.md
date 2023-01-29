@@ -8,7 +8,7 @@
 -   ~App Info and beef out options menu~
 -   Login/Sign Up stages better designed
 -   Describe benefits of guest mode
--   Guest mode working
+-   ~Guest mode working~
 -   ~Share button~
 -   ~Report button~
 -   ~Fix zIndex bug on android~
@@ -20,3 +20,4 @@
 -   Purchase within app
 -   User folders/wishlists
 -   Logic preventing users from adding too many reports
+-   A lot of reused code. Consider refactoring to tidy up
