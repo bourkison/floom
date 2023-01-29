@@ -105,7 +105,6 @@ const SavedProducts = ({}: StackScreenProps<
     };
 
     const loadMore = async () => {
-        console.log('Load more');
         if (!isLoadingMore && !isLoading && !isRefreshing && moreToLoad) {
             loadProducts('more', savedProducts[savedProducts.length - 1]._id);
         }

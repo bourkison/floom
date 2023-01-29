@@ -108,7 +108,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         };
     });
 
-    const deleteProduct = useCallback(() => {
+    const prepAnimation = () => {
         const layoutAnimConfig = {
             duration: 300,
             update: {
@@ -125,6 +125,10 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         // As per: https://shopify.github.io/flash-list/docs/guides/layout-animation
         listRef.current?.prepareForLayoutAnimationRender();
         LayoutAnimation.configureNext(layoutAnimConfig);
+    };
+
+    const deleteProduct = () => {
+        prepAnimation();
 
         if (type === 'saved') {
             dispatch(DELETE_SAVED_PRODUCT({_id: product._id, index}));
@@ -133,12 +137,13 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         if (onDelete) {
             onDelete(product._id, index);
         }
-    }, [dispatch, index, onDelete, type, product, listRef]);
+    };
 
     const rightSwipe = () => {
         if (type === 'saved') {
             buyProduct();
         } else if (type === 'deleted') {
+            prepAnimation();
             dispatch(SAVE_PRODUCT(product));
         }
     };

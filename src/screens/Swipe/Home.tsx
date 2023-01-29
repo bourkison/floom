@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import ProductList from '@/components/Product/ProductList';
 import FeaturedProduct from '@/components/Product/FeaturedProduct';
 import {View, StyleSheet, useWindowDimensions} from 'react-native';
@@ -25,9 +25,6 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width, height} = useWindowDimensions();
 
     const isLoading = useAppSelector(state => state.product.unsaved.isLoading);
-    const isLoadingMore = useAppSelector(
-        state => state.product.unsaved.isLoadingMore,
-    );
     const moreToLoad = useAppSelector(
         state => state.product.unsaved.moreToLoad,
     );
@@ -36,7 +33,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
     );
 
     // Calculate margins for different device heights.
-    const calculateMargins = (): number => {
+    const calculateMargins = useCallback((): number => {
         const headerHeight = HEADER_HEIGHT_W_STATUS_BAR;
         const searchBarHeight = FILTER_DROPDOWN_CLOSED_HEIGHT;
         const productListHeight = (width - IMAGE_PADDING) / IMAGE_RATIO;
@@ -52,7 +49,15 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
             featuredProductHeight;
 
         return remainingHeight / 5;
-    };
+    }, [height, width]);
+
+    const actionButtonDisabled = useCallback((): boolean => {
+        if (!productsLength && !moreToLoad && !isLoading) {
+            return true;
+        }
+
+        return false;
+    }, [moreToLoad, productsLength, isLoading]);
 
     return (
         <View style={styles.flexOne}>
@@ -77,17 +82,20 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                 <View
                     style={[
                         styles.buttonsContainer,
-                        !isLoading &&
-                        !isLoadingMore &&
-                        !moreToLoad &&
-                        !productsLength
-                            ? styles.hidden
-                            : undefined,
                         {marginTop: calculateMargins()},
                     ]}>
-                    <ActionButton type="delete" />
-                    <ActionButton type="buy" />
-                    <ActionButton type="save" />
+                    <ActionButton
+                        type="delete"
+                        disabled={actionButtonDisabled()}
+                    />
+                    <ActionButton
+                        type="buy"
+                        disabled={actionButtonDisabled()}
+                    />
+                    <ActionButton
+                        type="save"
+                        disabled={actionButtonDisabled()}
+                    />
                 </View>
             </View>
         </View>

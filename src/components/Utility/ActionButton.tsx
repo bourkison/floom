@@ -20,6 +20,7 @@ import Animated, {
 type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
     onPress?: () => void;
+    disabled: boolean;
 };
 
 const SCALE_AMOUNT = 0.9;
@@ -30,7 +31,11 @@ const BORDER_WIDTH = 4;
 
 const PROGRESS_DURATION = 250;
 
-const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
+const ActionButton: React.FC<ActionButtonProps> = ({
+    type,
+    onPress,
+    disabled,
+}) => {
     const dispatch = useAppDispatch();
     const action = useAppSelector(state => state.product.action);
 
@@ -126,7 +131,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
 
     return (
         <Animated.View style={[styles.buttonContainer, rStyle]}>
-            <Pressable onPress={press}>
+            <Pressable onPress={press} disabled={disabled}>
                 <View style={[styles.button]}>{icon()}</View>
             </Pressable>
         </Animated.View>

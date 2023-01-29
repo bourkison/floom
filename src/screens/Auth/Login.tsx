@@ -20,7 +20,6 @@ const Login = ({navigation}: StackScreenProps<AuthStackParamList, 'Login'>) => {
     const login = async () => {
         try {
             setIsLoading(true);
-            console.log('Logging in');
             await Auth.signIn({
                 username: email,
                 password: password,
@@ -40,11 +39,7 @@ const Login = ({navigation}: StackScreenProps<AuthStackParamList, 'Login'>) => {
                 throw err;
             });
 
-            console.log('Logged in. Fetching user.');
-
             await dispatch(FETCH_USER());
-
-            console.log('User fetched.');
         } catch (err) {
             // TODO: Handle error.
             console.error(err);

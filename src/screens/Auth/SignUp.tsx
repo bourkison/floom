@@ -57,8 +57,6 @@ const SignUp = ({
                 },
             };
 
-            console.log('Signing up with:', payload);
-
             const user = await Auth.signUp(payload).catch(err => {
                 // TODO: Handle sign up error.
                 console.error(err);
