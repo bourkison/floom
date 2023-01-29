@@ -40,7 +40,6 @@ const SetDob: React.FC<SetDobProps> = ({
                         value={new Date(selectedValue)}
                         display="spinner"
                         onChange={(e, d) => {
-                            console.log('CHANGE:', d);
                             setSelectedValue(d || new Date());
                         }}
                     />

@@ -109,8 +109,6 @@ export const queryUnsavedProduct = async (
 
         let excludedProductsArr: Types.ObjectId[] = [];
 
-        console.log('EXCLUDE DELETED:', excludeDeleted, user.deletedProducts);
-
         if (excludeDeleted) {
             excludedProductsArr = [
                 ...excludedProductsArr,

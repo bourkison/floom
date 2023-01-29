@@ -66,8 +66,7 @@ export const BRAND_OPTIONS = ['H&M', 'Nike', 'Adidas', 'Aelfrice Eden'];
 export const LOCAL_KEY_SAVED_PRODUCTS = '@savedProducts';
 export const LOCAL_KEY_DELETED_PRODUCTS = '@deletedProducts';
 
-export const ACTION_BUTTON_SIZE_ACTIVE = 50;
-export const ACTION_BUTTON_SIZE_INACTIVE = 55;
+export const ACTION_BUTTON_SIZE = 55;
 
 export const DELETED_STORED_PRODUCTS_AMOUNT = 100;
 export const SAVED_STORED_PRODUCTS_AMOUNT = 100;
@@ -116,4 +115,4 @@ export const PALETTE = {
 
 export const DELETE_COLOR: Color = PALETTE.rose[6];
 export const SAVE_COLOR: Color = PALETTE.lime[6];
-export const BUY_COLOR: Color = PALETTE.blue[6];
+export const BUY_COLOR: Color = PALETTE.amber[5];

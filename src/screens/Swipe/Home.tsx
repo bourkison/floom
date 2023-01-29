@@ -6,14 +6,23 @@ import {View, StyleSheet, useWindowDimensions} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 
-import {IMAGE_RATIO, IMAGE_PADDING, PALETTE} from '@/constants';
-import FilterDropdown from '@/components/Product/FilterDropdown';
+import {
+    IMAGE_RATIO,
+    IMAGE_PADDING,
+    PALETTE,
+    ACTION_BUTTON_SIZE,
+    FEATURED_PRODUCT_SIZE,
+} from '@/constants';
+import FilterDropdown, {
+    FILTER_DROPDOWN_CLOSED_HEIGHT,
+} from '@/components/Product/FilterDropdown';
 
 import ActionButton from '@/components/Utility/ActionButton';
 import {useAppSelector} from '@/store/hooks';
+import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
 
 const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
-    const {width} = useWindowDimensions();
+    const {width, height} = useWindowDimensions();
 
     const isLoading = useAppSelector(state => state.product.unsaved.isLoading);
     const isLoadingMore = useAppSelector(
@@ -26,10 +35,29 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
         state => state.product.unsaved.products.length,
     );
 
+    // Calculate margins for different device heights.
+    const calculateMargins = (): number => {
+        const headerHeight = HEADER_HEIGHT_W_STATUS_BAR;
+        const searchBarHeight = FILTER_DROPDOWN_CLOSED_HEIGHT;
+        const productListHeight = (width - IMAGE_PADDING) / IMAGE_RATIO;
+        const actionButtonHeight = ACTION_BUTTON_SIZE;
+        const featuredProductHeight = FEATURED_PRODUCT_SIZE;
+
+        const remainingHeight =
+            height -
+            headerHeight -
+            searchBarHeight -
+            productListHeight -
+            actionButtonHeight -
+            featuredProductHeight;
+
+        return remainingHeight / 5;
+    };
+
     return (
         <View style={styles.flexOne}>
             <FilterDropdown obj="unsaved" />
-            <View style={styles.container}>
+            <View style={[styles.container, {marginTop: calculateMargins()}]}>
                 <View
                     style={[
                         styles.productContainer,
@@ -37,7 +65,11 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     ]}>
                     <ProductList />
                 </View>
-                <View style={styles.featuredProductContainer}>
+                <View
+                    style={[
+                        styles.featuredProductContainer,
+                        {marginTop: calculateMargins()},
+                    ]}>
                     <FeaturedProduct />
                 </View>
 
@@ -51,6 +83,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                         !productsLength
                             ? styles.hidden
                             : undefined,
+                        {marginTop: calculateMargins()},
                     ]}>
                     <ActionButton type="delete" />
                     <ActionButton type="buy" />
@@ -63,7 +96,6 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 10,
         flex: 1,
         alignItems: 'center',
         alignContent: 'center',
@@ -78,7 +110,6 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     buttonsContainer: {
-        marginTop: 10,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

@@ -21,7 +21,6 @@ import {
     DELETE_ALL_DELETED_PRODUCTS,
     DELETE_DELETED_PRODUCT,
     LOAD_DELETED_PRODUCTS,
-    LOAD_UNSAVED_PRODUCTS,
 } from '@/store/slices/product';
 import {FlashList} from '@shopify/flash-list';
 import {Product} from '@/types/product';
@@ -105,7 +104,7 @@ const DeletedProducts = () => {
 
     const retry = async (clearFilters: boolean) => {
         await dispatch(
-            LOAD_UNSAVED_PRODUCTS({
+            LOAD_DELETED_PRODUCTS({
                 queryStringParameters: {
                     loadAmount: 25,
                     type: 'deleted',

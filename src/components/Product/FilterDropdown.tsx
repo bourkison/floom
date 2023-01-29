@@ -168,7 +168,6 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
     };
 
     const measureDropdownTop = (): boolean => {
-        console.log(dropdownTop);
         if (DropdownButton && DropdownButton.current) {
             DropdownButton.current.measure((_fx, _fy, _w, h) => {
                 setDropdownTop(h);

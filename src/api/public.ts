@@ -57,13 +57,9 @@ export async function getPublicProduct(
 ): Promise<ProductType[]> {
     const path = '/public';
 
-    console.log('geting public product', input.init);
-
     input.init.body.method = 'GET_PRODUCTS';
 
     const data = await API.post(API_NAME, path, input.init);
-
-    console.log('received public product', data);
 
     let response: ProductType[] = [];
 

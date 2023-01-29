@@ -85,7 +85,9 @@ const FeaturedProduct = () => {
                     </View>
                 </TouchableOpacity>
             ) : isLoading ? (
-                <ActivityIndicator />
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator />
+                </View>
             ) : (
                 <Text>Error</Text>
             )}
@@ -126,6 +128,11 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontWeight: '500',
+    },
+    loadingContainer: {
+        flexBasis: FEATURED_PRODUCT_SIZE,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

@@ -603,7 +603,6 @@ const productSlice = createSlice({
                 state.unsaved.isLoading = false;
                 state.unsaved.isLoadingMore = false;
                 state.unsaved.moreToLoad = action.payload.__moreToLoad;
-                console.log(state.unsaved.moreToLoad);
             })
             .addCase(
                 LOAD_UNSAVED_PRODUCTS.rejected,
@@ -715,7 +714,7 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_SAVED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
-                console.log('Delete saved product rejected');
+                console.error('Delete saved product rejected');
             })
             .addCase(DELETE_DELETED_PRODUCT.pending, (state, action) => {
                 state.deleted.products = [
@@ -725,10 +724,7 @@ const productSlice = createSlice({
             })
             .addCase(DELETE_DELETED_PRODUCT.rejected, () => {
                 // TODO: Handle rejections.
-                console.log('Delete deleted product rejected');
-            })
-            .addCase(DELETE_ALL_DELETED_PRODUCTS.pending, () => {
-                console.log('Deleting all products');
+                console.error('Delete deleted product rejected');
             })
             .addCase(DELETE_ALL_DELETED_PRODUCTS.fulfilled, state => {
                 state.deleted.products = [];

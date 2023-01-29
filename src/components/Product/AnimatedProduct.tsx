@@ -284,7 +284,6 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
                 Math.abs(offsetX.value) < ACTION_THRESHOLD &&
                 -offsetY.value < ACTION_THRESHOLD
             ) {
-                console.log('idle');
                 action.value = 'idle';
                 runOnJS(setAction)('idle');
                 runOnJS(Haptics.selectionAsync)();
@@ -305,7 +304,6 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
                 action.value !== 'save' &&
                 offsetX.value >= ACTION_THRESHOLD
             ) {
-                console.log('save');
                 action.value = 'save';
                 runOnJS(setAction)('save');
                 runOnJS(Haptics.selectionAsync)();
@@ -315,7 +313,6 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
                 action.value !== 'delete' &&
                 offsetX.value <= -ACTION_THRESHOLD
             ) {
-                console.log('deleted');
                 action.value = 'delete';
                 runOnJS(setAction)('delete');
                 runOnJS(Haptics.selectionAsync)();

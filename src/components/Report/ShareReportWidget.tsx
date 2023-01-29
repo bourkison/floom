@@ -146,6 +146,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 25,
+        paddingTop: 10,
+        paddingHorizontal: 10,
     },
     headerText: {
         fontSize: 18,

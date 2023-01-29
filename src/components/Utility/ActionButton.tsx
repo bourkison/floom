@@ -1,14 +1,13 @@
 import React, {useCallback, useEffect} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
-import {Feather, AntDesign, Ionicons} from '@expo/vector-icons';
+import {Ionicons, MaterialCommunityIcons, Octicons} from '@expo/vector-icons';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {COMMENCE_ANIMATE, SET_ACTION} from '@/store/slices/product';
 import {
     SAVE_COLOR,
     BUY_COLOR,
     DELETE_COLOR,
-    ACTION_BUTTON_SIZE_ACTIVE,
-    ACTION_BUTTON_SIZE_INACTIVE,
+    ACTION_BUTTON_SIZE,
     PALETTE,
 } from '@/constants';
 import Animated, {
@@ -85,22 +84,22 @@ const ActionButton: React.FC<ActionButtonProps> = ({type, onPress}) => {
                 <Ionicons
                     name="heart"
                     color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
-                    size={ACTION_BUTTON_SIZE_INACTIVE / 2.5}
+                    size={ACTION_BUTTON_SIZE / 2.5}
                 />
             );
         } else if (type === 'buy') {
             return (
-                <AntDesign
-                    name="shoppingcart"
-                    size={ACTION_BUTTON_SIZE_ACTIVE / 2}
+                <MaterialCommunityIcons
+                    name="cart"
+                    size={ACTION_BUTTON_SIZE / 2}
                     color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
                 />
             );
         } else {
             return (
-                <Feather
+                <Octicons
                     name="x"
-                    size={ACTION_BUTTON_SIZE_ACTIVE / 2}
+                    size={ACTION_BUTTON_SIZE / 2}
                     color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
                 />
             );
@@ -138,16 +137,16 @@ const styles = StyleSheet.create({
     buttonContainer: {
         marginHorizontal: 8,
         shadowColor: PALETTE.neutral[5],
-        borderRadius: ACTION_BUTTON_SIZE_INACTIVE / 2 + BORDER_WIDTH,
+        borderRadius: ACTION_BUTTON_SIZE / 2 + BORDER_WIDTH,
         borderWidth: BORDER_WIDTH,
         elevation: 5,
     },
     button: {
         zIndex: -1,
-        width: ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2,
-        height: ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2,
-        flexBasis: ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2,
-        borderRadius: (ACTION_BUTTON_SIZE_INACTIVE - BORDER_WIDTH * 2) / 2,
+        width: ACTION_BUTTON_SIZE - BORDER_WIDTH * 2,
+        height: ACTION_BUTTON_SIZE - BORDER_WIDTH * 2,
+        flexBasis: ACTION_BUTTON_SIZE - BORDER_WIDTH * 2,
+        borderRadius: (ACTION_BUTTON_SIZE - BORDER_WIDTH * 2) / 2,
         flexGrow: 0,
         flexShrink: 0,
         justifyContent: 'center',
