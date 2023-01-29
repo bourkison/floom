@@ -37,6 +37,8 @@ type FilterItemProps = {
     obj: 'saved' | 'unsaved' | 'deleted';
 };
 
+export const FILTER_DROPDOWN_CLOSED_HEIGHT = 40;
+
 const FilterItem: React.FC<FilterItemProps> = ({item, options, type, obj}) => {
     const [selected, setSelected] = useState(false);
     const dispatch = useAppDispatch();
@@ -462,7 +464,7 @@ const styles = StyleSheet.create({
     },
     buttonsContainer: {
         backgroundColor: '#FFF',
-        height: 40,
+        height: FILTER_DROPDOWN_CLOSED_HEIGHT,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#1a1f25',

@@ -23,11 +23,11 @@ import {GestureDetector, Gesture} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 
 import {useAppDispatch} from '@/store/hooks';
-import {DELETE_SAVED_PRODUCT} from '@/store/slices/product';
+import {DELETE_SAVED_PRODUCT, SAVE_PRODUCT} from '@/store/slices/product';
 
 import {MainStackParamList} from '@/nav/Navigator';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {BUY_COLOR, DELETE_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
+import {BUY_COLOR, PALETTE, SAVE_COLOR} from '@/constants';
 import {capitaliseString, formatPrice} from '@/services';
 import BrandLogo from '../Utility/BrandLogo';
 import * as WebBrowser from 'expo-web-browser';
@@ -135,6 +135,14 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         }
     }, [dispatch, index, onDelete, type, product, listRef]);
 
+    const rightSwipe = () => {
+        if (type === 'saved') {
+            buyProduct();
+        } else if (type === 'deleted') {
+            dispatch(SAVE_PRODUCT(product));
+        }
+    };
+
     const buyProduct = async () => {
         await WebBrowser.openBrowserAsync(product.link);
         offsetX.value = withTiming(0, {
@@ -199,7 +207,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                 });
             } else if (isRightSwipeActive.value && e.state === 5) {
                 offsetX.value = withTiming(width, {duration: 500});
-                runOnJS(buyProduct)();
+                runOnJS(rightSwipe)();
             } else {
                 offsetX.value = withTiming(0, {
                     easing: Easing.inOut(Easing.quad),
@@ -299,7 +307,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         height: '100%',
         width: '100%',
-        backgroundColor: DELETE_COLOR,
+        backgroundColor: PALETTE.red[7],
         alignItems: 'flex-end',
         justifyContent: 'center',
     },

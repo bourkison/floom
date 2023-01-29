@@ -306,9 +306,24 @@ export const LOAD_DELETED_PRODUCTS = createAsyncThunk<
                 queryStringParameters: input.queryStringParameters,
             };
 
-            return await queryProduct({
-                init,
-            });
+            if (input.filtered) {
+                init = buildInitWithFilters(
+                    init,
+                    'deleted',
+                    state.product.deleted.filters,
+                );
+            }
+
+            try {
+                return await queryProduct({
+                    init,
+                });
+            } catch (err: any) {
+                return rejectWithValue({
+                    message: err?.message || undefined,
+                    code: err?.response?.status || undefined,
+                });
+            }
         } else {
             const productIds: string[] = JSON.parse(
                 (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||

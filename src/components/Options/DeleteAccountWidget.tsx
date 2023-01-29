@@ -44,7 +44,10 @@ const DeleteAccountWidget = () => {
             <Text style={styles.hintText}>
                 WARNING: Deleted accounts can not be recovered.
             </Text>
-            <Modal visible={modalVisible} transparent={true}>
+            <Modal
+                visible={modalVisible}
+                transparent={true}
+                animationType="fade">
                 <Pressable
                     onPress={() => setModalVisible(false)}
                     style={styles.modalPressable}>
@@ -136,7 +139,7 @@ const styles = StyleSheet.create({
         backgroundColor: PALETTE.red[7],
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10,
+        borderRadius: 5,
         width: '100%',
         alignSelf: 'center',
     },
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10,
+        borderRadius: 5,
         width: '100%',
         alignSelf: 'center',
         backgroundColor: 'transparent',

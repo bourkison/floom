@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
     View,
     Image,
@@ -15,6 +15,8 @@ import {OptionsStackParamList} from '@/nav/OptionsNavigator';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {LOAD_DELETED_PRODUCTS} from '@/store/slices/product';
+
+import {PALETTE} from '@/constants';
 
 const NUM_PRODUCTS = 5;
 
@@ -60,6 +62,42 @@ const DeletedProductsWidget = () => {
         }
     }, [dispatch, deletedProducts, isLoading, loadAttempted]);
 
+    const isEmpty = useCallback(() => {
+        if (!isLoading && !deletedProducts.length) {
+            return true;
+        }
+
+        return false;
+    }, [isLoading, deletedProducts]);
+
+    const content = () => {
+        if (isLoading) {
+            return <ActivityIndicator />;
+        }
+
+        if (isEmpty()) {
+            return (
+                <View style={styles.noProductTextContainer}>
+                    <Text style={styles.noProductText}>
+                        No deleted products. Get swiping!
+                    </Text>
+                </View>
+            );
+        }
+
+        return (
+            <View style={styles.imageContainer}>
+                {deletedProducts.map(product => (
+                    <Image
+                        key={product._id}
+                        style={[imageSize]}
+                        source={{uri: product.images[0]}}
+                    />
+                ))}
+            </View>
+        );
+    };
+
     return (
         <View
             style={styles.container}
@@ -76,19 +114,7 @@ const DeletedProductsWidget = () => {
                     navigation.navigate('DeletedProducts');
                 }}
                 activeOpacity={0.5}>
-                {isLoading ? (
-                    <ActivityIndicator />
-                ) : (
-                    <View style={styles.imageContainer}>
-                        {deletedProducts.map(product => (
-                            <Image
-                                key={product._id}
-                                style={[imageSize]}
-                                source={{uri: product.images[0]}}
-                            />
-                        ))}
-                    </View>
-                )}
+                {content()}
                 <View style={styles.optionLink}>
                     <View style={styles.optionTextContainer}>
                         <Text>View All</Text>
@@ -124,6 +150,16 @@ const styles = StyleSheet.create({
         flexBasis: 18,
         flexGrow: 0,
         flexShrink: 0,
+    },
+    noProductTextContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noProductText: {
+        color: PALETTE.neutral[4],
+        fontSize: 12,
+        paddingHorizontal: 5,
+        paddingVertical: 3,
     },
 });
 
