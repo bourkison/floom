@@ -21,6 +21,7 @@ import {
     DELETE_ALL_DELETED_PRODUCTS,
     DELETE_DELETED_PRODUCT,
     LOAD_DELETED_PRODUCTS,
+    LOAD_UNSAVED_PRODUCTS,
 } from '@/store/slices/product';
 import {FlashList} from '@shopify/flash-list';
 import {Product} from '@/types/product';
@@ -102,6 +103,24 @@ const DeletedProducts = () => {
         setIsRefreshing(false);
     };
 
+    const retry = async (clearFilters: boolean) => {
+        await dispatch(
+            LOAD_UNSAVED_PRODUCTS({
+                queryStringParameters: {
+                    loadAmount: 25,
+                    type: 'deleted',
+                    reversed: true,
+                },
+                loadType: 'initial',
+                filtered: !clearFilters,
+            }),
+        );
+
+        if (clearFilters) {
+            dispatch(CLEAR_FILTERS({obj: 'deleted'}));
+        }
+    };
+
     const loadMore = async () => {
         if (moreToLoad) {
             dispatch(
@@ -166,15 +185,12 @@ const DeletedProducts = () => {
                         <AnimatedButton
                             style={styles.refreshButton}
                             textStyle={styles.refreshButtonText}
-                            onPress={refresh}>
+                            onPress={() => retry(false)}>
                             Refresh
                         </AnimatedButton>
                         {hasFilters ? (
                             <AnimatedButton
-                                onPress={() => {
-                                    dispatch(CLEAR_FILTERS({obj: 'deleted'}));
-                                    refresh();
-                                }}
+                                onPress={() => retry(true)}
                                 style={styles.clearFiltersRefreshButton}
                                 textStyle={
                                     styles.clearFiltersRefreshButtonText
@@ -233,10 +249,12 @@ const DeletedProducts = () => {
                     ) : undefined
                 }
                 refreshControl={
-                    <RefreshControl
-                        onRefresh={refresh}
-                        refreshing={isRefreshing}
-                    />
+                    !isLoading ? (
+                        <RefreshControl
+                            onRefresh={refresh}
+                            refreshing={isRefreshing}
+                        />
+                    ) : undefined
                 }
                 onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
             />

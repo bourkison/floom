@@ -302,8 +302,10 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
                         }}>
                         <View style={styles.columnsContainer}>
                             <View style={styles.column}>
-                                <Text style={styles.columnHeader}>Gender</Text>
-                                {GENDER_OPTIONS.map(g => (
+                                <Text style={styles.columnHeader}>Style</Text>
+                                {GENDER_OPTIONS.filter(
+                                    g => g.value !== 'other',
+                                ).map(g => (
                                     <FilterItem
                                         obj={obj}
                                         item={g.label}
