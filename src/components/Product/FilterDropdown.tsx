@@ -29,6 +29,7 @@ import {
     CLEAR_FILTERS,
 } from '@/store/slices/product';
 import AnimatedButton from '../Utility/AnimatedButton';
+import * as Haptics from 'expo-haptics';
 
 type FilterItemProps = {
     item: string;
@@ -127,6 +128,8 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
     };
 
     const search = () => {
+        Haptics.impactAsync();
+
         if (obj === 'unsaved') {
             dispatch(
                 LOAD_UNSAVED_PRODUCTS({

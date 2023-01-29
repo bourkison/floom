@@ -289,7 +289,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
             ) {
                 action.value = 'idle';
                 runOnJS(setAction)('idle');
-                runOnJS(Haptics.selectionAsync)();
+                runOnJS(Haptics.impactAsync)();
             }
             // else if we're not buying and we should be (i.e. offsetY value above 2x action threshold)
             else if (
@@ -300,7 +300,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
             ) {
                 action.value = 'buy';
                 runOnJS(setAction)('buy');
-                runOnJS(Haptics.selectionAsync)();
+                runOnJS(Haptics.impactAsync)();
             }
             // else if we're not saving and we should be (i.e. offsetX value above action threshold)
             else if (
@@ -309,7 +309,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
             ) {
                 action.value = 'save';
                 runOnJS(setAction)('save');
-                runOnJS(Haptics.selectionAsync)();
+                runOnJS(Haptics.impactAsync)();
             }
             // finally, if we're not deleting and we should be (i.e. offsetX value below action threshold)
             else if (
@@ -318,7 +318,7 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
             ) {
                 action.value = 'delete';
                 runOnJS(setAction)('delete');
-                runOnJS(Haptics.selectionAsync)();
+                runOnJS(Haptics.impactAsync)();
             }
 
             // if (action.value !== 'buy' && -e.translationY > Math.abs(e.translationX))
@@ -381,6 +381,8 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
         });
 
     const openProduct = () => {
+        Haptics.selectionAsync();
+
         navigation.navigate('ProductView', {
             product: product,
             imageIndex: imageIndex,

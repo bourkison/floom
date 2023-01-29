@@ -19,6 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {MainStackParamList} from '@/nav/Navigator';
 import {useAppSelector} from '@/store/hooks';
+import * as Haptics from 'expo-haptics';
 
 const FeaturedProduct = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -77,6 +78,8 @@ const FeaturedProduct = () => {
     }, [type, filter]);
 
     const press = () => {
+        Haptics.selectionAsync();
+
         if (product) {
             navigation.navigate('ProductView', {
                 product,

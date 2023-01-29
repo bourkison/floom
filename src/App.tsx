@@ -10,6 +10,7 @@ import {Provider} from 'react-redux';
 import store from '@/store';
 
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {StatusBar} from 'expo-status-bar';
 
 import {Amplify} from 'aws-amplify';
 import awsconfig from './aws-exports';
@@ -54,6 +55,7 @@ const App = () => {
             <Provider store={store}>
                 <GestureHandlerRootView style={styles.flexOne}>
                     <NavigationContainer>
+                        <StatusBar style="dark" />
                         <Navigator />
                     </NavigationContainer>
                 </GestureHandlerRootView>

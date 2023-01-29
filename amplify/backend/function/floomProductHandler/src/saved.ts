@@ -4,6 +4,7 @@ import {ProductType, UserType} from './types';
 import MongooseModels from '/opt/nodejs/models';
 import {Model, Types, FilterQuery, PipelineStage} from 'mongoose';
 import {MAX_LOAD_AMOUNT} from '.';
+import {buildQueryWithFilters, checkIfFiltered} from './services';
 
 export const querySavedOrDeletedProduct = async (
     event: APIGatewayEvent,
@@ -15,36 +16,7 @@ export const querySavedOrDeletedProduct = async (
     const startAt = event.queryStringParameters.startAt || '';
     const reversed = event.queryStringParameters.reversed === 'true' || false;
 
-    // Get relevant filters and convert to lower case.
-    const filteredGenders: string[] = event.queryStringParameters
-        .filteredGenders
-        ? event.queryStringParameters.filteredGenders
-              .split(',')
-              .map(g => g.toLowerCase().trim())
-        : [];
-
-    const filteredCategories: string[] = event.queryStringParameters
-        .filteredCategories
-        ? event.queryStringParameters.filteredCategories
-              .split(',')
-              .map(c => c.toLowerCase().trim())
-        : [];
-
-    const filteredColors: string[] = event.queryStringParameters.filteredColors
-        ? event.queryStringParameters.filteredColors
-              .split(',')
-              .map(c => c.toLowerCase().trim())
-        : [];
-
-    const searchText: string = event.queryStringParameters.query || '';
-
-    const isFiltered =
-        filteredGenders.length ||
-        filteredCategories.length ||
-        filteredColors.length ||
-        searchText
-            ? true
-            : false;
+    const isFiltered = checkIfFiltered(event);
 
     const User: Model<UserType> = await MongooseModels().User(MONGODB_URI);
     const Product: Model<ProductType> = await MongooseModels().Product(
@@ -363,47 +335,7 @@ export const querySavedOrDeletedProduct = async (
         },
     };
 
-    if (filteredGenders.length) {
-        const regex = new RegExp(
-            filteredGenders.map(g => `^${g}$`).join('|'),
-            'gi',
-        );
-        matchQuery = {
-            ...matchQuery,
-            gender: {
-                $regex: regex,
-            },
-        };
-    }
-
-    if (filteredCategories.length) {
-        matchQuery = {
-            ...matchQuery,
-            categories: {
-                $in: filteredCategories,
-            },
-        };
-    }
-
-    if (filteredColors.length) {
-        const regex = new RegExp(filteredColors.join('|'), 'gi');
-
-        matchQuery = {
-            ...matchQuery,
-            colors: {
-                $regex: regex,
-            },
-        };
-    }
-
-    if (searchText) {
-        matchQuery = {
-            ...matchQuery,
-            $text: {
-                $search: searchText,
-            },
-        };
-    }
+    matchQuery = buildQueryWithFilters(matchQuery, event);
 
     let aggregationArr: PipelineStage[] = [
         {$match: matchQuery},

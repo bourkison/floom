@@ -58,17 +58,23 @@ export type QueryPublicProductInit = {
         filteredCategories: string[];
         filteredColors: string[];
         loadAmount: number;
+        query: string;
     };
 };
 
 export type GetPublicProductParams = {
     init: GetPublicProductInit;
+    type: 'saved' | 'deleted';
 };
 
 export type GetPublicProductInit = {
     body: {
         method?: 'GET_PRODUCTS';
         products: string[];
+        filteredGenders: string[];
+        filteredCategories: string[];
+        filteredColors: string[];
+        query: string;
     };
 };
 

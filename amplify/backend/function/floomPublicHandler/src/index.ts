@@ -5,6 +5,7 @@ import MongooseModels from '/opt/nodejs/models';
 import {Model, FilterQuery, Types} from 'mongoose';
 import {getFeaturedProduct} from './featured';
 import {ProductType} from './types';
+import {buildQueryWithFilters} from './services';
 
 const queryProducts = async (
     event: APIGatewayEvent,
@@ -16,25 +17,6 @@ const queryProducts = async (
     const loadAmount: number = parseInt(
         JSON.parse(event.body)?.loadAmount || 5,
     );
-    // Get relevant filters and convert to lower case.
-    const filteredGenders: string[] = JSON.parse(event.body)?.filteredGenders
-        ? JSON.parse(event.body).filteredGenders.map((g: string) =>
-              g.toLowerCase(),
-          )
-        : [];
-
-    const filteredCategories: string[] = JSON.parse(event.body)
-        ?.filteredCategories
-        ? JSON.parse(event.body).filteredCategories.map((c: string) =>
-              c.toLowerCase(),
-          )
-        : [];
-
-    const filteredColors: string[] = JSON.parse(event.body)?.filteredColors
-        ? JSON.parse(event.body).filteredColors.map((c: string) =>
-              c.toLowerCase(),
-          )
-        : [];
 
     const Product: Model<ProductType> = await MongooseModels().Product(
         MONGODB_URI,
@@ -49,46 +31,16 @@ const queryProducts = async (
         body: JSON.stringify({success: false}),
     };
 
-    console.log('TEST');
-
     try {
         // Build out filtered query.
-        let query: FilterQuery<ProductType> = {
-            _id: {
-                $nin: excludedProducts,
+        let query = buildQueryWithFilters(
+            {
+                _id: {
+                    $nin: excludedProducts,
+                },
             },
-        };
-
-        if (filteredGenders.length) {
-            const regex = new RegExp(
-                filteredGenders.map(g => `^${g}$`).join('|'),
-                'gi',
-            );
-            query = {
-                ...query,
-                gender: {
-                    $regex: regex,
-                },
-            };
-        }
-
-        if (filteredCategories.length) {
-            query = {
-                ...query,
-                categories: {
-                    $in: filteredCategories,
-                },
-            };
-        }
-
-        if (filteredColors.length) {
-            query = {
-                ...query,
-                colors: {
-                    $in: filteredColors,
-                },
-            };
-        }
+            event,
+        );
 
         const products = await Product.aggregate([
             {$match: query},
@@ -172,11 +124,16 @@ const getProducts = async (
     }
 
     try {
-        const products = await Product.find({
-            _id: {
-                $in: productIds.map(id => new Types.ObjectId(id)),
+        let query = buildQueryWithFilters(
+            {
+                _id: {
+                    $in: productIds.map(id => new Types.ObjectId(id)),
+                },
             },
-        }).lean();
+            event,
+        );
+
+        const products = await Product.find(query).lean();
 
         if (!products.length) {
             response = {

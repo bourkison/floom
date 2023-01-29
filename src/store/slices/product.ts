@@ -143,10 +143,12 @@ export const LOAD_UNSAVED_PRODUCTS = createAsyncThunk<
                 init: {
                     body: {
                         excludedProducts: productsToExclude,
-                        filteredGenders: [],
-                        filteredCategories: [],
-                        filteredColors: [],
+                        filteredGenders: state.product.unsaved.filters.gender,
+                        filteredCategories:
+                            state.product.unsaved.filters.category,
+                        filteredColors: state.product.unsaved.filters.color,
                         loadAmount: 5,
+                        query: state.product.unsaved.filters.searchText,
                     },
                 },
             });
@@ -168,6 +170,32 @@ export const SAVE_PRODUCT = createAsyncThunk<void, ProductType>(
             let currentSavedProducts: string[] = JSON.parse(
                 (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
             );
+
+            let currentDeletedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
+                    '[]',
+            );
+
+            // Remove from deleted if there.
+            let deletedIndex = currentDeletedProducts.findIndex(
+                i => i === p._id,
+            );
+            if (deletedIndex > -1) {
+                currentDeletedProducts = [
+                    ...currentDeletedProducts.slice(0, deletedIndex),
+                    ...currentDeletedProducts.slice(deletedIndex + 1),
+                ];
+
+                await AsyncStorage.setItem(
+                    LOCAL_KEY_DELETED_PRODUCTS,
+                    JSON.stringify(currentDeletedProducts),
+                );
+            }
+
+            // Add to saved if not there already.
+            if (currentSavedProducts.includes(p._id)) {
+                return;
+            }
 
             currentSavedProducts.unshift(p._id);
 
@@ -203,6 +231,29 @@ export const DELETE_PRODUCT = createAsyncThunk<void, ProductType>(
                 (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
                     '[]',
             );
+
+            let currentSavedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+            );
+
+            // Remove from saved if there.
+            let savedIndex = currentSavedProducts.findIndex(i => i === p._id);
+            if (savedIndex > -1) {
+                currentSavedProducts = [
+                    ...currentSavedProducts.slice(0, savedIndex),
+                    ...currentSavedProducts.slice(savedIndex + 1),
+                ];
+
+                await AsyncStorage.setItem(
+                    LOCAL_KEY_DELETED_PRODUCTS,
+                    JSON.stringify(currentSavedProducts),
+                );
+            }
+
+            // Add to deleted if not there already.
+            if (currentDeletedProducts.includes(p._id)) {
+                return;
+            }
 
             currentDeletedProducts.unshift(p._id);
 
@@ -313,8 +364,16 @@ export const LOAD_SAVED_PRODUCTS = createAsyncThunk<
             try {
                 const products = await getPublicProduct({
                     init: {
-                        body: {products: productIds},
+                        body: {
+                            products: productIds,
+                            filteredGenders: state.product.saved.filters.gender,
+                            filteredCategories:
+                                state.product.saved.filters.category,
+                            filteredColors: state.product.saved.filters.color,
+                            query: state.product.saved.filters.searchText,
+                        },
                     },
+                    type: 'saved',
                 });
 
                 return {
@@ -383,8 +442,17 @@ export const LOAD_DELETED_PRODUCTS = createAsyncThunk<
             try {
                 const products = await getPublicProduct({
                     init: {
-                        body: {products: productIds},
+                        body: {
+                            products: productIds,
+                            filteredGenders:
+                                state.product.deleted.filters.gender,
+                            filteredCategories:
+                                state.product.deleted.filters.category,
+                            filteredColors: state.product.deleted.filters.color,
+                            query: state.product.deleted.filters.searchText,
+                        },
                     },
+                    type: 'deleted',
                 });
 
                 return {

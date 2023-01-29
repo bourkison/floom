@@ -4,6 +4,7 @@ import {ProductType, UserType} from './types';
 import MongooseModels from '/opt/nodejs/models';
 import {Model, Types, FilterQuery} from 'mongoose';
 import {MAX_LOAD_AMOUNT} from '.';
+import {buildQueryWithFilters} from './services';
 
 export const queryUnsavedProduct = async (
     event: APIGatewayEvent,
@@ -18,29 +19,6 @@ export const queryUnsavedProduct = async (
     const excludeSaved =
         event.queryStringParameters.excludeSaved === 'true' || false;
     const ordered = event.queryStringParameters.ordered === 'true' || false;
-
-    // Get relevant filters and convert to lower case.
-    const filteredGenders: string[] = event.queryStringParameters
-        .filteredGenders
-        ? event.queryStringParameters.filteredGenders
-              .split(',')
-              .map(g => g.toLowerCase().trim())
-        : [];
-
-    const filteredCategories: string[] = event.queryStringParameters
-        .filteredCategories
-        ? event.queryStringParameters.filteredCategories
-              .split(',')
-              .map(c => c.toLowerCase().trim())
-        : [];
-
-    const filteredColors: string[] = event.queryStringParameters.filteredColors
-        ? event.queryStringParameters.filteredColors
-              .split(',')
-              .map(c => c.toLowerCase().trim())
-        : [];
-
-    const searchText: string = event.queryStringParameters.query || '';
 
     const Product: Model<ProductType> = await MongooseModels().Product(
         MONGODB_URI,
@@ -147,47 +125,7 @@ export const queryUnsavedProduct = async (
             };
         }
 
-        if (filteredGenders.length) {
-            const regex = new RegExp(
-                filteredGenders.map(g => `^${g}$`).join('|'),
-                'gi',
-            );
-            query = {
-                ...query,
-                gender: {
-                    $regex: regex,
-                },
-            };
-        }
-
-        if (filteredCategories.length) {
-            query = {
-                ...query,
-                categories: {
-                    $in: filteredCategories,
-                },
-            };
-        }
-
-        if (filteredColors.length) {
-            const regex = new RegExp(filteredColors.join('|'), 'gi');
-
-            query = {
-                ...query,
-                colors: {
-                    $regex: regex,
-                },
-            };
-        }
-
-        if (searchText) {
-            query = {
-                ...query,
-                $text: {
-                    $search: searchText,
-                },
-            };
-        }
+        query = buildQueryWithFilters(query, event);
 
         let products: ProductType[] = [];
 

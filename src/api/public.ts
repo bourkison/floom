@@ -84,8 +84,8 @@ export async function getPublicProduct(
             inStock: data.data[i].inStock,
             description: data.data[i].description || '',
             availableCountries: data.data[i].availableCountries,
-            saved: data.data[i].saved,
-            deleted: data.data[i].deleted,
+            saved: input.type === 'saved',
+            deleted: input.type === 'deleted',
         });
     }
 
