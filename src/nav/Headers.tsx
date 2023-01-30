@@ -9,6 +9,7 @@ import {
 import Constants from 'expo-constants';
 import {StackHeaderProps} from '@react-navigation/stack';
 import {Entypo, Ionicons, Feather} from '@expo/vector-icons';
+import {PALETTE} from '@/constants';
 
 type HeaderProps = {
     children: string | JSX.Element;
@@ -67,7 +68,7 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
                 <Ionicons name="heart-outline" size={24} />
             </TouchableOpacity>
         }>
-        Floom
+        <Text style={styles.logoText}>floom</Text>
     </HeaderTemplate>
 );
 
@@ -229,5 +230,12 @@ const styles = StyleSheet.create({
         flexBasis: Constants.statusBarHeight,
         flexGrow: 0,
         flexShrink: 0,
+    },
+    logoText: {
+        fontFamily: 'Gilroy',
+        fontSize: 26,
+        letterSpacing: -1,
+        color: PALETTE.neutral[9],
+        textAlign: 'center',
     },
 });

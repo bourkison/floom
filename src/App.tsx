@@ -15,6 +15,9 @@ import {StatusBar} from 'expo-status-bar';
 import {Amplify} from 'aws-amplify';
 import awsconfig from './aws-exports';
 import {FETCH_USER} from './store/slices/user';
+
+import {useFonts} from 'expo-font';
+
 Amplify.configure(awsconfig);
 
 // Wait until we've finished loading in before hiding splashscreen.
@@ -23,6 +26,10 @@ SplashScreen.preventAutoHideAsync();
 
 const App = () => {
     const [appIsReady, setAppIsReady] = useState(false);
+    const [userLoaded, setUserLoaded] = useState(false);
+    const [fontsLoaded] = useFonts({
+        Gilroy: require('@/assets/Gilroy-ExtraBold.otf'),
+    });
 
     useEffect(() => {
         const initFetch = async () => {
@@ -31,7 +38,7 @@ const App = () => {
             } catch (e) {
                 console.warn(e);
             } finally {
-                setAppIsReady(true);
+                setUserLoaded(true);
             }
         };
 
@@ -44,6 +51,12 @@ const App = () => {
             await SplashScreen.hideAsync();
         }
     }, [appIsReady]);
+
+    useEffect(() => {
+        if (userLoaded && fontsLoaded) {
+            setAppIsReady(true);
+        }
+    }, [userLoaded, fontsLoaded]);
 
     if (!appIsReady) {
         return null;

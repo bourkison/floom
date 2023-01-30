@@ -13,6 +13,7 @@ import {PALETTE} from '@/constants';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 // import Video from 'react-native-video';
 import {Video, ResizeMode} from 'expo-av';
+import FloomLogo from '@/components/Utility/FloomLogo';
 
 // Video found here: https://www.pexels.com/video/a-woman-sitting-on-the-chair-8400304/
 
@@ -60,6 +61,9 @@ const HomeAuth = ({
                     <Text style={styles.guestText}>Continue as Guest</Text>
                 </TouchableOpacity>
             </View>
+            <View style={styles.logoContainer}>
+                <FloomLogo />
+            </View>
             <View style={styles.topSectionCont} />
             <View style={styles.buttonsContainer}>
                 <View style={styles.loginButtonCont}>
@@ -92,6 +96,7 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: 10,
     },
+    logoContainer: {flex: 1},
     topSectionCont: {flex: 4},
     guestButtonContainer: {
         flex: 1,
