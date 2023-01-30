@@ -20,6 +20,8 @@ const ProductList = () => {
         state => state.product.unsaved.moreToLoad,
     );
 
+    const userStatus = useAppSelector(state => state.user.status);
+
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -46,19 +48,25 @@ const ProductList = () => {
             );
         };
 
-        // If no products, and more to load, and not already loading
+        // If no products, and more to load, and not already loading, AND we're not logging out (and resetting hence calling this useEffect again)
         // OR products is less than amount, more to load, and not already loading.
-        if (!products.length && !isLoading && moreToLoad) {
+        if (
+            !products.length &&
+            !isLoading &&
+            moreToLoad &&
+            userStatus !== 'loading'
+        ) {
             loadProducts('initial');
         } else if (
             products.length <= NUM_SHOWN_PRODUCTS + 1 &&
             !isLoading &&
             !isLoadingMore &&
-            moreToLoad
+            moreToLoad &&
+            userStatus !== 'loading'
         ) {
             loadProducts('more', products[products.length - 1]._id);
         }
-    }, [products, isLoading, dispatch, isLoadingMore, moreToLoad]);
+    }, [products, isLoading, dispatch, isLoadingMore, moreToLoad, userStatus]);
 
     const retry = async (clearFilters: boolean) => {
         if (clearFilters) {

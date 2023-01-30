@@ -7,6 +7,7 @@ import AccountDetailsWidget from '@/components/Options/AccountDetailsWidget';
 import LogoutWidget from '@/components/Options/LogoutWidget';
 import {useAppSelector} from '@/store/hooks';
 import AppInfoWidget from '@/components/Options/AppInfoWidget';
+import GuestAccountWidget from '@/components/Options/GuestAccountWidget';
 
 const Options = () => {
     const isGuest = useAppSelector(state => state.user.isGuest);
@@ -43,6 +44,7 @@ const Options = () => {
             ) : (
                 <View style={styles.section}>
                     <SectionHeader>Account</SectionHeader>
+                    <GuestAccountWidget />
                 </View>
             )}
 

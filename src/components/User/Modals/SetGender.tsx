@@ -32,7 +32,6 @@ const SetGender: React.FC<SetGenderProps> = ({
         if (touchableRef && touchableRef.current) {
             touchableRef.current.measure(
                 (x, y, width, height, pageX, pageY) => {
-                    console.log('setting modal top:', pageY + height + 1);
                     setModalTop(pageY + height + BORDER_WIDTH);
                 },
             );

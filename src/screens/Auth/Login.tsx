@@ -7,14 +7,9 @@ import LoginForm from '@/components/User/LoginForm';
 const Login = ({}: StackScreenProps<AuthStackParamList, 'Login'>) => {
     return (
         <SafeAreaView style={styles.safeContainer}>
-            <View style={{flex: 5}} />
-            <View
-                style={{
-                    flex: 2,
-                }}>
+            <View style={styles.formCont}>
                 <LoginForm />
             </View>
-            <View style={{flex: 5}} />
         </SafeAreaView>
     );
 };
@@ -22,6 +17,11 @@ const Login = ({}: StackScreenProps<AuthStackParamList, 'Login'>) => {
 const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
+    },
+    formCont: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });
 
