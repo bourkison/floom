@@ -22,37 +22,32 @@ export const FETCH_USER = createAsyncThunk(
     'user/FETCH_USER',
     async (_, {dispatch, getState}): Promise<UserDocData> => {
         // Call Auth.currentSession() so error is called if no user logged in.
-        try {
-            await Auth.currentSession();
-            const username = (await Auth.currentUserInfo()).attributes.email;
+        await Auth.currentSession();
+        const username = (await Auth.currentUserInfo()).attributes.email;
 
-            const state = getState() as RootState;
-            const user = await getUser({username: username, init: {}});
-            if (!state.product.unsaved.filters.gender.includes(user.gender)) {
-                if (user.gender === 'male') {
-                    dispatch(
-                        TOGGLE_FILTER({
-                            item: 'Male',
-                            type: 'gender',
-                            obj: 'unsaved',
-                        }),
-                    );
-                } else if (user.gender === 'female') {
-                    dispatch(
-                        TOGGLE_FILTER({
-                            item: 'Female',
-                            type: 'gender',
-                            obj: 'unsaved',
-                        }),
-                    );
-                }
+        const state = getState() as RootState;
+        const user = await getUser({username: username, init: {}});
+        if (!state.product.unsaved.filters.gender.includes(user.gender)) {
+            if (user.gender === 'male') {
+                dispatch(
+                    TOGGLE_FILTER({
+                        item: 'Male',
+                        type: 'gender',
+                        obj: 'unsaved',
+                    }),
+                );
+            } else if (user.gender === 'female') {
+                dispatch(
+                    TOGGLE_FILTER({
+                        item: 'Female',
+                        type: 'gender',
+                        obj: 'unsaved',
+                    }),
+                );
             }
-
-            return user;
-        } catch (err) {
-            console.error(err);
-            throw err;
         }
+
+        return user;
     },
 );
 
@@ -90,6 +85,7 @@ const userSlice = createSlice({
                 state.loggedIn = true;
                 state.docData = action.payload;
                 state.status = 'succeeded';
+                state.isGuest = false;
             })
             .addCase(FETCH_USER.rejected, state => {
                 state.loggedIn = false;
@@ -110,8 +106,7 @@ const userSlice = createSlice({
                 state.loggedIn = false;
                 state.docData = null;
                 state.status = 'idle';
-
-                // TODO: Reset entire store
+                state.isGuest = false;
             })
             .addCase(LOGOUT.rejected, state => {
                 console.error('Logout rejected.');
