@@ -12,10 +12,17 @@ const FloomLogo = () => {
 
 const styles = StyleSheet.create({
     logoText: {
-        fontFamily: 'Gilroy',
+        fontFamily: 'Gilroy-ExtraBold',
         fontSize: 72,
         letterSpacing: -4,
         color: PALETTE.neutral[9],
+        textShadowColor: PALETTE.neutral[0],
+        shadowOpacity: 0.6,
+        shadowColor: PALETTE.neutral[6],
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
     },
 });
 export default FloomLogo;

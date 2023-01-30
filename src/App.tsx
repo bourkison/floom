@@ -28,7 +28,8 @@ const App = () => {
     const [appIsReady, setAppIsReady] = useState(false);
     const [userLoaded, setUserLoaded] = useState(false);
     const [fontsLoaded] = useFonts({
-        Gilroy: require('@/assets/Gilroy-ExtraBold.otf'),
+        'Gilroy-ExtraBold': require('@/assets/Gilroy-ExtraBold.otf'),
+        'Gilroy-Light': require('@/assets/Gilroy-Light.otf'),
     });
 
     useEffect(() => {

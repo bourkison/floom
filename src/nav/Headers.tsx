@@ -68,7 +68,7 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
                 <Ionicons name="heart-outline" size={24} />
             </TouchableOpacity>
         }>
-        <Text style={styles.logoText}>floom</Text>
+        <Text style={styles.logoText}>Floom</Text>
     </HeaderTemplate>
 );
 
@@ -232,9 +232,7 @@ const styles = StyleSheet.create({
         flexShrink: 0,
     },
     logoText: {
-        fontFamily: 'Gilroy',
-        fontSize: 26,
-        letterSpacing: -1,
+        fontSize: 20,
         color: PALETTE.neutral[9],
         textAlign: 'center',
     },
