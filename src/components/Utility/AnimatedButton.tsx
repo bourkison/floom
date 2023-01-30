@@ -1,10 +1,17 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
-import {ViewStyle, Text, TextStyle, Pressable} from 'react-native';
+import {
+    ViewStyle,
+    Text,
+    TextStyle,
+    Pressable,
+    View,
+    StyleSheet,
+} from 'react-native';
 import {Color} from '@/types';
 
 type AnimatedButtonProps = {
@@ -27,8 +34,6 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     disabledColor,
 }) => {
     const sScale = useSharedValue(1);
-    const initBackgroundColor = style.backgroundColor;
-    const sBackgroundColor = useSharedValue(style.backgroundColor);
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -37,22 +42,11 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
                     scale: sScale.value,
                 },
             ],
-            backgroundColor: sBackgroundColor.value,
         };
     });
 
-    useEffect(() => {
-        if (disabled && disabledColor) {
-            sBackgroundColor.value = disabledColor;
-        } else if (!disabled) {
-            sBackgroundColor.value = initBackgroundColor;
-        }
-    }, [disabled, disabledColor, initBackgroundColor, sBackgroundColor]);
-
     const pressIn = () => {
-        if (!disabled) {
-            sScale.value = withTiming(scale, {duration: 150});
-        }
+        sScale.value = withTiming(scale, {duration: 150});
     };
 
     const pressOut = () => {
@@ -60,16 +54,52 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     };
 
     return (
-        <Pressable onPressIn={pressIn} onPressOut={pressOut} onPress={onPress}>
-            <Animated.View style={[style, rStyle]}>
-                {typeof children === 'string' ? (
-                    <Text style={textStyle}>{children}</Text>
-                ) : (
-                    children
-                )}
+        <Pressable
+            onPressIn={pressIn}
+            onPressOut={pressOut}
+            onPress={onPress}
+            disabled={disabled}>
+            <Animated.View style={[style, rStyle, styles.paddingsRemoved]}>
+                <View
+                    style={[
+                        style,
+                        disabled && disabledColor
+                            ? {backgroundColor: disabledColor}
+                            : undefined,
+                    ]}>
+                    {typeof children === 'string' ? (
+                        <Text style={textStyle}>{children}</Text>
+                    ) : (
+                        children
+                    )}
+                </View>
             </Animated.View>
         </Pressable>
     );
 };
+
+const styles = StyleSheet.create({
+    paddingsRemoved: {
+        padding: 0,
+        paddingHorizontal: 0,
+        paddingVertical: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
+        margin: 0,
+        marginHorizontal: 0,
+        marginVertical: 0,
+        marginLeft: 0,
+        marginRight: 0,
+        marginTop: 0,
+        marginBottom: 0,
+        borderWidth: 0,
+        borderTopWidth: 0,
+        borderBottomWidth: 0,
+        borderLeftWidth: 0,
+        borderRightWidget: 0,
+    },
+});
 
 export default AnimatedButton;

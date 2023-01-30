@@ -78,7 +78,6 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
                     <FeaturedProduct />
                 </View>
 
-                {/* Don't render action buttons if no products found. */}
                 <View
                     style={[
                         styles.buttonsContainer,

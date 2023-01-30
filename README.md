@@ -14,6 +14,7 @@
 -   ~Fix zIndex bug on android~
 -   ~Preload images~
 -   Filters: Price, Brand
+-   Google and Apple Sign In
 
 ## Out of Scope Ideas
 
