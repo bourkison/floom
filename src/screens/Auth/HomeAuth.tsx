@@ -12,9 +12,7 @@ import {AuthStackParamList} from '@/nav/Navigator';
 import {PALETTE} from '@/constants';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {FontAwesome5} from '@expo/vector-icons';
-// import Video from 'react-native-video';
 import {Video, ResizeMode} from 'expo-av';
-import FloomLogo from '@/components/Utility/FloomLogo';
 
 // Video found here: https://www.pexels.com/video/a-woman-sitting-on-the-chair-8400304/
 
@@ -66,12 +64,11 @@ const HomeAuth = ({
                 <View>
                     <Text style={styles.logoText}>floom</Text>
                 </View>
-                <Text style={{color: PALETTE.neutral[8], marginTop: -5}}>
-                    Shop the revolution™
-                </Text>
+                <Text style={styles.sloganText}>Shop the revolution™</Text>
             </View>
             <View style={styles.topSectionCont} />
             <View style={styles.buttonsContainer}>
+                {/* TODO: Federated Sign In */}
                 <View style={styles.continueWithButtonCont}>
                     <AnimatedButton
                         style={styles.continueWithButton}
@@ -147,10 +144,10 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     logoText: {
-        fontFamily: 'Gilroy-ExtraBold',
+        fontFamily: 'JosefinSans-Light',
         fontSize: 72,
-        letterSpacing: -4,
         color: PALETTE.neutral[9],
+        letterSpacing: 0,
         textShadowColor: PALETTE.neutral[0],
         shadowOpacity: 0.6,
         shadowColor: PALETTE.neutral[6],
@@ -159,7 +156,9 @@ const styles = StyleSheet.create({
             height: 0,
         },
         paddingTop: 10,
+        textTransform: 'uppercase',
     },
+    sloganText: {color: PALETTE.neutral[8], marginTop: -5},
     topSectionCont: {flex: 12},
     guestButtonContainer: {
         flex: 1,

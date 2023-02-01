@@ -30,6 +30,9 @@ const App = () => {
     const [fontsLoaded] = useFonts({
         'Gilroy-ExtraBold': require('@/assets/Gilroy-ExtraBold.otf'),
         'Gilroy-Light': require('@/assets/Gilroy-Light.otf'),
+        'Philosopher-Bold': require('@/assets/Philosopher-Bold.ttf'),
+        'JosefinSans-Light': require('@/assets/JosefinSans-Light.ttf'),
+        'JosefinSans-Regular': require('@/assets/JosefinSans-Regular.ttf'),
     });
 
     useEffect(() => {
