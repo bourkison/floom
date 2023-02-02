@@ -236,6 +236,6 @@ const styles = StyleSheet.create({
         color: PALETTE.neutral[9],
         textAlign: 'center',
         fontFamily: 'JosefinSans-Regular',
-        textTransform: 'uppercase',
+        textTransform: 'lowercase',
     },
 });
