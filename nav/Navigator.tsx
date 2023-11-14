@@ -30,7 +30,7 @@ export default function Navigator() {
             <AuthStack.Screen
                 name="SignUp"
                 component={SignUp}
-                options={{headerShown: false}}
+                options={{headerShown: false /*gestureEnabled: false*/}}
             />
             <AuthStack.Screen
                 name="Login"
