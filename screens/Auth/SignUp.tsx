@@ -4,26 +4,31 @@ import React, {useState} from 'react';
 import {
     StyleSheet,
     View,
-    ScrollView,
     Text,
     TextInput,
-    ActivityIndicator,
-    Image,
+    useWindowDimensions,
 } from 'react-native';
+import Animated, {
+    Easing,
+    SlideInRight,
+    SlideOutLeft,
+} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import UpdateDetailsWidget from '@/components/User/UpdateDetailsWidget';
-import UpdatePasswordWidget from '@/components/User/UpdatePasswordWidget';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
-import SectionHeader from '@/components/Utility/SectionHeader';
 import {PALETTE} from '@/constants';
 import {AuthStackParamList} from '@/nav/Navigator';
 import {Database} from '@/types/schema';
 
 type UserRow = Database['public']['Tables']['users']['Row'];
 
+type SignUpStages = 'name' | 'email' | 'password' | 'dob' | 'verify';
+
 const SignUp = ({
     navigation,
 }: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
+    const [page, setPage] = useState<SignUpStages>('name');
+
     const [isLoading, setIsLoading] = useState(false);
 
     const [email, setEmail] = useState('');
@@ -34,6 +39,9 @@ const SignUp = ({
 
     const [password, setPassword] = useState('');
     const [confPassword, setConfPassword] = useState('');
+
+    const {top, bottom, left, right} = useSafeAreaInsets();
+    const {width, height} = useWindowDimensions();
 
     const validateForm = (): boolean => {
         if (password !== confPassword) {
@@ -49,21 +57,57 @@ const SignUp = ({
     };
 
     return (
-        <View style={styles.container}>
-            <Image
-                source={require('@/assets/signUpBackground.png')}
-                style={{
-                    width: 500 / (9 / 16),
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    position: 'absolute',
-                }}
-            />
-            <ScrollView>
+        <View
+            style={[
+                styles.container,
+                {
+                    paddingTop: top,
+                    paddingBottom: bottom,
+                    paddingLeft: left,
+                    paddingRight: right,
+                },
+            ]}>
+            {page === 'name' && (
                 <View style={styles.section}>
-                    <View style={styles.box}>
+                    <Animated.View
+                        style={styles.box}
+                        exiting={SlideOutLeft.easing(
+                            Easing.inOut(Easing.quad),
+                        )}>
+                        <TextInput
+                            placeholder="Email"
+                            placeholderTextColor={PALETTE.neutral[3]}
+                            autoComplete="name"
+                            autoCorrect={false}
+                            value={name}
+                            style={styles.textInput}
+                            onChangeText={setName}
+                        />
+                    </Animated.View>
+                    <Text style={styles.hintText}>
+                        Your name can not be changed later.
+                    </Text>
+
+                    <View style={styles.buttonContainer}>
+                        <AnimatedButton
+                            style={styles.signUpButton}
+                            textStyle={styles.signUpButtonText}
+                            onPress={() => setPage('email')}
+                            disabled={isLoading}>
+                            Next
+                        </AnimatedButton>
+                    </View>
+                </View>
+            )}
+
+            {page === 'email' && (
+                <View style={styles.section}>
+                    <Animated.View
+                        style={styles.box}
+                        exiting={SlideOutLeft}
+                        entering={SlideInRight.delay(500).easing(
+                            Easing.inOut(Easing.quad),
+                        )}>
                         <TextInput
                             placeholder="Email"
                             placeholderTextColor={PALETTE.neutral[3]}
@@ -74,11 +118,23 @@ const SignUp = ({
                             style={styles.textInput}
                             onChangeText={setEmail}
                         />
-                    </View>
+                    </Animated.View>
                     <Text style={styles.hintText}>
                         Your email can not be changed later.
                     </Text>
+
+                    <View style={styles.buttonContainer}>
+                        <AnimatedButton
+                            style={styles.signUpButton}
+                            textStyle={styles.signUpButtonText}
+                            onPress={() => setPage('name')}
+                            disabled={isLoading}>
+                            Next
+                        </AnimatedButton>
+                    </View>
                 </View>
+            )}
+            {/* <ScrollView>
                 <View style={styles.section}>
                     <SectionHeader>Details</SectionHeader>
                     <UpdateDetailsWidget
@@ -110,7 +166,7 @@ const SignUp = ({
                         {isLoading ? <ActivityIndicator /> : 'Sign Up'}
                     </AnimatedButton>
                 </View>
-            </ScrollView>
+            </ScrollView> */}
         </View>
     );
 };
@@ -162,6 +218,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: '100%',
         alignSelf: 'center',
+        marginHorizontal: 10,
     },
     signUpButtonText: {
         color: PALETTE.gray[1],
