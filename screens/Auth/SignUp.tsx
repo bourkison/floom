@@ -1,18 +1,15 @@
 import {StackScreenProps} from '@react-navigation/stack';
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
 import React, {useState} from 'react';
 import {
     StyleSheet,
     View,
     Text,
     TextInput,
-    useWindowDimensions,
-    KeyboardAvoidingView,
+    ActivityIndicator,
 } from 'react-native';
 import Animated, {
-    BaseAnimationBuilder,
     Easing,
-    EntryExitAnimationFunction,
     SlideInLeft,
     SlideInRight,
     SlideOutLeft,
@@ -24,13 +21,24 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
 import {AuthStackParamList} from '@/nav/Navigator';
-import {Database} from '@/types/schema';
+import {supabase} from '@/services/supabase';
+// import {Database} from '@/types/schema';
 
-type UserRow = Database['public']['Tables']['users']['Row'];
+// type UserRow = Database['public']['Tables']['users']['Row'];
 
-const SIGN_UP_STAGES = ['name', 'email', 'password', 'dob', 'verify'] as const;
-const MIN_AGE = dayjs().subtract(16, 'year').toDate();
+const SIGN_UP_STAGES = [
+    'name',
+    'email',
+    'password',
+    'confPassword',
+    'verify',
+    'dob',
+] as const;
+// const MIN_AGE = dayjs().subtract(16, 'year').toDate();
 const ANIMATION_DURATION = 400;
+
+// TODO: Find a better way to do this for initial load.
+const instantAnimation = new SlideInRight().duration(0).build();
 
 const slideInLeftAnimation = new SlideInLeft()
     .easing(Easing.quad)
@@ -50,19 +58,16 @@ const slideOutRightAnimation = new SlideOutRight()
     .duration(ANIMATION_DURATION)
     .build();
 
-const SignUp = ({
-    navigation,
-}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
+const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
     const [pageIndex, setPageIndex] = useState(0);
-    const transitionDirection = useSharedValue<'next' | 'previous'>('next');
+    const transitionDirection = useSharedValue<'next' | 'previous' | ''>('');
 
     const [isLoading, setIsLoading] = useState(false);
 
     const [email, setEmail] = useState('');
-
     const [name, setName] = useState('');
-    const [dob, setDob] = useState(MIN_AGE);
-    const [gender, setGender] = useState<UserRow['gender'] | ''>('');
+    // const [dob, setDob] = useState(MIN_AGE);
+    // const [gender, setGender] = useState<UserRow['gender'] | ''>('');
 
     const [password, setPassword] = useState('');
     const [confPassword, setConfPassword] = useState('');
@@ -71,6 +76,10 @@ const SignUp = ({
 
     const CustomEnterAnimation = (values: any) => {
         'worklet';
+
+        if (transitionDirection.value === '') {
+            return instantAnimation(values);
+        }
 
         return transitionDirection.value === 'next'
             ? slideInRightAnimation(values)
@@ -85,17 +94,22 @@ const SignUp = ({
             : slideOutRightAnimation(values);
     };
 
-    const validateForm = (): boolean => {
-        if (password !== confPassword) {
-            return false;
+    const supabaseSignUp = async () => {
+        setIsLoading(true);
+
+        const {data, error} = await supabase.auth.signUp({email, password});
+
+        setIsLoading(false);
+
+        if (error) {
+            console.error(error);
+            return;
         }
 
-        return true;
-    };
+        const verifyIndex = SIGN_UP_STAGES.findIndex(val => val === 'verify');
+        setPageIndex(verifyIndex);
 
-    const signUp = async () => {
-        validateForm();
-        setIsLoading(true);
+        console.log('data', data);
     };
 
     const nextPage = () => {
@@ -150,14 +164,15 @@ const SignUp = ({
                         Your name can not be changed later.
                     </Text>
 
-                    <View style={styles.buttonContainer}>
-                        <AnimatedButton
-                            style={styles.button}
-                            textStyle={styles.buttonText}
-                            onPress={nextPage}
-                            disabled={isLoading}>
-                            Next
-                        </AnimatedButton>
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.nextButton}
+                                textStyle={styles.nextButtonText}
+                                onPress={nextPage}>
+                                Next
+                            </AnimatedButton>
+                        </View>
                     </View>
                 </Animated.View>
             )}
@@ -187,14 +202,113 @@ const SignUp = ({
                         want us to).
                     </Text> */}
 
-                    <View style={styles.buttonContainer}>
-                        <AnimatedButton
-                            style={styles.button}
-                            textStyle={styles.buttonText}
-                            onPress={previousPage}
-                            disabled={isLoading}>
-                            Previous
-                        </AnimatedButton>
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.previousButton}
+                                textStyle={styles.previousButtonText}
+                                onPress={previousPage}>
+                                Previous
+                            </AnimatedButton>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.nextButton}
+                                textStyle={styles.nextButtonText}
+                                onPress={nextPage}>
+                                Next
+                            </AnimatedButton>
+                        </View>
+                    </View>
+                </Animated.View>
+            )}
+
+            {pageIndex === 2 && (
+                <Animated.View
+                    style={styles.section}
+                    exiting={CustomExitAnimation}
+                    entering={CustomEnterAnimation}>
+                    <View style={styles.box}>
+                        <TextInput
+                            autoCapitalize="none"
+                            autoComplete="off"
+                            autoCorrect={false}
+                            secureTextEntry
+                            value={password}
+                            style={styles.textInput}
+                            onChangeText={setPassword}
+                            onSubmitEditing={nextPage}
+                        />
+                    </View>
+
+                    <Text style={styles.hintText}>
+                        Set your password, we'll ask you to confirm it next
+                        page.
+                    </Text>
+
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.previousButton}
+                                textStyle={styles.previousButtonText}
+                                onPress={previousPage}>
+                                Previous
+                            </AnimatedButton>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.nextButton}
+                                textStyle={styles.nextButtonText}
+                                onPress={nextPage}>
+                                Next
+                            </AnimatedButton>
+                        </View>
+                    </View>
+                </Animated.View>
+            )}
+
+            {pageIndex === 3 && (
+                <Animated.View
+                    style={styles.section}
+                    exiting={CustomExitAnimation}
+                    entering={CustomEnterAnimation}>
+                    <View style={styles.box}>
+                        <TextInput
+                            autoCapitalize="none"
+                            autoComplete="off"
+                            autoCorrect={false}
+                            secureTextEntry
+                            value={confPassword}
+                            style={styles.textInput}
+                            onChangeText={setConfPassword}
+                            onSubmitEditing={nextPage}
+                        />
+                    </View>
+                    <Text style={styles.hintText}>Confirm your password.</Text>
+
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.previousButton}
+                                textStyle={styles.previousButtonText}
+                                onPress={previousPage}>
+                                Previous
+                            </AnimatedButton>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.nextButton}
+                                textStyle={styles.nextButtonText}
+                                onPress={supabaseSignUp}
+                                // disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator size={14} />
+                                ) : (
+                                    'Create Account'
+                                )}
+                            </AnimatedButton>
+                        </View>
                     </View>
                 </Animated.View>
             )}
@@ -221,7 +335,7 @@ const SignUp = ({
                         setConfirmNewPassword={setConfPassword}
                     />
                 </View>
-                <View style={styles.buttonContainer}>
+                <View style={styles.buttonsContainer}>
                     <AnimatedButton
                         style={styles.button}
                         textStyle={styles.buttonText}
@@ -246,6 +360,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         borderColor: PALETTE.neutral[9],
         borderBottomWidth: 3,
+        textAlign: 'center',
     },
     section: {paddingHorizontal: 25, width: '100%'},
     box: {},
@@ -268,7 +383,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         marginTop: 3,
     },
-    button: {
+    nextButton: {
         padding: 7,
         backgroundColor: PALETTE.neutral[8],
         justifyContent: 'center',
@@ -276,9 +391,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: '100%',
         alignSelf: 'center',
-        marginHorizontal: 10,
+        marginLeft: 10,
     },
-    buttonText: {
+    nextButtonText: {
         color: PALETTE.gray[1],
         fontSize: 12,
         fontWeight: 'bold',
@@ -287,7 +402,32 @@ const styles = StyleSheet.create({
         flexShrink: 0,
         flexGrow: 0,
     },
-    buttonContainer: {paddingHorizontal: 10, marginTop: 10},
+    previousButton: {
+        padding: 7,
+        borderColor: PALETTE.neutral[9],
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        width: '100%',
+        marginRight: 10,
+        alignSelf: 'center',
+    },
+    previousButtonText: {
+        color: PALETTE.neutral[9],
+        fontSize: 12,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    buttonContainer: {flex: 1},
+    buttonsContainer: {
+        paddingHorizontal: 10,
+        marginTop: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 
 export default SignUp;
