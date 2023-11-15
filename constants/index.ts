@@ -74,3 +74,5 @@ export const GENDER_OPTIONS = [
     {value: 'female', label: 'Female'},
     {value: 'other', label: 'Both'},
 ] as const;
+
+export const MIN_AGE = 16;

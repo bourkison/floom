@@ -20,12 +20,9 @@ import Animated, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
-import {PALETTE} from '@/constants';
+import {MIN_AGE, PALETTE} from '@/constants';
 import {AuthStackParamList} from '@/nav/Navigator';
 import {supabase} from '@/services/supabase';
-// import {Database} from '@/types/schema';
-
-// type UserRow = Database['public']['Tables']['users']['Row'];
 
 export const SIGN_UP_STAGES = [
     'name',
@@ -35,7 +32,7 @@ export const SIGN_UP_STAGES = [
     'verify',
     'additionalInfo',
 ] as const;
-const MIN_AGE = dayjs().subtract(16, 'year').toDate();
+const MIN_AGE_DOB = dayjs().subtract(MIN_AGE, 'year').toDate();
 const ANIMATION_DURATION = 400;
 
 // TODO: Find a better way to do this for initial load.
@@ -60,20 +57,18 @@ const slideOutRightAnimation = new SlideOutRight()
     .build();
 
 const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
-    const [pageIndex, setPageIndex] = useState(0);
+    const [pageIndex, setPageIndex] = useState(route.params.startPageIndex);
     const transitionDirection = useSharedValue<'next' | 'previous' | ''>('');
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const [email, setEmail] = useState('');
     const [name, setName] = useState('');
-    const [token, setToken] = useState('');
-
-    const [dob, setDob] = useState(MIN_AGE);
-    // const [gender, setGender] = useState<UserRow['gender'] | ''>('');
-
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confPassword, setConfPassword] = useState('');
+    const [token, setToken] = useState('');
+    // const [gender, setGender] = useState<UserRow['gender'] | ''>('');
+    const [dob, setDob] = useState(MIN_AGE_DOB);
 
     const {top, bottom, left, right} = useSafeAreaInsets();
 
@@ -421,37 +416,52 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
             )}
 
             {pageIndex === 5 && (
-                <Animated.View
-                    style={[
-                        [styles.section, {paddingBottom: bottom}],
-                        {backgroundColor: 'red'},
-                    ]}
-                    exiting={CustomExitAnimation}
-                    entering={CustomEnterAnimation}>
-                    <Text>Additional Info.</Text>
+                <View
+                    style={{
+                        width: '100%',
+                        flex: 1,
+                    }}>
+                    <View />
+                    <Animated.View
+                        style={[
+                            [styles.section, {paddingBottom: bottom}],
+                            {backgroundColor: 'red'},
+                        ]}
+                        exiting={CustomExitAnimation}
+                        entering={CustomEnterAnimation}>
+                        <Text>Additional Info.</Text>
 
-                    <View style={styles.buttonsContainer}>
-                        <View style={styles.buttonContainer}>
-                            <AnimatedButton
-                                style={styles.nextButton}
-                                textStyle={styles.nextButtonText}
-                                onPress={verify}
-                                disabled={isLoading}>
-                                {isLoading ? (
-                                    <ActivityIndicator size={14} />
-                                ) : (
-                                    'Finish'
-                                )}
-                            </AnimatedButton>
+                        <View style={styles.buttonsContainer}>
+                            <View style={styles.buttonContainer}>
+                                <AnimatedButton
+                                    style={styles.nextButton}
+                                    textStyle={styles.nextButtonText}
+                                    onPress={verify}
+                                    disabled={isLoading}>
+                                    {isLoading ? (
+                                        <ActivityIndicator size={14} />
+                                    ) : (
+                                        'Finish'
+                                    )}
+                                </AnimatedButton>
+                            </View>
                         </View>
+                    </Animated.View>
+                    <View
+                        style={{
+                            width: '100%',
+                            justifyContent: 'flex-end',
+                            alignSelf: 'flex-end',
+                        }}>
+                        <DateTimePicker
+                            maximumDate={MIN_AGE_DOB}
+                            value={dob}
+                            mode="date"
+                            display="spinner"
+                            onChange={(_, d) => (d ? setDob(d) : undefined)}
+                        />
                     </View>
-
-                    <DateTimePicker
-                        maximumDate={MIN_AGE}
-                        value={dob}
-                        onChange={(_, d) => (d ? setDob(d) : undefined)}
-                    />
-                </Animated.View>
+                </View>
             )}
         </View>
     );
