@@ -1,5 +1,6 @@
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {StackScreenProps} from '@react-navigation/stack';
-// import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import React, {useState} from 'react';
 import {
     StyleSheet,
@@ -26,15 +27,15 @@ import {supabase} from '@/services/supabase';
 
 // type UserRow = Database['public']['Tables']['users']['Row'];
 
-const SIGN_UP_STAGES = [
+export const SIGN_UP_STAGES = [
     'name',
     'email',
     'password',
     'confPassword',
     'verify',
-    'dob',
+    'additionalInfo',
 ] as const;
-// const MIN_AGE = dayjs().subtract(16, 'year').toDate();
+const MIN_AGE = dayjs().subtract(16, 'year').toDate();
 const ANIMATION_DURATION = 400;
 
 // TODO: Find a better way to do this for initial load.
@@ -58,7 +59,7 @@ const slideOutRightAnimation = new SlideOutRight()
     .duration(ANIMATION_DURATION)
     .build();
 
-const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
+const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
     const [pageIndex, setPageIndex] = useState(0);
     const transitionDirection = useSharedValue<'next' | 'previous' | ''>('');
 
@@ -66,7 +67,9 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
 
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
-    // const [dob, setDob] = useState(MIN_AGE);
+    const [token, setToken] = useState('');
+
+    const [dob, setDob] = useState(MIN_AGE);
     // const [gender, setGender] = useState<UserRow['gender'] | ''>('');
 
     const [password, setPassword] = useState('');
@@ -112,8 +115,56 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
         console.log('data', data);
     };
 
+    const verify = async () => {
+        setIsLoading(true);
+
+        const {data, error} = await supabase.auth.verifyOtp({
+            email,
+            token,
+            type: 'email',
+        });
+
+        setIsLoading(false);
+
+        if (error) {
+            console.error(error);
+            // TODO: THIS NEEDS TO CHANGE IN PRODUCTION.
+            // return;
+        }
+
+        const additionalInfoIndex = SIGN_UP_STAGES.findIndex(
+            val => val === 'additionalInfo',
+        );
+        setPageIndex(additionalInfoIndex);
+
+        console.log('data', data);
+    };
+
     const nextPage = () => {
         transitionDirection.value = 'next';
+
+        const confPasswordIndex = SIGN_UP_STAGES.findIndex(
+            val => val === 'confPassword',
+        );
+        const verifyIndex = SIGN_UP_STAGES.findIndex(val => val === 'verify');
+        const additionalInfoIndex = SIGN_UP_STAGES.findIndex(
+            val => val === 'additionalInfo',
+        );
+
+        if (pageIndex === confPasswordIndex) {
+            console.warn('Attempting to move next page on confPasswordIndex');
+            return;
+        }
+
+        if (pageIndex === verifyIndex) {
+            console.warn('Attempting to move next page on verifyIndex');
+            return;
+        }
+
+        if (pageIndex === additionalInfoIndex) {
+            console.warn('Attempting to move next page on additionalInfoIndex');
+            return;
+        }
 
         if (pageIndex + 2 > SIGN_UP_STAGES.length) {
             console.error('Trying to increment pageIndex above page amount');
@@ -125,6 +176,23 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
 
     const previousPage = () => {
         transitionDirection.value = 'previous';
+
+        const verifyIndex = SIGN_UP_STAGES.findIndex(val => val === 'verify');
+        const additionalInfoIndex = SIGN_UP_STAGES.findIndex(
+            val => val === 'additionalInfo',
+        );
+
+        if (pageIndex === verifyIndex) {
+            console.warn('Attempting to move previous page on verifyIndex');
+            return;
+        }
+
+        if (pageIndex === additionalInfoIndex) {
+            console.warn(
+                'Attempting to move previous page on additionalInfoIndex',
+            );
+            return;
+        }
 
         if (pageIndex - 1 < 0) {
             console.error('Trying to increment pageIndex below 0');
@@ -140,17 +208,16 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                 styles.container,
                 {
                     paddingTop: top,
-                    paddingBottom: bottom,
                     paddingLeft: left,
                     paddingRight: right,
                 },
             ]}>
             {pageIndex === 0 && (
                 <Animated.View
-                    style={styles.section}
+                    style={[styles.section, {paddingBottom: bottom}]}
                     entering={CustomEnterAnimation}
                     exiting={CustomExitAnimation}>
-                    <View style={styles.box}>
+                    <View style={[styles.box]}>
                         <TextInput
                             autoComplete="name"
                             autoCorrect={false}
@@ -158,6 +225,7 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                             style={styles.textInput}
                             onChangeText={setName}
                             onSubmitEditing={nextPage}
+                            returnKeyType="next"
                         />
                     </View>
                     <Text style={styles.hintText}>
@@ -179,10 +247,10 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
 
             {pageIndex === 1 && (
                 <Animated.View
-                    style={styles.section}
+                    style={[styles.section, {paddingBottom: bottom}]}
                     exiting={CustomExitAnimation}
                     entering={CustomEnterAnimation}>
-                    <View style={styles.box}>
+                    <View style={[styles.box]}>
                         <TextInput
                             autoCapitalize="none"
                             autoComplete="email"
@@ -192,6 +260,7 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                             style={styles.textInput}
                             onChangeText={setEmail}
                             onSubmitEditing={nextPage}
+                            returnKeyType="next"
                         />
                     </View>
                     <Text style={styles.hintText}>
@@ -225,10 +294,10 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
 
             {pageIndex === 2 && (
                 <Animated.View
-                    style={styles.section}
+                    style={[styles.section, {paddingBottom: bottom}]}
                     exiting={CustomExitAnimation}
                     entering={CustomEnterAnimation}>
-                    <View style={styles.box}>
+                    <View style={[styles.box]}>
                         <TextInput
                             autoCapitalize="none"
                             autoComplete="off"
@@ -238,6 +307,7 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                             style={styles.textInput}
                             onChangeText={setPassword}
                             onSubmitEditing={nextPage}
+                            returnKeyType="next"
                         />
                     </View>
 
@@ -269,10 +339,10 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
 
             {pageIndex === 3 && (
                 <Animated.View
-                    style={styles.section}
+                    style={[styles.section, {paddingBottom: bottom}]}
                     exiting={CustomExitAnimation}
                     entering={CustomEnterAnimation}>
-                    <View style={styles.box}>
+                    <View style={[styles.box]}>
                         <TextInput
                             autoCapitalize="none"
                             autoComplete="off"
@@ -281,7 +351,8 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                             value={confPassword}
                             style={styles.textInput}
                             onChangeText={setConfPassword}
-                            onSubmitEditing={nextPage}
+                            onSubmitEditing={supabaseSignUp}
+                            returnKeyType="next"
                         />
                     </View>
                     <Text style={styles.hintText}>Confirm your password.</Text>
@@ -300,8 +371,7 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                                 style={styles.nextButton}
                                 textStyle={styles.nextButtonText}
                                 onPress={supabaseSignUp}
-                                // disabled={isLoading}
-                            >
+                                disabled={isLoading}>
                                 {isLoading ? (
                                     <ActivityIndicator size={14} />
                                 ) : (
@@ -312,39 +382,77 @@ const SignUp = (_: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                     </View>
                 </Animated.View>
             )}
-            {/* <ScrollView>
-                <View style={styles.section}>
-                    <SectionHeader>Details</SectionHeader>
-                    <UpdateDetailsWidget
-                        name={name}
-                        setName={setName}
-                        gender={gender}
-                        setGender={setGender}
-                        dob={dob}
-                        setDob={setDob}
-                        isUpdate={false}
+
+            {pageIndex === 4 && (
+                <Animated.View
+                    style={[styles.section, {paddingBottom: bottom}]}
+                    exiting={CustomExitAnimation}
+                    entering={CustomEnterAnimation}>
+                    <View style={[styles.box]}>
+                        <TextInput
+                            autoComplete="off"
+                            autoCapitalize="characters"
+                            autoCorrect={false}
+                            value={token}
+                            style={styles.textInput}
+                            onChangeText={setToken}
+                            onSubmitEditing={verify}
+                            returnKeyType="next"
+                        />
+                    </View>
+                    <Text style={styles.hintText}>Verify email</Text>
+
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.nextButton}
+                                textStyle={styles.nextButtonText}
+                                onPress={verify}
+                                disabled={isLoading}>
+                                {isLoading ? (
+                                    <ActivityIndicator size={14} />
+                                ) : (
+                                    'Verify'
+                                )}
+                            </AnimatedButton>
+                        </View>
+                    </View>
+                </Animated.View>
+            )}
+
+            {pageIndex === 5 && (
+                <Animated.View
+                    style={[
+                        [styles.section, {paddingBottom: bottom}],
+                        {backgroundColor: 'red'},
+                    ]}
+                    exiting={CustomExitAnimation}
+                    entering={CustomEnterAnimation}>
+                    <Text>Additional Info.</Text>
+
+                    <View style={styles.buttonsContainer}>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.nextButton}
+                                textStyle={styles.nextButtonText}
+                                onPress={verify}
+                                disabled={isLoading}>
+                                {isLoading ? (
+                                    <ActivityIndicator size={14} />
+                                ) : (
+                                    'Finish'
+                                )}
+                            </AnimatedButton>
+                        </View>
+                    </View>
+
+                    <DateTimePicker
+                        maximumDate={MIN_AGE}
+                        value={dob}
+                        onChange={(_, d) => (d ? setDob(d) : undefined)}
                     />
-                </View>
-                <View style={[styles.section, styles.topMargin]}>
-                    <SectionHeader>Password</SectionHeader>
-                    <UpdatePasswordWidget
-                        isUpdate={false}
-                        newPassword={password}
-                        setNewPassword={setPassword}
-                        confirmNewPassword={confPassword}
-                        setConfirmNewPassword={setConfPassword}
-                    />
-                </View>
-                <View style={styles.buttonsContainer}>
-                    <AnimatedButton
-                        style={styles.button}
-                        textStyle={styles.buttonText}
-                        onPress={signUp}
-                        disabled={isLoading}>
-                        {isLoading ? <ActivityIndicator /> : 'Sign Up'}
-                    </AnimatedButton>
-                </View>
-            </ScrollView> */}
+                </Animated.View>
+            )}
         </View>
     );
 };
@@ -362,8 +470,15 @@ const styles = StyleSheet.create({
         borderBottomWidth: 3,
         textAlign: 'center',
     },
-    section: {paddingHorizontal: 25, width: '100%'},
-    box: {},
+    section: {
+        paddingHorizontal: 25,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    box: {
+        width: '100%',
+    },
     inputHeader: {
         textTransform: 'uppercase',
         color: PALETTE.rose[4],

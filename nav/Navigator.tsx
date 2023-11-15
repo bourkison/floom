@@ -8,11 +8,8 @@ import SignUp from '@/screens/Auth/SignUp';
 export type AuthStackParamList = {
     HomeAuth: undefined;
     GuestWelcome: undefined;
-    SignUp: undefined;
-    VerifyEmail: {
-        username: string;
-        password: string;
-        sendCodeOnLoad?: boolean;
+    SignUp: {
+        startPageIndex: number;
     };
     Login: undefined;
 };
@@ -30,6 +27,7 @@ export default function Navigator() {
             <AuthStack.Screen
                 name="SignUp"
                 component={SignUp}
+                initialParams={{startPageIndex: 0}}
                 options={{headerShown: false /*gestureEnabled: false*/}}
             />
             <AuthStack.Screen

@@ -30,7 +30,7 @@ const HomeAuth = ({
 
     const navigateToSignUp = () => {
         VideoRef.current?.pauseAsync();
-        navigation.navigate('SignUp');
+        navigation.navigate('SignUp', {startPageIndex: 0});
     };
 
     const navigateToGuest = () => {
