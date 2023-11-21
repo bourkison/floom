@@ -19,7 +19,7 @@ type AnimatedButtonProps = {
     onPress?: () => void;
     style: ViewStyle;
     textStyle?: ViewStyle | TextStyle;
-    children: string | JSX.Element;
+    children: string | React.JSX.Element;
     scale?: number;
     disabled?: boolean;
     disabledColor?: Color;
