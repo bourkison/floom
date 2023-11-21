@@ -1,6 +1,7 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {StackScreenProps} from '@react-navigation/stack';
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 import React, {useState} from 'react';
 import {
     StyleSheet,
@@ -19,10 +20,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import SetGender from '@/components/User/SetGender';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {MIN_AGE, PALETTE} from '@/constants';
 import {AuthStackParamList} from '@/nav/Navigator';
 import {supabase} from '@/services/supabase';
+import {Gender} from '@/types';
 
 export const SIGN_UP_STAGES = [
     'name',
@@ -56,6 +59,8 @@ const slideOutRightAnimation = new SlideOutRight()
     .duration(ANIMATION_DURATION)
     .build();
 
+dayjs.extend(advancedFormat);
+
 const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
     const [pageIndex, setPageIndex] = useState(route.params.startPageIndex);
     const transitionDirection = useSharedValue<'next' | 'previous' | ''>('');
@@ -67,8 +72,9 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
     const [password, setPassword] = useState('');
     const [confPassword, setConfPassword] = useState('');
     const [token, setToken] = useState('');
-    // const [gender, setGender] = useState<UserRow['gender'] | ''>('');
+    const [gender, setGender] = useState<Gender>('both');
     const [dob, setDob] = useState(MIN_AGE_DOB);
+    const [userId, setUserId] = useState('');
 
     const {top, bottom, left, right} = useSafeAreaInsets();
 
@@ -104,10 +110,39 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
             return;
         }
 
+        setUserId(data.user?.id || '');
+
         const verifyIndex = SIGN_UP_STAGES.findIndex(val => val === 'verify');
         setPageIndex(verifyIndex);
 
         console.log('data', data);
+    };
+
+    const createUser = async () => {
+        setIsLoading(true);
+
+        console.log('CREATING WITH:', {
+            id: userId,
+            dob: dayjs(dob).format('YYYY-MM-D'),
+            email,
+            gender,
+            name,
+        });
+
+        const {data, error} = await supabase.from('users').insert({
+            id: userId,
+            dob: dayjs(dob).format('YYYY-MM-D'),
+            email,
+            gender,
+            name,
+        });
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        console.log('SUCCESSFUL CREATION', data);
     };
 
     const verify = async () => {
@@ -119,20 +154,29 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
             type: 'email',
         });
 
-        setIsLoading(false);
-
         if (error) {
             console.error(error);
             // TODO: THIS NEEDS TO CHANGE IN PRODUCTION.
             // return;
         }
 
+        const {data: loginData, error: loginError} =
+            await supabase.auth.signInWithPassword({email, password});
+
+        setIsLoading(false);
+
+        if (loginError) {
+            console.error('LOGIN ERROR:', loginError);
+            return;
+        }
+
+        console.log('verify data', data);
+        console.log('login data', loginData);
+
         const additionalInfoIndex = SIGN_UP_STAGES.findIndex(
             val => val === 'additionalInfo',
         );
         setPageIndex(additionalInfoIndex);
-
-        console.log('data', data);
     };
 
     const nextPage = () => {
@@ -417,35 +461,37 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
 
             {pageIndex === 5 && (
                 <Animated.View
-                    style={[{backgroundColor: 'red', flex: 1, width: '100%'}]}
+                    style={{flex: 1, width: '100%'}}
                     exiting={CustomExitAnimation}
                     entering={CustomEnterAnimation}>
                     <View style={[styles.section, {flex: 1}]}>
-                        <Text>Additional Info.</Text>
+                        <SetGender onChange={setGender} value={gender} />
 
-                        <View style={styles.buttonsContainer}>
-                            <View style={styles.buttonContainer}>
-                                <AnimatedButton
-                                    style={styles.nextButton}
-                                    textStyle={styles.nextButtonText}
-                                    onPress={verify}
-                                    disabled={isLoading}>
-                                    {isLoading ? (
-                                        <ActivityIndicator size={14} />
-                                    ) : (
-                                        'Finish'
-                                    )}
-                                </AnimatedButton>
-                            </View>
+                        <View style={{width: '100%', marginTop: 25}}>
+                            <Text>Date of Birth</Text>
+                            <Text>{dayjs(dob).format('Do of MMMM, YYYY')}</Text>
+                        </View>
+                    </View>
+
+                    <View style={[styles.buttonsContainer, {marginBottom: 25}]}>
+                        <View style={styles.buttonContainer}>
+                            <AnimatedButton
+                                style={styles.nextButton}
+                                textStyle={styles.nextButtonText}
+                                onPress={createUser}
+                                disabled={isLoading}>
+                                {isLoading ? (
+                                    <ActivityIndicator size={14} />
+                                ) : (
+                                    'Finish'
+                                )}
+                            </AnimatedButton>
                         </View>
                     </View>
 
                     <View
                         style={{
                             width: '100%',
-                            backgroundColor: 'violet',
-                            justifyContent: 'flex-end',
-                            alignSelf: 'flex-end',
                         }}>
                         <DateTimePicker
                             maximumDate={MIN_AGE_DOB}
