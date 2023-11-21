@@ -416,19 +416,11 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
             )}
 
             {pageIndex === 5 && (
-                <View
-                    style={{
-                        width: '100%',
-                        flex: 1,
-                    }}>
-                    <View />
-                    <Animated.View
-                        style={[
-                            [styles.section, {paddingBottom: bottom}],
-                            {backgroundColor: 'red'},
-                        ]}
-                        exiting={CustomExitAnimation}
-                        entering={CustomEnterAnimation}>
+                <Animated.View
+                    style={[{backgroundColor: 'red', flex: 1, width: '100%'}]}
+                    exiting={CustomExitAnimation}
+                    entering={CustomEnterAnimation}>
+                    <View style={[styles.section, {flex: 1}]}>
                         <Text>Additional Info.</Text>
 
                         <View style={styles.buttonsContainer}>
@@ -446,10 +438,12 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                                 </AnimatedButton>
                             </View>
                         </View>
-                    </Animated.View>
+                    </View>
+
                     <View
                         style={{
                             width: '100%',
+                            backgroundColor: 'violet',
                             justifyContent: 'flex-end',
                             alignSelf: 'flex-end',
                         }}>
@@ -458,10 +452,10 @@ const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
                             value={dob}
                             mode="date"
                             display="spinner"
-                            onChange={(_, d) => (d ? setDob(d) : undefined)}
+                            onChange={(_, d) => d && setDob(d)}
                         />
                     </View>
-                </View>
+                </Animated.View>
             )}
         </View>
     );
