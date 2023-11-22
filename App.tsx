@@ -1,8 +1,8 @@
 import {NavigationContainer} from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import {StatusBar} from 'expo-status-bar';
-import React, {useCallback, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
@@ -16,29 +16,27 @@ SplashScreen.preventAutoHideAsync();
 export default function App() {
     const [appIsReady, setAppIsReady] = useState(false);
 
-    const onLayoutRootView = useCallback(async () => {
+    useEffect(() => {
         if (appIsReady) {
-            await SplashScreen.hideAsync();
+            SplashScreen.hideAsync();
         }
     }, [appIsReady]);
 
     return (
-        <View onLayout={onLayoutRootView} style={styles.flexOne}>
-            <Provider store={store}>
-                <SafeAreaProvider>
-                    <GestureHandlerRootView style={styles.flexOne}>
-                        <AppLoader
-                            appIsReady={appIsReady}
-                            setAppIsReady={setAppIsReady}>
-                            <NavigationContainer>
-                                <StatusBar style="dark" />
-                                <Navigator />
-                            </NavigationContainer>
-                        </AppLoader>
-                    </GestureHandlerRootView>
-                </SafeAreaProvider>
-            </Provider>
-        </View>
+        <Provider store={store}>
+            <SafeAreaProvider>
+                <GestureHandlerRootView style={styles.flexOne}>
+                    <AppLoader
+                        appIsReady={appIsReady}
+                        setAppIsReady={setAppIsReady}>
+                        <NavigationContainer>
+                            <StatusBar style="dark" />
+                            <Navigator />
+                        </NavigationContainer>
+                    </AppLoader>
+                </GestureHandlerRootView>
+            </SafeAreaProvider>
+        </Provider>
     );
 }
 

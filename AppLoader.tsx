@@ -19,6 +19,7 @@ export default function AppLoader({
     const dispatch = useAppDispatch();
     const [userLoaded, setUserLoaded] = useState(false);
 
+    // LOAD FONTS
     const [fontsLoaded] = useFonts({
         'Gilroy-ExtraBold': require('@/assets/fonts/Gilroy-ExtraBold.otf'),
         'Gilroy-Light': require('@/assets/fonts/Gilroy-Light.otf'),
@@ -27,6 +28,7 @@ export default function AppLoader({
         'JosefinSans-Regular': require('@/assets/fonts/JosefinSans-Regular.ttf'),
     });
 
+    // LOAD USER
     useEffect(() => {
         const initFetch = async () => {
             const {
@@ -42,6 +44,7 @@ export default function AppLoader({
             const {data, error} = await supabase
                 .from('users')
                 .select()
+                .eq('id', user.id)
                 .limit(1)
                 .single();
 
@@ -55,6 +58,7 @@ export default function AppLoader({
                 return;
             }
 
+            console.log('USER DATA', data);
             dispatch(login(data));
             setUserLoaded(true);
         };
