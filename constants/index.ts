@@ -66,6 +66,8 @@ export const DELETE_TEXT = 'Hide';
 export const SAVE_TEXT = 'Save';
 export const BUY_TEXT = 'Buy';
 
+export const LOCAL_KEY_SAVED_PRODUCTS = '@savedProducts';
+export const LOCAL_KEY_DELETED_PRODUCTS = '@deletedProducts';
 export const MAX_LOCAL_SAVED_PRODUCTS = 100;
 export const MAX_LOCAL_DELETED_PRODUCTS = 100;
 

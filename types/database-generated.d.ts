@@ -178,7 +178,56 @@ export interface Database {
             };
         };
         Views: {
-            [_ in never]: never;
+            v_products: {
+                Row: {
+                    brand: string | null;
+                    categories: string[] | null;
+                    colors: string[] | null;
+                    created_at: string | null;
+                    gender: string | null;
+                    id: number | null;
+                    images: string[] | null;
+                    in_stock: boolean | null;
+                    link: string | null;
+                    name: string | null;
+                    price: number | null;
+                    sale_price: number | null;
+                    updated_at: string | null;
+                    vendor_product_id: string | null;
+                };
+                Insert: {
+                    brand?: string | null;
+                    categories?: string[] | null;
+                    colors?: string[] | null;
+                    created_at?: string | null;
+                    gender?: string | null;
+                    id?: number | null;
+                    images?: string[] | null;
+                    in_stock?: boolean | null;
+                    link?: string | null;
+                    name?: string | null;
+                    price?: number | null;
+                    sale_price?: number | null;
+                    updated_at?: string | null;
+                    vendor_product_id?: string | null;
+                };
+                Update: {
+                    brand?: string | null;
+                    categories?: string[] | null;
+                    colors?: string[] | null;
+                    created_at?: string | null;
+                    gender?: string | null;
+                    id?: number | null;
+                    images?: string[] | null;
+                    in_stock?: boolean | null;
+                    link?: string | null;
+                    name?: string | null;
+                    price?: number | null;
+                    sale_price?: number | null;
+                    updated_at?: string | null;
+                    vendor_product_id?: string | null;
+                };
+            };
         };
         Functions: {
             [_ in never]: never;
