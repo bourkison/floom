@@ -264,6 +264,111 @@ export const saveProduct = createAsyncThunk<
     }
 });
 
+export const deleteSavedProduct = createAsyncThunk<
+    void,
+    number,
+    {rejectValue: PostgrestError | AuthError}
+>(
+    'product/deleteSavedProduct',
+    async (productId, {getState, rejectWithValue}) => {
+        const state = getState() as RootState;
+
+        if (state.user.isGuest) {
+            let currentSavedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+            );
+
+            const index = currentSavedProducts.findIndex(
+                p => p === productId.toString(),
+            );
+
+            if (index > -1) {
+                currentSavedProducts = [
+                    ...currentSavedProducts.slice(0, index),
+                    ...currentSavedProducts.slice(index + 1),
+                ];
+
+                await AsyncStorage.setItem(
+                    LOCAL_KEY_SAVED_PRODUCTS,
+                    JSON.stringify(currentSavedProducts),
+                );
+            } else {
+                throw new Error('Product not found');
+            }
+        } else {
+            const {data: userData, error: userError} =
+                await supabase.auth.getUser();
+
+            if (userError) {
+                return rejectWithValue(userError);
+            }
+
+            const {error} = await supabase
+                .from('saves')
+                .delete()
+                .eq('product_id', productId)
+                .eq('user_id', userData.user.id);
+
+            if (error) {
+                return rejectWithValue(error);
+            }
+        }
+    },
+);
+
+export const deleteDeletedProduct = createAsyncThunk<
+    void,
+    number,
+    {rejectValue: PostgrestError | AuthError}
+>(
+    'product/deleteDeletedProduct',
+    async (productId, {getState, rejectWithValue}) => {
+        const state = getState() as RootState;
+
+        if (state.user.isGuest) {
+            let currentDeletedProducts: string[] = JSON.parse(
+                (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
+                    '[]',
+            );
+
+            const index = currentDeletedProducts.findIndex(
+                p => p === productId.toString(),
+            );
+
+            if (index > -1) {
+                currentDeletedProducts = [
+                    ...currentDeletedProducts.slice(0, index),
+                    ...currentDeletedProducts.slice(index + 1),
+                ];
+
+                await AsyncStorage.setItem(
+                    LOCAL_KEY_DELETED_PRODUCTS,
+                    JSON.stringify(currentDeletedProducts),
+                );
+            } else {
+                throw new Error('Product not found');
+            }
+        } else {
+            const {data: userData, error: userError} =
+                await supabase.auth.getUser();
+
+            if (userError) {
+                return rejectWithValue(userError);
+            }
+
+            const {error} = await supabase
+                .from('deletes')
+                .delete()
+                .eq('product_id', productId)
+                .eq('user_id', userData.user.id);
+
+            if (error) {
+                return rejectWithValue(error);
+            }
+        }
+    },
+);
+
 export const deleteProduct = createAsyncThunk<
     void,
     number,
