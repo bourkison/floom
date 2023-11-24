@@ -5,6 +5,7 @@ import {
     createSlice,
     PayloadAction,
 } from '@reduxjs/toolkit';
+import {PostgrestError} from '@supabase/supabase-js';
 
 import {
     LOCAL_KEY_DELETED_PRODUCTS,
@@ -15,7 +16,6 @@ import {supabase} from '@/services/supabase';
 import {RootState} from '@/store';
 import {Gender} from '@/types';
 import {Database} from '@/types/schema';
-import {PostgrestError} from '@supabase/supabase-js';
 
 type ProductType = Database['public']['Views']['v_products']['Row'];
 type AnimationState = 'idle' | 'save' | 'buy' | 'delete';
@@ -71,11 +71,9 @@ export const loadUnsavedProducts = createAsyncThunk<
     {rejectValue: PostgrestError}
 >('product/loadUnsavedProducts', async (_, {getState, rejectWithValue}) => {
     const state = getState() as RootState;
+    let query = supabase.from('v_products').select();
 
     if (state.user.isGuest) {
-        // If user is a guest, exclude products within query itself.
-        let query = supabase.from('v_products').select();
-
         query = applyProductFilters(query, {
             gender: state.product.unsaved.filters.gender,
             category: state.product.unsaved.filters.category,
@@ -111,20 +109,80 @@ export const loadUnsavedProducts = createAsyncThunk<
 
         return data;
     } else {
-        // Else call the rpc function, which will pull from DB to exclude.
-        let query = supabase.rpc('exclude_products', {
-            exclude_deleted: state.product.unsaved.filters.excludeDeleted,
-            exclude_saved: state.product.unsaved.filters.excludeSaved,
-        });
-
-        query = applyProductFilters(query, {
+        const {data, error} = await applyProductFilters(query, {
             gender: state.product.unsaved.filters.gender,
             category: state.product.unsaved.filters.category,
             searchText: state.product.unsaved.filters.searchText,
             color: state.product.unsaved.filters.color,
+            excludeDeleted: state.product.unsaved.filters.excludeDeleted,
+            excludeSaved: state.product.unsaved.filters.excludeSaved,
         });
 
-        const {data, error} = await query;
+        if (error) {
+            return rejectWithValue(error);
+        }
+
+        return data;
+    }
+});
+
+export const loadSavedProducts = createAsyncThunk<
+    Database['public']['Views']['v_products']['Row'][],
+    void,
+    {rejectValue: PostgrestError}
+>('product/loadSavedProducts', async (_, {getState, rejectWithValue}) => {
+    const state = getState() as RootState;
+
+    let query = supabase.from('v_products').select();
+    query = applyProductFilters(query, state.product.saved.filters);
+
+    if (state.user.isGuest) {
+        const savedProducts = JSON.parse(
+            (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+        );
+
+        const {data, error} = await query.in('id', savedProducts);
+
+        if (error) {
+            return rejectWithValue(error);
+        }
+
+        return data;
+    } else {
+        const {data, error} = await query.eq('saved', true);
+
+        if (error) {
+            return rejectWithValue(error);
+        }
+
+        return data;
+    }
+});
+
+export const loadDeletedProducts = createAsyncThunk<
+    Database['public']['Views']['v_products']['Row'][],
+    void,
+    {rejectValue: PostgrestError}
+>('product/loadSavedProducts', async (_, {getState, rejectWithValue}) => {
+    const state = getState() as RootState;
+
+    let query = supabase.from('v_products').select();
+    query = applyProductFilters(query, state.product.saved.filters);
+
+    if (state.user.isGuest) {
+        const deletedProducts = JSON.parse(
+            (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) || '[]',
+        );
+
+        const {data, error} = await query.in('id', deletedProducts);
+
+        if (error) {
+            return rejectWithValue(error);
+        }
+
+        return data;
+    } else {
+        const {data, error} = await query.eq('deleted', true);
 
         if (error) {
             return rejectWithValue(error);

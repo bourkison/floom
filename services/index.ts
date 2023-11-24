@@ -14,6 +14,8 @@ type Filters = {
     category: string[];
     color: string[];
     searchText: string;
+    excludeSaved?: boolean;
+    excludeDeleted?: boolean;
 };
 
 export function applyProductFilters(
@@ -36,6 +38,14 @@ export function applyProductFilters(
 
     if (filters.gender !== 'both') {
         query = query.eq('gender', filters.gender);
+    }
+
+    if (filters.excludeSaved) {
+        query = query.eq('saved', filters.excludeSaved);
+    }
+
+    if (filters.excludeDeleted) {
+        query = query.eq('deleted', filters.excludeDeleted);
     }
 
     return query;
