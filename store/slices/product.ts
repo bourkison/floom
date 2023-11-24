@@ -67,10 +67,10 @@ export const loadUnsavedProducts = createAsyncThunk(
     async (_, {getState, rejectWithValue}) => {
         const state = getState() as RootState;
 
-        const query = supabase.from('v_products').select();
-
         if (state.user.isGuest) {
             // If user is a guest, exclude products within query itself.
+            const query = supabase.from('v_products').select();
+
             const excludeSaved = state.product.unsaved.filters.excludeSaved
                 ? JSON.parse(
                       (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) ||
@@ -101,7 +101,10 @@ export const loadUnsavedProducts = createAsyncThunk(
             return data;
         } else {
             // Else call the rpc function, which will pull from DB to exclude.
-            const {data, error} = await query;
+            const {data, error} = await supabase.rpc('exclude_products', {
+                exclude_deleted: true,
+                exclude_saved: false,
+            });
 
             if (error) {
                 rejectWithValue(error);
