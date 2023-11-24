@@ -10,9 +10,12 @@ import {
     LOCAL_KEY_DELETED_PRODUCTS,
     LOCAL_KEY_SAVED_PRODUCTS,
 } from '@/constants';
+import {applyProductFilters} from '@/services';
 import {supabase} from '@/services/supabase';
 import {RootState} from '@/store';
+import {Gender} from '@/types';
 import {Database} from '@/types/schema';
+import {PostgrestError} from '@supabase/supabase-js';
 
 type ProductType = Database['public']['Views']['v_products']['Row'];
 type AnimationState = 'idle' | 'save' | 'buy' | 'delete';
@@ -26,7 +29,7 @@ const initialState = productAdapter.getInitialState({
         moreToLoad: true,
         isLoadingMore: false,
         filters: {
-            gender: [] as string[],
+            gender: 'both' as Gender,
             category: [] as string[],
             color: [] as string[],
             searchText: '',
@@ -38,7 +41,7 @@ const initialState = productAdapter.getInitialState({
         moreToLoad: true,
         isLoadingMore: false,
         filters: {
-            gender: [] as string[],
+            gender: 'both' as Gender,
             category: [] as string[],
             color: [] as string[],
             searchText: '',
@@ -52,7 +55,7 @@ const initialState = productAdapter.getInitialState({
         moreToLoad: true,
         isLoadingMore: false,
         filters: {
-            gender: [] as string[],
+            gender: 'both' as Gender,
             category: [] as string[],
             color: [] as string[],
             searchText: '',
@@ -62,58 +65,74 @@ const initialState = productAdapter.getInitialState({
     action: 'idle' as AnimationState,
 });
 
-export const loadUnsavedProducts = createAsyncThunk(
-    'product/loadUnsavedProducts',
-    async (_, {getState, rejectWithValue}) => {
-        const state = getState() as RootState;
+export const loadUnsavedProducts = createAsyncThunk<
+    Database['public']['Views']['v_products']['Row'][],
+    void,
+    {rejectValue: PostgrestError}
+>('product/loadUnsavedProducts', async (_, {getState, rejectWithValue}) => {
+    const state = getState() as RootState;
 
-        if (state.user.isGuest) {
-            // If user is a guest, exclude products within query itself.
-            const query = supabase.from('v_products').select();
+    if (state.user.isGuest) {
+        // If user is a guest, exclude products within query itself.
+        let query = supabase.from('v_products').select();
 
-            const excludeSaved = state.product.unsaved.filters.excludeSaved
-                ? JSON.parse(
-                      (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) ||
-                          '[]',
-                  )
-                : [];
+        query = applyProductFilters(query, {
+            gender: state.product.unsaved.filters.gender,
+            category: state.product.unsaved.filters.category,
+            searchText: state.product.unsaved.filters.searchText,
+            color: state.product.unsaved.filters.color,
+        });
 
-            const excludeDeleted = state.product.unsaved.filters.excludeDeleted
-                ? JSON.parse(
-                      (await AsyncStorage.getItem(
-                          LOCAL_KEY_DELETED_PRODUCTS,
-                      )) || '[]',
-                  )
-                : [];
+        const excludeSaved = state.product.unsaved.filters.excludeSaved
+            ? JSON.parse(
+                  (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) ||
+                      '[]',
+              )
+            : [];
 
-            const productsToExclude = [...excludeSaved, ...excludeDeleted];
+        const excludeDeleted = state.product.unsaved.filters.excludeDeleted
+            ? JSON.parse(
+                  (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) ||
+                      '[]',
+              )
+            : [];
 
-            const {data, error} = await query.not(
-                'id',
-                'in',
-                productsToExclude.join(','),
-            );
+        const productsToExclude = [...excludeSaved, ...excludeDeleted];
 
-            if (error) {
-                rejectWithValue(error);
-            }
+        const {data, error} = await query.not(
+            'id',
+            'in',
+            productsToExclude.join(','),
+        );
 
-            return data;
-        } else {
-            // Else call the rpc function, which will pull from DB to exclude.
-            const {data, error} = await supabase.rpc('exclude_products', {
-                exclude_deleted: true,
-                exclude_saved: false,
-            });
-
-            if (error) {
-                rejectWithValue(error);
-            }
-
-            return data;
+        if (error) {
+            return rejectWithValue(error);
         }
-    },
-);
+
+        return data;
+    } else {
+        // Else call the rpc function, which will pull from DB to exclude.
+        let query = supabase.rpc('exclude_products', {
+            exclude_deleted: state.product.unsaved.filters.excludeDeleted,
+            exclude_saved: state.product.unsaved.filters.excludeSaved,
+        });
+
+        query = applyProductFilters(query, {
+            gender: state.product.unsaved.filters.gender,
+            category: state.product.unsaved.filters.category,
+            searchText: state.product.unsaved.filters.searchText,
+            color: state.product.unsaved.filters.color,
+        });
+
+        const {data, error} = await query;
+
+        if (error) {
+            return rejectWithValue(error);
+        }
+
+        return data;
+    }
+});
 
 const productSlice = createSlice({
     name: 'product',

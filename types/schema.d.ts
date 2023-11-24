@@ -3,22 +3,30 @@ import {MergeDeep} from 'type-fest';
 import {Database as DatabaseGenerated} from '@/types/database-generated';
 import {Gender} from '@/types';
 
-// Merge "View" Rows with "Table" Rows to remove nulls
-type NonNullDatabase = MergeDeep<
-    DatabaseGenerated,
+type NonNullVProducts = MergeDeep<
+    DatabaseGenerated['public']['Views']['v_products']['Row'],
     {
-        public: {
-            Views: {
-                v_products: {
-                    Row: DatabaseGenerated['public']['Tables']['products']['Row'];
-                };
-            };
-        };
+        brand: string;
+        categories: string[];
+        colors: string[];
+        created_at: string;
+        deleted: boolean;
+        gender: Gender;
+        id: number;
+        images: string[];
+        in_stock: boolean;
+        link: string;
+        name: string;
+        price: number;
+        sale_price: number;
+        saved: boolean;
+        updated_at: string;
+        vendor_product_id: string;
     }
 >;
 
 export type Database = MergeDeep<
-    NonNullDatabase,
+    DatabaseGenerated,
     {
         public: {
             Tables: {
@@ -30,7 +38,12 @@ export type Database = MergeDeep<
             };
             Views: {
                 v_products: {
-                    Row: {saved: boolean};
+                    Row: NonNullVProducts;
+                };
+            };
+            Functions: {
+                exclude_products: {
+                    Returns: NonNullVProducts[];
                 };
             };
         };
