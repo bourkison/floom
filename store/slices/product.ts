@@ -5,11 +5,13 @@ import {
     createSlice,
     PayloadAction,
 } from '@reduxjs/toolkit';
-import {PostgrestError} from '@supabase/supabase-js';
+import {AuthError, PostgrestError} from '@supabase/supabase-js';
 
 import {
     LOCAL_KEY_DELETED_PRODUCTS,
     LOCAL_KEY_SAVED_PRODUCTS,
+    MAX_LOCAL_DELETED_PRODUCTS,
+    MAX_LOCAL_SAVED_PRODUCTS,
 } from '@/constants';
 import {applyProductFilters} from '@/services';
 import {supabase} from '@/services/supabase';
@@ -189,6 +191,146 @@ export const loadDeletedProducts = createAsyncThunk<
         }
 
         return data;
+    }
+});
+
+export const saveProduct = createAsyncThunk<
+    void,
+    number,
+    {rejectValue: PostgrestError | AuthError}
+>('product/saveProduct', async (productId, {getState, rejectWithValue}) => {
+    const state = getState() as RootState;
+
+    if (state.user.isGuest) {
+        let currentSavedProducts: string[] = JSON.parse(
+            (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+        );
+
+        let currentDeletedProducts: string[] = JSON.parse(
+            (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) || '[]',
+        );
+
+        // Remove from deleted if there.
+        const deletedIndex = currentDeletedProducts.findIndex(
+            i => i === productId.toString(),
+        );
+        if (deletedIndex > -1) {
+            currentDeletedProducts = [
+                ...currentDeletedProducts.slice(0, deletedIndex),
+                ...currentDeletedProducts.slice(deletedIndex + 1),
+            ];
+
+            await AsyncStorage.setItem(
+                LOCAL_KEY_DELETED_PRODUCTS,
+                JSON.stringify(currentDeletedProducts),
+            );
+        }
+
+        // Add to saved if not there already.
+        if (currentSavedProducts.includes(productId.toString())) {
+            return;
+        }
+
+        currentSavedProducts.unshift(productId.toString());
+
+        if (currentSavedProducts.length > MAX_LOCAL_SAVED_PRODUCTS) {
+            currentSavedProducts = currentSavedProducts.slice(
+                0,
+                MAX_LOCAL_SAVED_PRODUCTS,
+            );
+
+            // TODO: Display warning to user announcing they have gone over their deleted amount
+        }
+
+        await AsyncStorage.setItem(
+            LOCAL_KEY_SAVED_PRODUCTS,
+            JSON.stringify(currentSavedProducts),
+        );
+    } else {
+        const {data: userData, error: userError} =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            return rejectWithValue(userError);
+        }
+
+        const {error} = await supabase
+            .from('saves')
+            .insert({product_id: productId, user_id: userData.user.id});
+
+        if (error) {
+            return rejectWithValue(error);
+        }
+    }
+});
+
+export const deleteProduct = createAsyncThunk<
+    void,
+    number,
+    {rejectValue: PostgrestError | AuthError}
+>('product/deleteProduct', async (productId, {getState, rejectWithValue}) => {
+    const state = getState() as RootState;
+
+    if (state.user.isGuest) {
+        let currentDeletedProducts: string[] = JSON.parse(
+            (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) || '[]',
+        );
+
+        let currentSavedProducts: string[] = JSON.parse(
+            (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
+        );
+
+        // Remove from saved if there.
+        const savedIndex = currentSavedProducts.findIndex(
+            i => i === productId.toString(),
+        );
+        if (savedIndex > -1) {
+            currentSavedProducts = [
+                ...currentSavedProducts.slice(0, savedIndex),
+                ...currentSavedProducts.slice(savedIndex + 1),
+            ];
+
+            await AsyncStorage.setItem(
+                LOCAL_KEY_DELETED_PRODUCTS,
+                JSON.stringify(currentSavedProducts),
+            );
+        }
+
+        // Add to deleted if not there already.
+        if (currentDeletedProducts.includes(productId.toString())) {
+            return;
+        }
+
+        currentDeletedProducts.unshift(productId.toString());
+
+        if (currentDeletedProducts.length > MAX_LOCAL_DELETED_PRODUCTS) {
+            currentDeletedProducts = currentDeletedProducts.slice(
+                0,
+                MAX_LOCAL_DELETED_PRODUCTS,
+            );
+
+            // TODO: Display warning to user announcing they have gone over their deleted amount
+        }
+
+        await AsyncStorage.setItem(
+            LOCAL_KEY_DELETED_PRODUCTS,
+            JSON.stringify(currentDeletedProducts),
+        );
+    } else {
+        const {data: userData, error: userError} =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            return rejectWithValue(userError);
+        }
+
+        const {error} = await supabase
+            .from('deletes')
+            .insert({product_id: productId, user_id: userData.user.id});
+
+        if (error) {
+            return rejectWithValue(error);
+        }
     }
 });
 
