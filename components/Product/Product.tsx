@@ -60,6 +60,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     useEffect(() => {
         for (let i = 1; i < IMAGE_PREFETCH_AMOUNT; i++) {
             const img = product.images[imageIndex + i];
+            console.log('image fetching', img);
 
             if (img && !prefetchedImages.includes(img)) {
                 Image.prefetch(img);

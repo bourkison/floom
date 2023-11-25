@@ -44,12 +44,12 @@ export function applyProductFilters(
 
     if (filters.excludeSaved) {
         console.log('excluding saved');
-        query = query.eq('saved', filters.excludeSaved);
+        query = query.neq('saved', true);
     }
 
     if (filters.excludeDeleted) {
         console.log('excluding deleted');
-        query = query.eq('deleted', filters.excludeDeleted);
+        query = query.neq('deleted', true);
     }
 
     return query;
@@ -90,7 +90,7 @@ export const capitaliseString = (str: string): string => {
 };
 
 export const formatPrice = (price: number): string => {
-    return `£${(price / 1000).toFixed(2)}`;
+    return `£${(price / 100).toFixed(2)}`;
 };
 
 export const alreadyExists = (

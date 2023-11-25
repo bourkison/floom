@@ -73,7 +73,7 @@ export const loadUnsavedProducts = createAsyncThunk<
     {rejectValue: PostgrestError}
 >('product/loadUnsavedProducts', async (_, {getState, rejectWithValue}) => {
     const state = getState() as RootState;
-    let query = supabase.from('v_products').select();
+    let query = supabase.from('v_products').select().limit(10);
 
     if (state.user.isGuest) {
         query = applyProductFilters(query, {
@@ -609,6 +609,85 @@ const productSlice = createSlice({
             })
             .addCase(loadUnsavedProducts.rejected, (state, {meta, payload}) => {
                 console.error('error loading', payload, meta);
+            })
+            .addCase(saveProduct.pending, (state, action) => {
+                state.animation = 'idle';
+                state.action = 'idle';
+
+                // Slice from unsaved if they are the same.
+                if (state.unsaved.products[0].id === action.meta.arg) {
+                    state.unsaved.products = state.unsaved.products.slice(1);
+                }
+
+                // // Unshift into saved if not saved from API response, and not already in our array (to avoid duplicates), and no filters applied.
+                // if (
+                //     !action.meta.arg.saved &&
+                //     !alreadyExists(action.meta.arg.id, state.saved.products) &&
+                //     !filtersApplied(state.saved.filters)
+                // ) {
+                //     state.saved.products.unshift({
+                //         ...action.meta.arg,
+                //         deleted: false,
+                //         saved: true,
+                //     });
+
+                //     // Ensure we don't overload on memory by only storing SAVED_STORED_PRODUCTS_AMOUNT of products.
+                //     if (
+                //         state.saved.products.length >
+                //         SAVED_STORED_PRODUCTS_AMOUNT
+                //     ) {
+                //         state.saved.products = state.saved.products.slice(
+                //             0,
+                //             SAVED_STORED_PRODUCTS_AMOUNT,
+                //         );
+                //         state.saved.moreToLoad = true;
+                //     }
+                // }
+
+                // if (action.meta.arg.deleted) {
+                //     state.deleted.products = state.deleted.products.filter(
+                //         p => p._id !== action.meta.arg._id,
+                //     );
+                // }
+            })
+            .addCase(deleteProduct.pending, (state, action) => {
+                state.animation = 'idle';
+
+                // Slice from unsaved if they are the same.
+                if (state.unsaved.products[0]?.id === action.meta.arg) {
+                    state.unsaved.products = state.unsaved.products.slice(1);
+                }
+
+                // // Unshift into saved if not saved from API response, and not already in our array (to avoid duplicates).
+                // if (
+                //     !action.meta.arg.deleted &&
+                //     !alreadyExists(action.meta.arg._id, state.deleted.products)
+                // ) {
+                //     state.deleted.products.unshift({
+                //         ...action.meta.arg,
+                //         saved: false,
+                //         deleted: true,
+                //     });
+
+                //     // Ensure we don't overload on memory by only storing DELETED_STORED_PRODUCTS_AMOUNT of products.
+                //     if (
+                //         state.deleted.products.length >
+                //         DELETED_STORED_PRODUCTS_AMOUNT
+                //     ) {
+                //         state.deleted.products = state.deleted.products.slice(
+                //             0,
+                //             DELETED_STORED_PRODUCTS_AMOUNT,
+                //         );
+
+                //         state.deleted.moreToLoad = true;
+                //     }
+                // }
+
+                // if (action.meta.arg.saved) {
+                //     state.saved.products = state.saved.products.filter(
+                //         p => p._id !== action.meta.arg._id,
+                //     );
+                // }
             });
     },
 });
