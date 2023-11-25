@@ -9,6 +9,7 @@ import HomeAuth from '@/screens/Auth/HomeAuth';
 import Login from '@/screens/Auth/Login';
 import SignUp from '@/screens/Auth/SignUp';
 import Home from '@/screens/Main/Home';
+import ProductView from '@/screens/Main/ProductView';
 import {useAppSelector} from '@/store/hooks';
 import {Database} from '@/types/schema';
 
@@ -77,6 +78,18 @@ export default function Navigator() {
                 name="Home"
                 component={Home}
                 options={{header: HomeHeader}}
+            />
+            <MainStack.Screen
+                name="ProductView"
+                component={ProductView}
+                options={{
+                    cardStyleInterpolator:
+                        CardStyleInterpolators.forModalPresentationIOS,
+                    presentation: 'modal',
+                    gestureDirection: 'vertical',
+                    headerShown: false,
+                    gestureEnabled: true,
+                }}
             />
         </MainStack.Navigator>
     );

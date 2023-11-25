@@ -6,22 +6,55 @@ import {Gender} from '@/types';
 type NonNullVProducts = MergeDeep<
     DatabaseGenerated['public']['Views']['v_products']['Row'],
     {
-        brand: string;
-        categories: string[];
-        colors: string[];
-        created_at: string;
-        deleted: boolean;
+        brand: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['brand']
+        >;
+        categories: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['categories']
+        >;
+        colors: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['colors']
+        >;
+        created_at: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['created_at']
+        >;
+        deleted: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['deleted']
+        >;
         gender: Gender;
-        id: number;
-        images: string[];
-        in_stock: boolean;
-        link: string;
-        name: string;
-        price: number;
-        sale_price: number;
-        saved: boolean;
-        updated_at: string;
-        vendor_product_id: string;
+        id: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['id']
+        >;
+        images: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['images']
+        >;
+        in_stock: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['in_stock']
+        >;
+        link: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['link']
+        >;
+        name: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['name']
+        >;
+        price: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['number']
+        >;
+        sale_price: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['sale_price']
+        >;
+        saved: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['saved']
+        >;
+        updated_at: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['updated_at']
+        >;
+        vendor_product_id: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['vendor_product_id']
+        >;
+        description: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['description']
+        >;
     }
 >;
 

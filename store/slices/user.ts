@@ -53,6 +53,11 @@ const userSlice = createSlice({
             state.isGuest = false;
             state.userData = action.payload;
         },
+        loginAsGuest(state) {
+            state.loggedIn = true;
+            state.isGuest = true;
+            state.userData = null;
+        },
         logout(state) {
             state.loggedIn = false;
             state.isGuest = false;

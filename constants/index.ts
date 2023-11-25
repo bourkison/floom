@@ -103,3 +103,18 @@ export const COLOR_OPTIONS = [
 ] as const;
 
 export const MIN_AGE = 16;
+
+export const REPORT_TYPES = [
+    {
+        id: 'inappropriate',
+        name: 'Inappropriate content',
+    },
+    {
+        id: 'broken',
+        name: 'Something is broken',
+    },
+    {
+        id: 'other',
+        name: 'Other',
+    },
+] as const;

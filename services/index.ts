@@ -105,3 +105,11 @@ export const alreadyExists = (
 
     return false;
 };
+
+export const stringifyColors = (colors: string[]): string => {
+    return colors
+        .map(color => {
+            return capitaliseString(color);
+        })
+        .join(', ');
+};
