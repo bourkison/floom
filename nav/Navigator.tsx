@@ -4,12 +4,17 @@ import {
 } from '@react-navigation/stack';
 import React from 'react';
 
-import {HEADER_HEIGHT_W_STATUS_BAR, HomeHeader} from '@/nav/Headers';
+import {
+    HEADER_HEIGHT_W_STATUS_BAR,
+    HomeHeader,
+    SavedProductsHeader,
+} from '@/nav/Headers';
 import HomeAuth from '@/screens/Auth/HomeAuth';
 import Login from '@/screens/Auth/Login';
 import SignUp from '@/screens/Auth/SignUp';
 import Home from '@/screens/Main/Home';
 import ProductView from '@/screens/Main/ProductView';
+import SavedProducts from '@/screens/Main/SavedProducts';
 import {useAppSelector} from '@/store/hooks';
 import {Database} from '@/types/schema';
 
@@ -31,6 +36,7 @@ export type MainStackParamList = {
         reference: 'swipe' | 'saved' | 'deleted' | 'featured';
         imageIndex?: number;
     };
+    SavedProducts: undefined;
 };
 
 const MainStack = createStackNavigator<MainStackParamList>();
@@ -88,6 +94,15 @@ export default function Navigator() {
                     presentation: 'modal',
                     gestureDirection: 'vertical',
                     headerShown: false,
+                    gestureEnabled: true,
+                }}
+            />
+            <MainStack.Screen
+                name="SavedProducts"
+                component={SavedProducts}
+                options={{
+                    gestureDirection: 'horizontal',
+                    header: SavedProductsHeader,
                     gestureEnabled: true,
                 }}
             />

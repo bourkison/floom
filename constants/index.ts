@@ -114,6 +114,10 @@ export const REPORT_TYPES = [
         name: 'Something is broken',
     },
     {
+        id: 'brokenImage',
+        name: 'Image is broken',
+    },
+    {
         id: 'other',
         name: 'Other',
     },

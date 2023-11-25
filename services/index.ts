@@ -1,5 +1,6 @@
 import {PostgrestFilterBuilder} from '@supabase/postgrest-js';
 
+import {RootState} from '@/store';
 import {Gender} from '@/types';
 import {Database} from '@/types/schema';
 
@@ -33,22 +34,18 @@ export function applyProductFilters(
     }
 
     if (filters.category.length) {
-        console.log('filtering categories', filters.category);
         query = query.in('categories', filters.category);
     }
 
     if (filters.gender !== 'both') {
-        console.log('filtering for gender', filters.gender);
         query = query.eq('gender', filters.gender);
     }
 
     if (filters.excludeSaved) {
-        console.log('excluding saved');
         query = query.neq('saved', true);
     }
 
     if (filters.excludeDeleted) {
-        console.log('excluding deleted');
         query = query.neq('deleted', true);
     }
 
@@ -113,3 +110,18 @@ export const stringifyColors = (colors: string[]): string => {
         })
         .join(', ');
 };
+
+export function filtersApplied(
+    filters: RootState['product']['saved']['filters'],
+) {
+    if (
+        filters.category.length ||
+        filters.color.length ||
+        filters.gender !== 'both' ||
+        filters.searchText
+    ) {
+        return true;
+    }
+
+    return false;
+}
