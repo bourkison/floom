@@ -1,6 +1,10 @@
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+    CardStyleInterpolators,
+    createStackNavigator,
+} from '@react-navigation/stack';
 import React from 'react';
 
+import {HEADER_HEIGHT_W_STATUS_BAR, HomeHeader} from '@/nav/Headers';
 import HomeAuth from '@/screens/Auth/HomeAuth';
 import Login from '@/screens/Auth/Login';
 import SignUp from '@/screens/Auth/SignUp';
@@ -58,8 +62,22 @@ export default function Navigator() {
     }
 
     return (
-        <MainStack.Navigator initialRouteName="Home">
-            <MainStack.Screen name="Home" component={Home} />
+        <MainStack.Navigator
+            initialRouteName="Home"
+            screenOptions={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                gestureEnabled: true,
+                headerStyle: {
+                    height: HEADER_HEIGHT_W_STATUS_BAR,
+                    elevation: 999,
+                    zIndex: 999,
+                },
+            }}>
+            <MainStack.Screen
+                name="Home"
+                component={Home}
+                options={{header: HomeHeader}}
+            />
         </MainStack.Navigator>
     );
 }

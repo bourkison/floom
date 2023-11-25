@@ -15,11 +15,11 @@ import {
     ACTION_BUTTON_SIZE,
     FEATURED_PRODUCT_SIZE,
 } from '@/constants';
-// import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
+import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
 import {MainStackParamList} from '@/nav/Navigator';
 import {useAppSelector} from '@/store/hooks';
 
-const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
+const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width, height} = useWindowDimensions();
 
     const isLoading = useAppSelector(state => state.product.unsaved.isLoading);
@@ -32,7 +32,7 @@ const Home = ({}: StackScreenProps<MainStackParamList, 'Home'>) => {
 
     // Calculate margins for different device heights.
     const calculateMargins = useCallback((): number => {
-        const headerHeight = 0;
+        const headerHeight = HEADER_HEIGHT_W_STATUS_BAR;
         const searchBarHeight = FILTER_DROPDOWN_CLOSED_HEIGHT;
         const productListHeight = (width - IMAGE_PADDING) / IMAGE_RATIO;
         const actionButtonHeight = ACTION_BUTTON_SIZE;

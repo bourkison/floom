@@ -13,7 +13,7 @@ import {
     MAX_LOCAL_DELETED_PRODUCTS,
     MAX_LOCAL_SAVED_PRODUCTS,
 } from '@/constants';
-import {applyProductFilters} from '@/services';
+import {alreadyExists, applyProductFilters} from '@/services';
 import {supabase} from '@/services/supabase';
 import {RootState} from '@/store';
 import {Gender} from '@/types';
@@ -587,6 +587,28 @@ const productSlice = createSlice({
             .addCase(loadUnsavedProducts.fulfilled, (state, action) => {
                 state.unsaved.isLoading = false;
                 console.log('LOADED', action.payload);
+
+                // Only add to local state if it doesn't already exist (to avoid duplicates).
+                for (let i = 0; i < action.payload.length; i++) {
+                    if (
+                        !alreadyExists(
+                            action.payload[i].id,
+                            state.unsaved.products,
+                        )
+                    ) {
+                        state.unsaved.products = [
+                            ...state.unsaved.products,
+                            action.payload[i],
+                        ];
+                    }
+                }
+
+                if (action.payload.length === 0) {
+                    state.unsaved.moreToLoad = false;
+                }
+            })
+            .addCase(loadUnsavedProducts.rejected, (state, {meta, payload}) => {
+                console.error('error loading', payload, meta);
             });
     },
 });

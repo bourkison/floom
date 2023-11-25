@@ -32,19 +32,23 @@ export function applyProductFilters(
         );
     }
 
-    if (filters.category) {
-        query = query.in('category', filters.category);
+    if (filters.category.length) {
+        console.log('filtering categories', filters.category);
+        query = query.in('categories', filters.category);
     }
 
     if (filters.gender !== 'both') {
+        console.log('filtering for gender', filters.gender);
         query = query.eq('gender', filters.gender);
     }
 
     if (filters.excludeSaved) {
+        console.log('excluding saved');
         query = query.eq('saved', filters.excludeSaved);
     }
 
     if (filters.excludeDeleted) {
+        console.log('excluding deleted');
         query = query.eq('deleted', filters.excludeDeleted);
     }
 
@@ -87,4 +91,17 @@ export const capitaliseString = (str: string): string => {
 
 export const formatPrice = (price: number): string => {
     return `£${(price / 1000).toFixed(2)}`;
+};
+
+export const alreadyExists = (
+    productId: number,
+    products: Database['public']['Views']['v_products']['Row'][],
+): boolean => {
+    for (let i = 0; i < products.length; i++) {
+        if (products[i].id === productId) {
+            return true;
+        }
+    }
+
+    return false;
 };
