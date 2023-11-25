@@ -607,8 +607,17 @@ const productSlice = createSlice({
                     state.unsaved.moreToLoad = false;
                 }
             })
-            .addCase(loadUnsavedProducts.rejected, (state, {meta, payload}) => {
+            .addCase(loadUnsavedProducts.rejected, (_, {meta, payload}) => {
                 console.error('error loading', payload, meta);
+            })
+            .addCase(loadSavedProducts.pending, state => {
+                state.saved.isLoading = true;
+            })
+            .addCase(loadSavedProducts.fulfilled, (state, action) => {
+                state.saved.products = action.payload;
+                state.saved.isLoading = false;
+                state.saved.isLoadingMore = false;
+                state.saved.moreToLoad = false;
             })
             .addCase(saveProduct.pending, (state, action) => {
                 state.animation = 'idle';
