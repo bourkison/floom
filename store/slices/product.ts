@@ -34,6 +34,7 @@ const initialState = productAdapter.getInitialState({
             gender: 'both' as Gender,
             category: [] as string[],
             color: [] as string[],
+            brand: [] as {id: number; name: string}[],
             searchText: '',
         },
     },
@@ -46,6 +47,7 @@ const initialState = productAdapter.getInitialState({
             gender: 'both' as Gender,
             category: [] as string[],
             color: [] as string[],
+            brand: [] as {id: number; name: string}[],
             searchText: '',
             excludeDeleted: true,
             excludeSaved: true,
@@ -60,6 +62,7 @@ const initialState = productAdapter.getInitialState({
             gender: 'both' as Gender,
             category: [] as string[],
             color: [] as string[],
+            brand: [] as {id: number; name: string}[],
             searchText: '',
         },
     },
@@ -517,6 +520,29 @@ const productSlice = createSlice({
                     !state.unsaved.filters.excludeDeleted;
             }
         },
+        toggleBrand(
+            state,
+            action: PayloadAction<{
+                obj: 'unsaved' | 'saved' | 'deleted';
+                brand: {id: number; name: string};
+            }>,
+        ) {
+            const index = state[action.payload.obj].filters.brand.findIndex(
+                brand => action.payload.brand.id === brand.id,
+            );
+
+            if (index < 0) {
+                state[action.payload.obj].filters.brand = [
+                    ...state[action.payload.obj].filters.brand,
+                    action.payload.brand,
+                ];
+            } else {
+                state[action.payload.obj].filters.brand = [
+                    ...state[action.payload.obj].filters.brand.slice(0, index),
+                    ...state[action.payload.obj].filters.brand.slice(index + 1),
+                ];
+            }
+        },
         toggleFilter(
             state,
             action: PayloadAction<{
@@ -715,6 +741,7 @@ export const {
     clearFilters,
     commenceAnimate,
     setAction,
+    toggleBrand,
     toggleExclude,
     toggleFilter,
     updateSearchFilter,

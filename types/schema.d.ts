@@ -74,11 +74,6 @@ export type Database = MergeDeep<
                     Row: NonNullVProducts;
                 };
             };
-            Functions: {
-                exclude_products: {
-                    Returns: NonNullVProducts[];
-                };
-            };
         };
     }
 >;

@@ -9,10 +9,10 @@ import {
     StyleSheet,
     Pressable,
     TouchableOpacity,
-    TextInput,
     ViewStyle,
 } from 'react-native';
 
+import SearchInput from '@/components/Utility/SearchInput';
 import {PALETTE} from '@/constants';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {loadUnsavedProducts, updateSearchFilter} from '@/store/slices/product';
@@ -93,40 +93,14 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => {
                     <Ionicons name="heart-outline" size={24} />
                 </TouchableOpacity>
             }
-            style={styles.homeHeader}>
+            style={styles.hiddenShadowWithBorder}>
             <View style={styles.searchContainer}>
-                <View style={styles.searchSection}>
-                    <Ionicons
-                        name="search"
-                        style={styles.searchIcon}
-                        color={PALETTE.neutral[0]}
-                    />
-
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search"
-                        placeholderTextColor={PALETTE.neutral[3]}
-                        onChangeText={updateSearchText}
-                        onSubmitEditing={search}
-                        value={searchText}
-                        returnKeyType="search"
-                        selectTextOnFocus={true}
-                    />
-
-                    {searchText.length > 0 && (
-                        <Pressable
-                            onPress={() => {
-                                updateSearchText('');
-                            }}>
-                            <Feather
-                                name="x-circle"
-                                style={styles.searchIcon}
-                                color={PALETTE.neutral[0]}
-                                size={14}
-                            />
-                        </Pressable>
-                    )}
-                </View>
+                <SearchInput
+                    value={searchText}
+                    onChangeText={updateSearchText}
+                    onSubmitEditing={search}
+                    onClearPress={() => updateSearchText('')}
+                />
             </View>
         </HeaderTemplate>
     );
@@ -256,6 +230,20 @@ export const FiltersHomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
     </HeaderTemplate>
 );
 
+export const BrandHeader: React.FC<StackHeaderProps> = ({navigation}) => (
+    <HeaderTemplate
+        leftIcon={
+            <Pressable
+                style={styles.headerIcon}
+                onPress={() => navigation.goBack()}>
+                <Feather name="x" size={24} />
+            </Pressable>
+        }
+        style={styles.hiddenShadowWithBorder}>
+        Brand
+    </HeaderTemplate>
+);
+
 const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,
@@ -317,26 +305,7 @@ const styles = StyleSheet.create({
         width: '100%',
         flex: 1,
     },
-    searchSection: {
-        backgroundColor: PALETTE.neutral[5],
-        borderRadius: 5,
-        marginVertical: 5,
-        width: '100%',
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    searchInput: {
-        color: PALETTE.neutral[0],
-        fontSize: 14,
-        alignSelf: 'center',
-        paddingVertical: 5,
-        flex: 1,
-    },
-    searchIcon: {
-        paddingHorizontal: 5,
-    },
-    homeHeader: {
+    hiddenShadowWithBorder: {
         shadowOpacity: 0,
         borderBottomWidth: 1,
         borderBottomColor: PALETTE.neutral[2],

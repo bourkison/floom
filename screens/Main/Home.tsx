@@ -3,10 +3,8 @@ import React, {useCallback} from 'react';
 import {View, StyleSheet, useWindowDimensions} from 'react-native';
 
 import FeaturedProduct from '@/components/Product/FeaturedProduct';
-import FilterDropdown, {
-    FILTER_DROPDOWN_CLOSED_HEIGHT,
-} from '@/components/Product/FilterDropdown';
 import ProductList from '@/components/Product/ProductList';
+import SortFilter, {FILTERS_HEIGHT} from '@/components/Product/SortFilter';
 import ActionButton from '@/components/Utility/ActionButton';
 import {
     IMAGE_RATIO,
@@ -18,7 +16,6 @@ import {
 import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
 import {MainStackParamList} from '@/nav/Navigator';
 import {useAppSelector} from '@/store/hooks';
-import SortFilter from '@/components/Product/SortFilter';
 
 const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width, height} = useWindowDimensions();
@@ -34,7 +31,7 @@ const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
     // Calculate margins for different device heights.
     const calculateMargins = useCallback((): number => {
         const headerHeight = HEADER_HEIGHT_W_STATUS_BAR;
-        const searchBarHeight = FILTER_DROPDOWN_CLOSED_HEIGHT;
+        const searchBarHeight = FILTERS_HEIGHT;
         const productListHeight = (width - IMAGE_PADDING) / IMAGE_RATIO;
         const actionButtonHeight = ACTION_BUTTON_SIZE;
         const featuredProductHeight = FEATURED_PRODUCT_SIZE;

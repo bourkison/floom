@@ -6,7 +6,7 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {PALETTE} from '@/constants';
 import {MainStackParamList} from '@/nav/Navigator';
 
-const FILTERS_HEIGHT = 44;
+export const FILTERS_HEIGHT = 44;
 
 type SortFilterProps = {
     obj: 'saved' | 'unsaved' | 'deleted';
