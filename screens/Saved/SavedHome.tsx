@@ -1,256 +1,127 @@
 import {StackScreenProps} from '@react-navigation/stack';
-import {FlashList} from '@shopify/flash-list';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {
-    View,
-    StyleSheet,
-    ActivityIndicator,
-    RefreshControl,
-    Text,
-    useWindowDimensions,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 
-import FilterDropdown, {
-    FILTER_DROPDOWN_CLOSED_HEIGHT,
-} from '@/components/Product/FilterDropdown';
-import ProductListItem, {
-    PRODUCT_LIST_ITEM_HEIGHT,
-} from '@/components/Product/ProductListItem';
-import AnimatedButton from '@/components/Utility/AnimatedButton';
-import {PALETTE} from '@/constants';
-import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
-import {filtersApplied} from '@/services';
-import {useAppSelector, useAppDispatch} from '@/store/hooks';
-import {loadSavedProducts, clearFilters} from '@/store/slices/product';
+import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
+import SearchInput from '@/components/Utility/SearchInput';
 
-const ON_END_REACHED_THRESHOLD = 1;
+type CollectionType = {
+    name: string;
+    id: number;
+    products: Database['public']['Views']['v_saves']['Row'][];
+};
 
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
-    const [isRefreshing, setIsRefereshing] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchText, setSearchText] = useState('');
 
-    const dispatch = useAppDispatch();
-    const savedProducts = useAppSelector(state => state.product.saved.products);
-    const moreToLoad = useAppSelector(state => state.product.saved.moreToLoad);
-    const isLoading = useAppSelector(state => state.product.saved.isLoading);
-
-    const isLoadingMore = useAppSelector(
-        state => state.product.saved.isLoadingMore,
-    );
-    const filters = useAppSelector(state => state.product.saved.filters);
-    const gender = useAppSelector(
-        state => state.user.userData?.gender || 'both',
-    );
-
-    const {height} = useWindowDimensions();
-
-    const ListRef =
-        useRef<FlashList<Database['public']['Views']['v_products']['Row']>>(
-            null,
-        );
-
-    const loadProducts = useCallback(async () => {
-        await dispatch(loadSavedProducts());
-    }, [dispatch]);
+    const [collections, setCollections] = useState<CollectionType[]>([]);
+    // Saves are saves that do not have a collection.
+    const [saves, setSaves] = useState<
+        Database['public']['Views']['v_saves']['Row'][]
+    >([]);
 
     useEffect(() => {
-        // Call on initial load.
-        if (!savedProducts.length && moreToLoad && !isLoading) {
-            loadProducts();
-        }
-    }, [loadProducts, savedProducts, moreToLoad, isLoading]);
+        const fetchSaves = async () => {
+            setIsLoading(true);
 
-    const refresh = async () => {
-        setIsRefereshing(true);
-        await loadProducts();
-        setIsRefereshing(false);
-    };
+            const {data, error} = await supabase
+                .from('v_saves')
+                .select()
+                .order('created_at', {ascending: false});
 
-    const retry = useCallback(async () => {
-        await dispatch(loadSavedProducts());
+            setIsLoading(false);
 
-        if (clearFilters) {
-            dispatch(clearFilters({filterType: 'saved', gender}));
-        }
-    }, [dispatch, gender]);
+            if (error) {
+                // TODO: Handle error.
+                console.error(error);
+                return;
+            }
 
-    const loadMore = async () => {
-        if (!isLoadingMore && !isLoading && !isRefreshing && moreToLoad) {
-            loadProducts();
-        }
-    };
+            const tempCollections: CollectionType[] = [];
+            const tempSaves: Database['public']['Views']['v_saves']['Row'][] =
+                [];
 
-    const isEmpty = useMemo(() => {
-        if (!isLoading && !savedProducts.length && !moreToLoad) {
-            return true;
-        }
+            // Loop through the response, and push to either the relevant collection,
+            // or to the saves array (if no collection associated).
+            data.forEach(save => {
+                if (
+                    save.collection_id !== null &&
+                    save.collection_name !== null
+                ) {
+                    const collId = save.collection_id;
+                    const collName = save.collection_name;
 
-        return false;
-    }, [isLoading, savedProducts, moreToLoad]);
+                    // First check to see if the collection has already been added.
+                    let collectionIndex = tempCollections.findIndex(
+                        collection => (collection.id = collId),
+                    );
 
-    const EmptyComponent = useMemo(() => {
-        if (isLoading) {
-            return (
-                <View style={styles.loadingIndicator}>
-                    <ActivityIndicator />
-                </View>
-            );
-        }
+                    // If not, add it.
+                    if (collectionIndex < 0) {
+                        tempCollections.push({
+                            name: collName,
+                            id: collId,
+                            products: [],
+                        });
+                        collectionIndex = tempCollections.length - 1;
+                    }
 
-        if (isEmpty) {
-            const remainingHeight =
-                height -
-                HEADER_HEIGHT_W_STATUS_BAR -
-                FILTER_DROPDOWN_CLOSED_HEIGHT;
+                    // Finally, add this save in.
+                    tempCollections[collectionIndex].products.push(save);
 
-            const hasFilters = filtersApplied(filters);
+                    return;
+                }
 
-            return (
-                <View
-                    style={[styles.emptyContainer, {height: remainingHeight}]}>
-                    <Text style={styles.noProductsText}>
-                        {hasFilters
-                            ? 'No products found. Clear filters, or retry.'
-                            : 'No saved products. Get swiping, or retry.'}
-                    </Text>
-                    <View style={styles.refreshButtonContainer}>
-                        <AnimatedButton
-                            style={styles.refreshButton}
-                            textStyle={styles.refreshButtonText}
-                            onPress={() => retry()}>
-                            Refresh
-                        </AnimatedButton>
-                        {hasFilters ? (
-                            <AnimatedButton
-                                onPress={() => retry()}
-                                style={styles.clearFiltersRefreshButton}
-                                textStyle={
-                                    styles.clearFiltersRefreshButtonText
-                                }>
-                                Clear Filters and Refresh
-                            </AnimatedButton>
-                        ) : undefined}
-                    </View>
-                </View>
-            );
-        }
+                tempSaves.push(save);
+            });
 
-        return <View />;
-    }, [filters, height, isEmpty, isLoading, retry]);
+            setCollections(tempCollections);
+            setSaves(tempSaves);
+
+            console.log('COLLECTIONS:', tempCollections);
+            console.log('SAVES:', tempSaves);
+        };
+
+        fetchSaves();
+    }, []);
 
     return (
-        <View style={styles.safeContainer}>
-            <FilterDropdown obj="saved" />
-            <FlashList
-                ref={ListRef}
-                data={savedProducts}
-                ListEmptyComponent={EmptyComponent}
-                renderItem={({item, index}) => (
-                    <ProductListItem
-                        listRef={ListRef}
-                        product={item}
-                        index={index}
-                        type="saved"
-                    />
-                )}
-                keyExtractor={item => item.id.toString()}
-                onEndReached={() => {
-                    if (moreToLoad && !isLoadingMore) {
-                        loadMore();
-                    }
-                }}
-                estimatedItemSize={PRODUCT_LIST_ITEM_HEIGHT}
-                removeClippedSubviews={true}
-                onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
-                ListFooterComponent={
-                    isLoadingMore ? (
-                        <ActivityIndicator style={styles.activityIndicator} />
-                    ) : undefined
-                }
-                refreshControl={
-                    !isLoading ? (
-                        <RefreshControl
-                            onRefresh={refresh}
-                            refreshing={isRefreshing}
-                        />
-                    ) : undefined
-                }
-            />
+        <View>
+            <View style={styles.searchContainer}>
+                <SearchInput
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    onClearPress={() => setSearchText('')}
+                />
+            </View>
+
+            {!isLoading ? (
+                saves.map(save => <Text key={save.id}>{save.name}</Text>)
+            ) : (
+                <ActivityIndicator />
+            )}
+            <Text>Saved Home</Text>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    safeContainer: {
-        flex: 1,
-    },
-    contentContainer: {
-        backgroundColor: 'violet',
-        flex: 1,
-    },
-    container: {
-        flexDirection: 'column',
-        background: 'violet',
-    },
-    activityIndicator: {
-        marginTop: 5,
-    },
-    emptyContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    refreshButtonContainer: {
+    searchContainer: {
+        paddingVertical: 5,
         paddingHorizontal: 10,
-        width: '75%',
-        marginTop: 5,
-    },
-    refreshButton: {
-        padding: 7,
-        backgroundColor: PALETTE.neutral[8],
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 10,
         width: '100%',
-        alignSelf: 'center',
+        flexBasis: 50,
+        backgroundColor: '#FFF',
+        shadowColor: '#1a1f25',
+        shadowOffset: {
+            height: -1,
+            width: -1,
+        },
+        shadowOpacity: 0.3,
     },
-    refreshButtonText: {
-        color: PALETTE.gray[1],
-        fontSize: 12,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        flexBasis: 14,
-        flexShrink: 0,
-        flexGrow: 0,
-    },
-    clearFiltersRefreshButton: {
-        padding: 7,
-        borderColor: PALETTE.neutral[8],
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 10,
-        width: '100%',
-        alignSelf: 'center',
-        marginTop: 5,
-    },
-    clearFiltersRefreshButtonText: {
-        color: PALETTE.neutral[8],
-        fontSize: 12,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        flexBasis: 14,
-        flexShrink: 0,
-        flexGrow: 0,
-    },
-    noProductsText: {
-        color: PALETTE.neutral[4],
-        fontSize: 12,
-        paddingHorizontal: 5,
-        paddingVertical: 3,
-    },
-    loadingIndicator: {marginTop: 25},
 });
 
 export default SavedHome;

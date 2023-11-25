@@ -169,18 +169,21 @@ export interface Database {
       }
       saves: {
         Row: {
+          collection_id: number | null
           created_at: string | null
           id: number
           product_id: number
           user_id: string
         }
         Insert: {
+          collection_id?: number | null
           created_at?: string | null
           id?: number
           product_id: number
           user_id: string
         }
         Update: {
+          collection_id?: number | null
           created_at?: string | null
           id?: number
           product_id?: number
@@ -242,6 +245,30 @@ export interface Database {
           sale_price: number | null
           saved: boolean | null
           updated_at: string | null
+          vendor_product_id: string | null
+        }
+      }
+      v_saves: {
+        Row: {
+          brand: string | null
+          collection_id: number | null
+          collection_name: string | null
+          colors: string[] | null
+          created_at: string | null
+          deleted: boolean | null
+          description: string | null
+          gender: string | null
+          id: number | null
+          in_stock: boolean | null
+          link: string | null
+          name: string | null
+          partner: string | null
+          price: number | null
+          product_id: number | null
+          product_type: string | null
+          sale_price: number | null
+          saved: boolean | null
+          user_id: string | null
           vendor_product_id: string | null
         }
       }

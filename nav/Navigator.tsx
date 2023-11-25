@@ -5,11 +5,7 @@ import {
 import React from 'react';
 
 import FiltersNavigator from '@/nav/FiltersNavigator';
-import {
-    HEADER_HEIGHT_W_STATUS_BAR,
-    HomeHeader,
-    SavedProductsHeader,
-} from '@/nav/Headers';
+import {HEADER_HEIGHT_W_STATUS_BAR, HomeHeader} from '@/nav/Headers';
 import OptionsNavigator from '@/nav/OptionsNavigator';
 import SavedNavigator from '@/nav/SavedNavigator';
 import HomeAuth from '@/screens/Auth/HomeAuth';
