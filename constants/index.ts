@@ -124,17 +124,19 @@ export const COLOR_OPTIONS: readonly {
 }[] = [
     {label: 'Black', value: 'black', color: PALETTE.slate[9]},
     {label: 'White', value: 'white', color: PALETTE.gray[1]},
+    {label: 'Beige', value: 'beige', color: '#FFF0DB'},
     {label: 'Brown', value: 'brown', color: PALETTE.amber[8]},
     {label: 'Grey', value: 'gray', color: PALETTE.gray[5]},
     {label: 'Neutral', value: 'neutral', color: PALETTE.neutral[4]},
     {label: 'Blue', value: 'blue', color: PALETTE.blue[6]},
     {label: 'Navy', value: 'navy', color: PALETTE.blue[9]},
     {label: 'Green', value: 'green', color: PALETTE.green[5]},
+    {label: 'Khaki', value: 'khaki', color: '#F0E68C'},
     {label: 'Red', value: 'red', color: PALETTE.red[6]},
     {label: 'Purple', value: 'purple', color: PALETTE.purple[8]},
     {label: 'Pink', value: 'pink', color: PALETTE.pink[5]},
     {label: 'Orange', value: 'orange', color: PALETTE.orange[5]},
-    {label: 'Yellow', value: 'yellow', color: PALETTE.yellow[3]},
+    {label: 'Yellow', value: 'yellow', color: PALETTE.yellow[4]},
 ] as const;
 
 export const MIN_AGE = 16;
