@@ -8,6 +8,7 @@ import {
 import {AuthError, PostgrestError} from '@supabase/supabase-js';
 
 import {
+    CATEGORY_OPTIONS,
     COLOR_OPTIONS,
     LOCAL_KEY_DELETED_PRODUCTS,
     LOCAL_KEY_SAVED_PRODUCTS,
@@ -512,6 +513,15 @@ const productSlice = createSlice({
         setAction(state, action: PayloadAction<AnimationState>) {
             state.action = action.payload;
         },
+        setGender(
+            state,
+            action: PayloadAction<{
+                obj: 'unsaved' | 'saved' | 'deleted';
+                gender: Gender;
+            }>,
+        ) {
+            state[action.payload.obj].filters.gender = action.payload.gender;
+        },
         toggleExclude(state, action: PayloadAction<'deleted' | 'saved'>) {
             if (action.payload === 'saved') {
                 state.unsaved.filters.excludeSaved =
@@ -544,6 +554,34 @@ const productSlice = createSlice({
                 ];
             }
         },
+        toggleCategory(
+            state,
+            action: PayloadAction<{
+                obj: 'unsaved' | 'saved' | 'deleted';
+                category: (typeof CATEGORY_OPTIONS)[number];
+            }>,
+        ) {
+            const index = state[action.payload.obj].filters.category.findIndex(
+                category => action.payload.category.value === category,
+            );
+
+            if (index < 0) {
+                state[action.payload.obj].filters.category = [
+                    ...state[action.payload.obj].filters.category,
+                    action.payload.category.value,
+                ];
+            } else {
+                state[action.payload.obj].filters.category = [
+                    ...state[action.payload.obj].filters.category.slice(
+                        0,
+                        index,
+                    ),
+                    ...state[action.payload.obj].filters.category.slice(
+                        index + 1,
+                    ),
+                ];
+            }
+        },
         toggleColor(
             state,
             action: PayloadAction<{
@@ -567,6 +605,7 @@ const productSlice = createSlice({
                 ];
             }
         },
+        // TODO: get rid of this functio and replace with individual ones above.
         toggleFilter(
             state,
             action: PayloadAction<{
@@ -765,7 +804,9 @@ export const {
     clearFilters,
     commenceAnimate,
     setAction,
+    setGender,
     toggleBrand,
+    toggleCategory,
     toggleColor,
     toggleExclude,
     toggleFilter,

@@ -3,6 +3,7 @@ import React from 'react';
 
 import {BrandHeader, ColorHeader, FiltersHomeHeader} from '@/nav/Headers';
 import Brand from '@/screens/Filters/Brand';
+import Category from '@/screens/Filters/Category';
 import Color from '@/screens/Filters/Color';
 import FiltersHome from '@/screens/Filters/FiltersHome';
 
@@ -10,6 +11,7 @@ export type FiltersStackParamList = {
     FiltersHome: undefined;
     Brand: undefined;
     Color: undefined;
+    Category: undefined;
 };
 
 const FiltersStack = createStackNavigator<FiltersStackParamList>();
@@ -30,6 +32,11 @@ const FiltersNavigator = () => {
             <FiltersStack.Screen
                 name="Color"
                 component={Color}
+                options={{header: ColorHeader}}
+            />
+            <FiltersStack.Screen
+                name="Category"
+                component={Category}
                 options={{header: ColorHeader}}
             />
         </FiltersStack.Navigator>

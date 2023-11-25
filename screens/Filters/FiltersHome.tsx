@@ -8,9 +8,11 @@ import {
     View,
 } from 'react-native';
 
+import SetGender from '@/components/User/SetGender';
 import {PALETTE} from '@/constants';
 import {FiltersStackParamList} from '@/nav/FiltersNavigator';
-import {useAppSelector} from '@/store/hooks';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
+import {setGender} from '@/store/slices/product';
 
 const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
 const TOUCHABLE_ACTIVE_OPACITY = 0.7;
@@ -18,12 +20,18 @@ const TOUCHABLE_ACTIVE_OPACITY = 0.7;
 const FiltersHome = ({
     navigation,
 }: StackScreenProps<FiltersStackParamList, 'FiltersHome'>) => {
+    const dispatch = useAppDispatch();
+
     const selectedBrands = useAppSelector(
         state => state.product.unsaved.filters.brand,
     );
 
     const selectedColors = useAppSelector(
         state => state.product.unsaved.filters.color,
+    );
+
+    const selectedGender = useAppSelector(
+        state => state.product.unsaved.filters.gender,
     );
 
     const brandText = useMemo<string>(() => {
@@ -53,6 +61,15 @@ const FiltersHome = ({
     return (
         <ScrollView style={styles.container}>
             <View style={styles.listContainer}>
+                <View style={styles.genderContainer}>
+                    <SetGender
+                        value={selectedGender}
+                        onChange={gender =>
+                            dispatch(setGender({obj: 'unsaved', gender}))
+                        }
+                    />
+                </View>
+
                 <TouchableHighlight
                     underlayColor={TOUCHABLE_UNDERLAY}
                     activeOpacity={TOUCHABLE_ACTIVE_OPACITY}
@@ -78,7 +95,24 @@ const FiltersHome = ({
                     <View style={styles.touchableContentContainer}>
                         <View>
                             <Text style={[styles.text, styles.title]}>
-                                Colors
+                                Colours
+                            </Text>
+                        </View>
+                        <View>
+                            <Text style={styles.text}>{colorText}</Text>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    underlayColor={TOUCHABLE_UNDERLAY}
+                    activeOpacity={TOUCHABLE_ACTIVE_OPACITY}
+                    onPress={() => navigation.navigate('Category')}
+                    style={[styles.touchable, styles.noBorder]}>
+                    <View style={styles.touchableContentContainer}>
+                        <View>
+                            <Text style={[styles.text, styles.title]}>
+                                Product Type
                             </Text>
                         </View>
                         <View>
@@ -102,6 +136,24 @@ const styles = StyleSheet.create({
             width: 0,
             height: 0,
         },
+    },
+    genderContainer: {
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        backgroundColor: '#FFF',
+        paddingHorizontal: 25,
+        paddingVertical: 25,
+        marginBottom: 25,
+    },
+    genderTextContainer: {
+        marginTop: -10,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     touchable: {},
     touchableContentContainer: {

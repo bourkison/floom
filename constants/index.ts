@@ -22,7 +22,7 @@ import {
     COLOR_PALETTE_YELLOW,
     COLOR_PALETTE_ZINC,
 } from '@/constants/colors';
-import {Color} from '@/types';
+import {Color, Gender} from '@/types';
 
 // PRODUCT IMAGE CONSTANTS
 export const IMAGE_RATIO = 0.7;
@@ -77,16 +77,44 @@ export const FEATURED_PRODUCT_SIZE = 64;
 export const GENDER_OPTIONS = [
     {value: 'male', label: 'Male'},
     {value: 'female', label: 'Female'},
-    {value: 'other', label: 'Both'},
+    {value: 'both', label: 'Both'},
 ] as const;
-export const CATEGORY_OPTIONS = [
-    'T-shirts',
-    'Shirts',
-    'Trousers',
-    'Jackets',
-    'Hats',
-    'Socks',
-    'Underwear',
+
+export const CATEGORY_OPTIONS: readonly {
+    label: string;
+    value: string;
+    style: Gender;
+}[] = [
+    {label: 'Bag', value: 'bag', style: 'both'},
+    {label: 'Beanie', value: 'beanie', style: 'both'},
+    {label: 'Belt', value: 'belt', style: 'both'},
+    {label: 'Blazer', value: 'blazer', style: 'both'},
+    {label: 'Cap', value: 'cap', style: 'both'},
+    {label: 'Cardigan', value: 'cardigan', style: 'both'},
+    {label: 'Coat', value: 'coat', style: 'both'},
+    {label: 'Dressing Gown', value: 'gown', style: 'both'},
+    {label: 'Gilet', value: 'gilet', style: 'both'},
+    {label: 'Gloves', value: 'gloves', style: 'both'},
+    {label: 'Hat', value: 'hat', style: 'both'},
+    {label: 'Jacket', value: 'jacket', style: 'both'},
+    {label: 'Jeans', value: 'jeans', style: 'both'},
+    {label: 'Jewellery', value: 'jewellery', style: 'both'},
+    {label: 'Jumper', value: 'jumper', style: 'both'},
+    {label: 'Leggings', value: 'leggings', style: 'female'},
+    {label: 'Pyjamas', value: 'pyjamas', style: 'both'},
+    {label: 'Scarf', value: 'scarf', style: 'both'},
+    {label: 'Shirt', value: 'shirt', style: 'both'},
+    {label: 'Shoes', value: 'shoes', style: 'both'},
+    {label: 'Shorts', value: 'shorts', style: 'both'},
+    {label: 'Slippers', value: 'slippers', style: 'both'},
+    {label: 'Socks', value: 'socks', style: 'both'},
+    {label: 'Sunglasses', value: 'sunglasses', style: 'both'},
+    {label: 'Sweatshirt', value: 'sweatshirt', style: 'both'},
+    {label: 'T-Shirt', value: 'tshirt', style: 'both'},
+    {label: 'Tie', value: 'tie', style: 'both'},
+    {label: 'Top', value: 'top', style: 'both'},
+    {label: 'Trousers', value: 'trousers', style: 'both'},
+    {label: 'Underwear', value: 'underwear', style: 'both'},
 ] as const;
 
 export const COLOR_OPTIONS: readonly {
@@ -96,12 +124,12 @@ export const COLOR_OPTIONS: readonly {
 }[] = [
     {label: 'Black', value: 'black', color: PALETTE.slate[9]},
     {label: 'White', value: 'white', color: PALETTE.gray[1]},
-    {label: 'Green', value: 'green', color: PALETTE.green[5]},
     {label: 'Brown', value: 'brown', color: PALETTE.amber[8]},
     {label: 'Grey', value: 'gray', color: PALETTE.gray[5]},
     {label: 'Neutral', value: 'neutral', color: PALETTE.neutral[4]},
     {label: 'Blue', value: 'blue', color: PALETTE.blue[6]},
     {label: 'Navy', value: 'navy', color: PALETTE.blue[9]},
+    {label: 'Green', value: 'green', color: PALETTE.green[5]},
     {label: 'Red', value: 'red', color: PALETTE.red[6]},
     {label: 'Purple', value: 'purple', color: PALETTE.purple[8]},
     {label: 'Pink', value: 'pink', color: PALETTE.pink[5]},
