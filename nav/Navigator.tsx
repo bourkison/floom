@@ -9,6 +9,7 @@ import {
     HomeHeader,
     SavedProductsHeader,
 } from '@/nav/Headers';
+import OptionsNavigator from '@/nav/OptionsNavigator';
 import HomeAuth from '@/screens/Auth/HomeAuth';
 import Login from '@/screens/Auth/Login';
 import SignUp from '@/screens/Auth/SignUp';
@@ -31,6 +32,7 @@ export type MainStackParamList = {
     Home: {
         imageIndex?: number;
     };
+    Options: undefined;
     ProductView: {
         product: Database['public']['Views']['v_products']['Row'];
         reference: 'swipe' | 'saved' | 'deleted' | 'featured';
@@ -103,6 +105,15 @@ export default function Navigator() {
                 options={{
                     gestureDirection: 'horizontal',
                     header: SavedProductsHeader,
+                    gestureEnabled: true,
+                }}
+            />
+            <MainStack.Screen
+                name="Options"
+                component={OptionsNavigator}
+                options={{
+                    gestureDirection: 'horizontal-inverted',
+                    headerShown: false,
                     gestureEnabled: true,
                 }}
             />

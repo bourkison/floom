@@ -165,7 +165,7 @@ export const loadDeletedProducts = createAsyncThunk<
     Database['public']['Views']['v_products']['Row'][],
     void,
     {rejectValue: PostgrestError}
->('product/loadSavedProducts', async (_, {getState, rejectWithValue}) => {
+>('product/loadDeletedProducts', async (_, {getState, rejectWithValue}) => {
     const state = getState() as RootState;
 
     let query = supabase.from('v_products').select();
@@ -618,6 +618,15 @@ const productSlice = createSlice({
                 state.saved.isLoading = false;
                 state.saved.isLoadingMore = false;
                 state.saved.moreToLoad = false;
+            })
+            .addCase(loadDeletedProducts.pending, state => {
+                state.deleted.isLoading = true;
+            })
+            .addCase(loadDeletedProducts.fulfilled, (state, action) => {
+                state.deleted.products = action.payload;
+                state.deleted.isLoading = false;
+                state.deleted.isLoadingMore = false;
+                state.deleted.moreToLoad = false;
             })
             .addCase(saveProduct.pending, (state, action) => {
                 state.animation = 'idle';
