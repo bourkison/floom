@@ -134,7 +134,7 @@ export const SavedProductsHeader: React.FC<StackHeaderProps> = ({
                 <Feather name="chevron-left" size={24} />
             </Pressable>
         }>
-        Liked Products
+        Saved
     </HeaderTemplate>
 );
 

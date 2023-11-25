@@ -19,7 +19,7 @@ import ProductListItem, {
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
 import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
-import {MainStackParamList} from '@/nav/Navigator';
+import {SavedStackParamList} from '@/nav/SavedNavigator';
 import {filtersApplied} from '@/services';
 import {useAppSelector, useAppDispatch} from '@/store/hooks';
 import {loadSavedProducts, clearFilters} from '@/store/slices/product';
@@ -27,9 +27,7 @@ import {Database} from '@/types/schema';
 
 const ON_END_REACHED_THRESHOLD = 1;
 
-const SavedProducts = (
-    _: StackScreenProps<MainStackParamList, 'SavedProducts'>,
-) => {
+const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [isRefreshing, setIsRefereshing] = useState(false);
 
     const dispatch = useAppDispatch();
@@ -255,4 +253,4 @@ const styles = StyleSheet.create({
     loadingIndicator: {marginTop: 25},
 });
 
-export default SavedProducts;
+export default SavedHome;

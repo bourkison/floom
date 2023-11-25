@@ -72,7 +72,7 @@ const ExcludeFilters = () => {
                                 ? styles.activeButtonText
                                 : styles.inactiveButtonText,
                         ]}>
-                        Exclude Liked
+                        Exclude Saved
                     </Text>
                     {excludeSaved ? (
                         <Ionicons

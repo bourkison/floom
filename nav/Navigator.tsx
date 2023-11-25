@@ -11,12 +11,12 @@ import {
     SavedProductsHeader,
 } from '@/nav/Headers';
 import OptionsNavigator from '@/nav/OptionsNavigator';
+import SavedNavigator from '@/nav/SavedNavigator';
 import HomeAuth from '@/screens/Auth/HomeAuth';
 import Login from '@/screens/Auth/Login';
 import SignUp from '@/screens/Auth/SignUp';
 import Home from '@/screens/Main/Home';
 import ProductView from '@/screens/Main/ProductView';
-import SavedProducts from '@/screens/Main/SavedProducts';
 import {useAppSelector} from '@/store/hooks';
 import {Database} from '@/types/schema';
 
@@ -114,11 +114,11 @@ export default function Navigator() {
             />
             <MainStack.Screen
                 name="SavedProducts"
-                component={SavedProducts}
+                component={SavedNavigator}
                 options={{
                     gestureDirection: 'horizontal',
-                    header: SavedProductsHeader,
                     gestureEnabled: true,
+                    headerShown: false,
                 }}
             />
             <MainStack.Screen

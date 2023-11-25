@@ -159,6 +159,23 @@ const FiltersHome = ({
                     </View>
                 </TouchableHighlight>
 
+                <TouchableHighlight
+                    underlayColor={TOUCHABLE_UNDERLAY}
+                    activeOpacity={TOUCHABLE_ACTIVE_OPACITY}
+                    onPress={() => navigation.navigate('Price')}
+                    style={[styles.touchable, styles.noBorder]}>
+                    <View style={styles.touchableContentContainer}>
+                        <View>
+                            <Text style={[styles.text, styles.title]}>
+                                Vendor
+                            </Text>
+                        </View>
+                        <View>
+                            <Text style={styles.text}>{priceText}</Text>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+
                 <View style={styles.excludeContainer}>
                     <ExcludeFilters />
                 </View>
