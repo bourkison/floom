@@ -34,8 +34,8 @@ const initialState = productAdapter.getInitialState({
         isLoadingMore: false,
         filters: {
             gender: 'both' as Gender,
-            category: [] as string[],
-            color: [] as string[],
+            category: [] as (typeof CATEGORY_OPTIONS)[number][],
+            color: [] as (typeof COLOR_OPTIONS)[number][],
             brand: [] as {id: number; name: string}[],
             searchText: '',
         },
@@ -47,8 +47,8 @@ const initialState = productAdapter.getInitialState({
         isLoadingMore: false,
         filters: {
             gender: 'both' as Gender,
-            category: [] as string[],
-            color: [] as string[],
+            category: [] as (typeof CATEGORY_OPTIONS)[number][],
+            color: [] as (typeof COLOR_OPTIONS)[number][],
             brand: [] as {id: number; name: string}[],
             searchText: '',
             excludeDeleted: true,
@@ -62,8 +62,8 @@ const initialState = productAdapter.getInitialState({
         isLoadingMore: false,
         filters: {
             gender: 'both' as Gender,
-            category: [] as string[],
-            color: [] as string[],
+            category: [] as (typeof CATEGORY_OPTIONS)[number][],
+            color: [] as (typeof COLOR_OPTIONS)[number][],
             brand: [] as {id: number; name: string}[],
             searchText: '',
         },
@@ -81,12 +81,7 @@ export const loadUnsavedProducts = createAsyncThunk<
     let query = supabase.from('v_products').select().limit(10);
 
     if (state.user.isGuest) {
-        query = applyProductFilters(query, {
-            gender: state.product.unsaved.filters.gender,
-            category: state.product.unsaved.filters.category,
-            searchText: state.product.unsaved.filters.searchText,
-            color: state.product.unsaved.filters.color,
-        });
+        query = applyProductFilters(query, state.product.unsaved.filters);
 
         const excludeSaved = state.product.unsaved.filters.excludeSaved
             ? JSON.parse(
@@ -116,14 +111,10 @@ export const loadUnsavedProducts = createAsyncThunk<
 
         return data;
     } else {
-        const {data, error} = await applyProductFilters(query, {
-            gender: state.product.unsaved.filters.gender,
-            category: state.product.unsaved.filters.category,
-            searchText: state.product.unsaved.filters.searchText,
-            color: state.product.unsaved.filters.color,
-            excludeDeleted: state.product.unsaved.filters.excludeDeleted,
-            excludeSaved: state.product.unsaved.filters.excludeSaved,
-        });
+        const {data, error} = await applyProductFilters(
+            query,
+            state.product.unsaved.filters,
+        );
 
         if (error) {
             return rejectWithValue(error);
@@ -562,13 +553,13 @@ const productSlice = createSlice({
             }>,
         ) {
             const index = state[action.payload.obj].filters.category.findIndex(
-                category => action.payload.category.value === category,
+                category => action.payload.category.value === category.value,
             );
 
             if (index < 0) {
                 state[action.payload.obj].filters.category = [
                     ...state[action.payload.obj].filters.category,
-                    action.payload.category.value,
+                    action.payload.category,
                 ];
             } else {
                 state[action.payload.obj].filters.category = [
@@ -590,71 +581,19 @@ const productSlice = createSlice({
             }>,
         ) {
             const index = state[action.payload.obj].filters.color.findIndex(
-                color => action.payload.color.value === color,
+                color => action.payload.color.value === color.value,
             );
 
             if (index < 0) {
                 state[action.payload.obj].filters.color = [
                     ...state[action.payload.obj].filters.color,
-                    action.payload.color.value,
+                    action.payload.color,
                 ];
             } else {
                 state[action.payload.obj].filters.color = [
                     ...state[action.payload.obj].filters.color.slice(0, index),
                     ...state[action.payload.obj].filters.color.slice(index + 1),
                 ];
-            }
-        },
-        // TODO: get rid of this functio and replace with individual ones above.
-        toggleFilter(
-            state,
-            action: PayloadAction<{
-                item: string;
-                type: 'gender' | 'category' | 'color';
-                obj: 'unsaved' | 'saved' | 'deleted';
-            }>,
-        ) {
-            // Push to relevant filter if exists, other wise exclude it.
-            if (action.payload.type === 'gender') {
-                // TODO: Better typechecking for gender
-                if (
-                    action.payload.item === 'male' ||
-                    action.payload.item === 'female' ||
-                    action.payload.item === 'both'
-                ) {
-                    state[action.payload.obj].filters.gender =
-                        action.payload.item;
-                }
-            } else if (action.payload.type === 'category') {
-                if (
-                    !state[action.payload.obj].filters.category.includes(
-                        action.payload.item,
-                    )
-                ) {
-                    state[action.payload.obj].filters.category = [
-                        ...state[action.payload.obj].filters.category,
-                        action.payload.item,
-                    ];
-                } else {
-                    state[action.payload.obj].filters.category = state[
-                        action.payload.obj
-                    ].filters.category.filter(i => i !== action.payload.item);
-                }
-            } else if (action.payload.type === 'color') {
-                if (
-                    !state[action.payload.obj].filters.color.includes(
-                        action.payload.item,
-                    )
-                ) {
-                    state[action.payload.obj].filters.color = [
-                        ...state[action.payload.obj].filters.color,
-                        action.payload.item,
-                    ];
-                } else {
-                    state[action.payload.obj].filters.color = state[
-                        action.payload.obj
-                    ].filters.color.filter(i => i !== action.payload.item);
-                }
             }
         },
         updateSearchFilter(
@@ -809,7 +748,6 @@ export const {
     toggleCategory,
     toggleColor,
     toggleExclude,
-    toggleFilter,
     updateSearchFilter,
 } = productSlice.actions;
 export default productSlice.reducer;

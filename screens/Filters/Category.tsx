@@ -23,7 +23,7 @@ const CategoryListItem = ({category}: CategoryProps) => {
 
     const isSelected = useMemo(() => {
         const index = selectedCategories.findIndex(
-            selected => selected === category.value,
+            selected => selected.value === category.value,
         );
 
         return !(index < 0);

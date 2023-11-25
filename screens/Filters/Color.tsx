@@ -25,7 +25,7 @@ const ColorListItem = ({color}: ColorListItemProps) => {
 
     const isSelected = useMemo(() => {
         const index = selectedColors.findIndex(
-            selected => selected === color.value,
+            selected => selected.value === color.value,
         );
 
         return !(index < 0);

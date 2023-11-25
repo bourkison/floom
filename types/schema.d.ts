@@ -9,9 +9,6 @@ type NonNullVProducts = MergeDeep<
         brand: NonNullable<
             DatabaseGenerated['public']['Views']['v_products']['Row']['brand']
         >;
-        categories: NonNullable<
-            DatabaseGenerated['public']['Views']['v_products']['Row']['categories']
-        >;
         colors: NonNullable<
             DatabaseGenerated['public']['Views']['v_products']['Row']['colors']
         >;
@@ -54,6 +51,9 @@ type NonNullVProducts = MergeDeep<
         >;
         description: NonNullable<
             DatabaseGenerated['public']['Views']['v_products']['Row']['description']
+        >;
+        product_type: NonNullable<
+            DatabaseGenerated['public']['Views']['v_products']['Row']['product_type']
         >;
     }
 >;

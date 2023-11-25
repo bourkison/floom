@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 
 import SetGender from '@/components/User/SetGender';
+import ExcludeFilters from '@/components/Utility/ExcludeFilters';
 import {PALETTE} from '@/constants';
 import {FiltersStackParamList} from '@/nav/FiltersNavigator';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {setGender} from '@/store/slices/product';
-import ExcludeFilters from '@/components/Utility/ExcludeFilters';
 
 const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
 const TOUCHABLE_ACTIVE_OPACITY = 0.7;
@@ -57,7 +57,7 @@ const FiltersHome = ({
         }
 
         if (selectedColors.length === 1) {
-            return selectedColors[0];
+            return selectedColors[0].label;
         }
 
         return `${selectedColors.length} selected`;
@@ -69,7 +69,7 @@ const FiltersHome = ({
         }
 
         if (selectedCategories.length === 1) {
-            return selectedCategories[0];
+            return selectedCategories[0].label;
         }
 
         return `${selectedCategories.length} selected`;

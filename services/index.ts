@@ -1,5 +1,6 @@
 import {PostgrestFilterBuilder} from '@supabase/postgrest-js';
 
+import {CATEGORY_OPTIONS, COLOR_OPTIONS} from '@/constants';
 import {RootState} from '@/store';
 import {Gender} from '@/types';
 import {Database} from '@/types/schema';
@@ -12,8 +13,8 @@ type VProductsFilterBuilder = PostgrestFilterBuilder<
 
 type Filters = {
     gender: Gender;
-    category: string[];
-    color: string[];
+    category: (typeof CATEGORY_OPTIONS)[number][];
+    color: (typeof COLOR_OPTIONS)[number][];
     searchText: string;
     excludeSaved?: boolean;
     excludeDeleted?: boolean;
@@ -34,7 +35,10 @@ export function applyProductFilters(
     }
 
     if (filters.category.length) {
-        query = query.in('categories', filters.category);
+        query = query.in(
+            'product_type',
+            filters.category.map(category => category.value),
+        );
     }
 
     if (filters.gender !== 'both') {
