@@ -10,7 +10,7 @@ import UpdatePasswordWidget from '@/components/Options/UpdatePasswordWidget';
 import SectionHeader from '@/components/Utility/SectionHeader';
 import {useAppSelector} from '@/store/hooks';
 
-const Options = () => {
+const OptionsHome = () => {
     const isGuest = useAppSelector(state => state.user.isGuest);
 
     const [currentPassword, setCurrentPassword] = useState('');
@@ -84,4 +84,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Options;
+export default OptionsHome;

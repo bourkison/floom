@@ -10,6 +10,7 @@ import {
     Pressable,
     TouchableOpacity,
     TextInput,
+    ViewStyle,
 } from 'react-native';
 
 import {PALETTE} from '@/constants';
@@ -20,6 +21,7 @@ type HeaderProps = {
     children: string | JSX.Element;
     leftIcon?: JSX.Element;
     rightIcon?: JSX.Element;
+    style?: ViewStyle;
 };
 
 export const HEADER_HEIGHT = 44;
@@ -30,6 +32,7 @@ const HeaderTemplate: React.FC<HeaderProps> = ({
     children,
     leftIcon,
     rightIcon,
+    style,
 }) => (
     <View
         style={[
@@ -37,6 +40,7 @@ const HeaderTemplate: React.FC<HeaderProps> = ({
             {
                 flexBasis: HEADER_HEIGHT_W_STATUS_BAR,
             },
+            style,
         ]}>
         <View style={styles.statusBarEmpty} />
         <View style={styles.headerRow}>
@@ -88,7 +92,8 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => {
                     style={styles.headerIcon}>
                     <Ionicons name="heart-outline" size={24} />
                 </TouchableOpacity>
-            }>
+            }
+            style={styles.homeHeader}>
             <View style={styles.searchContainer}>
                 <View style={styles.searchSection}>
                     <Ionicons
@@ -238,6 +243,19 @@ export const SignUpHeader: React.FC<StackHeaderProps> = ({navigation}) => (
     </HeaderTemplate>
 );
 
+export const FiltersHomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
+    <HeaderTemplate
+        leftIcon={
+            <Pressable
+                style={styles.headerIcon}
+                onPress={() => navigation.goBack()}>
+                <Feather name="x" size={24} />
+            </Pressable>
+        }>
+        Filter
+    </HeaderTemplate>
+);
+
 const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,
@@ -317,5 +335,10 @@ const styles = StyleSheet.create({
     },
     searchIcon: {
         paddingHorizontal: 5,
+    },
+    homeHeader: {
+        shadowOpacity: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: PALETTE.neutral[2],
     },
 });

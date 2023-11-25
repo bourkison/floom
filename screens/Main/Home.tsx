@@ -18,6 +18,7 @@ import {
 import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
 import {MainStackParamList} from '@/nav/Navigator';
 import {useAppSelector} from '@/store/hooks';
+import SortFilter from '@/components/Product/SortFilter';
 
 const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
     const {width, height} = useWindowDimensions();
@@ -59,7 +60,7 @@ const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
 
     return (
         <View style={styles.flexOne}>
-            <FilterDropdown obj="unsaved" />
+            <SortFilter obj="unsaved" />
             <View style={[styles.container, {marginTop: calculateMargins()}]}>
                 <View
                     style={[

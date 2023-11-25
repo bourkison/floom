@@ -10,7 +10,7 @@ import {
 } from '@/nav/Headers';
 import AppInfo from '@/screens/Options/AppInfo';
 import DeletedProducts from '@/screens/Options/DeletedProducts';
-import Options from '@/screens/Options/Options';
+import OptionsHome from '@/screens/Options/OptionsHome';
 import UpdateDetail from '@/screens/Options/UpdateDetail';
 
 export type OptionsStackParamList = {
@@ -33,7 +33,7 @@ const OptionsNavigator = () => {
             }}>
             <OptionsStack.Screen
                 name="OptionsHome"
-                component={Options}
+                component={OptionsHome}
                 options={{
                     gestureDirection: 'horizontal-inverted',
                     header: OptionsHeader,

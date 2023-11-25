@@ -4,6 +4,7 @@ import {
 } from '@react-navigation/stack';
 import React from 'react';
 
+import FiltersNavigator from '@/nav/FiltersNavigator';
 import {
     HEADER_HEIGHT_W_STATUS_BAR,
     HomeHeader,
@@ -29,6 +30,7 @@ export type AuthStackParamList = {
 };
 
 export type MainStackParamList = {
+    Filters: undefined;
     Home: {
         imageIndex?: number;
     };
@@ -86,6 +88,17 @@ export default function Navigator() {
                 name="Home"
                 component={Home}
                 options={{header: HomeHeader}}
+            />
+            <MainStack.Screen
+                name="Filters"
+                component={FiltersNavigator}
+                options={{
+                    gestureDirection: 'vertical',
+                    headerShown: false,
+                    gestureEnabled: false,
+                    cardStyleInterpolator:
+                        CardStyleInterpolators.forVerticalIOS,
+                }}
             />
             <MainStack.Screen
                 name="ProductView"

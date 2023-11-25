@@ -64,13 +64,13 @@ export default function AppLoader({
         };
 
         initFetch();
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         if (fontsLoaded && userLoaded) {
             setAppIsReady(true);
         }
-    }, [fontsLoaded, userLoaded]);
+    }, [fontsLoaded, userLoaded, setAppIsReady]);
 
     if (!appIsReady) {
         return null;
