@@ -1,13 +1,16 @@
 import {StackScreenProps} from '@react-navigation/stack';
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {View, StyleSheet, ActivityIndicator, ScrollView} from 'react-native';
 
+import CollapsibleSection from '@/components/Save/CollapsibleSection';
+import CollectionListItem from '@/components/Save/CollectionListItem';
+import SaveListItem from '@/components/Save/SaveListItem';
+import SearchInput from '@/components/Utility/SearchInput';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
-import SearchInput from '@/components/Utility/SearchInput';
 
-type CollectionType = {
+export type CollectionType = {
     name: string;
     id: number;
     products: Database['public']['Views']['v_saves']['Row'][];
@@ -22,6 +25,19 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [saves, setSaves] = useState<
         Database['public']['Views']['v_saves']['Row'][]
     >([]);
+
+    const [collectionsExpanded, setCollectionsExpanded] = useState(true);
+    const [savesExpanded, setSavesExpanded] = useState(true);
+
+    const filteredCollections = useMemo(() => {
+        return collections.filter(collection =>
+            collection.name.includes(searchText),
+        );
+    }, [collections, searchText]);
+
+    const filteredSaves = useMemo(() => {
+        return saves.filter(save => save.name.includes(searchText));
+    }, [saves, searchText]);
 
     useEffect(() => {
         const fetchSaves = async () => {
@@ -99,11 +115,33 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
             </View>
 
             {!isLoading ? (
-                saves.map(save => <Text key={save.id}>{save.name}</Text>)
+                <ScrollView>
+                    <CollapsibleSection
+                        headerText="Collections"
+                        onHeaderPress={() =>
+                            setCollectionsExpanded(!collectionsExpanded)
+                        }
+                        expanded={collectionsExpanded}>
+                        {filteredCollections.map(collection => (
+                            <CollectionListItem
+                                collection={collection}
+                                key={collection.id}
+                            />
+                        ))}
+                    </CollapsibleSection>
+
+                    <CollapsibleSection
+                        headerText="Saves"
+                        onHeaderPress={() => setSavesExpanded(!savesExpanded)}
+                        expanded={savesExpanded}>
+                        {filteredSaves.map(save => (
+                            <SaveListItem save={save} key={save.id} />
+                        ))}
+                    </CollapsibleSection>
+                </ScrollView>
             ) : (
                 <ActivityIndicator />
             )}
-            <Text>Saved Home</Text>
         </View>
     );
 };
