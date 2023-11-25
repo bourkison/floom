@@ -1,6 +1,7 @@
 import {Entypo, Ionicons, Feather} from '@expo/vector-icons';
 import {StackHeaderProps} from '@react-navigation/stack';
 import Constants from 'expo-constants';
+import * as Haptics from 'expo-haptics';
 import React from 'react';
 import {
     View,
@@ -8,9 +9,12 @@ import {
     StyleSheet,
     Pressable,
     TouchableOpacity,
+    TextInput,
 } from 'react-native';
 
 import {PALETTE} from '@/constants';
+import {useAppDispatch, useAppSelector} from '@/store/hooks';
+import {loadUnsavedProducts, updateSearchFilter} from '@/store/slices/product';
 
 type HeaderProps = {
     children: string | JSX.Element;
@@ -49,29 +53,79 @@ const HeaderTemplate: React.FC<HeaderProps> = ({
     </View>
 );
 
-export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
-    <HeaderTemplate
-        leftIcon={
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.navigate('Options');
-                }}
-                style={styles.headerIcon}>
-                <Entypo name="cog" size={24} />
-            </TouchableOpacity>
-        }
-        rightIcon={
-            <TouchableOpacity
-                onPress={() => {
-                    navigation.navigate('SavedProducts');
-                }}
-                style={styles.headerIcon}>
-                <Ionicons name="heart-outline" size={24} />
-            </TouchableOpacity>
-        }>
-        <Text style={styles.logoText}>Floom</Text>
-    </HeaderTemplate>
-);
+export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => {
+    const dispatch = useAppDispatch();
+    const searchText = useAppSelector(
+        state => state.product.unsaved.filters.searchText,
+    );
+
+    const updateSearchText = (val: string) => {
+        dispatch(updateSearchFilter({obj: 'unsaved', pl: val}));
+    };
+
+    const search = () => {
+        Haptics.impactAsync();
+
+        dispatch(loadUnsavedProducts());
+    };
+
+    return (
+        <HeaderTemplate
+            leftIcon={
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('Options');
+                    }}
+                    style={styles.headerIcon}>
+                    <Entypo name="cog" size={24} />
+                </TouchableOpacity>
+            }
+            rightIcon={
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('SavedProducts');
+                    }}
+                    style={styles.headerIcon}>
+                    <Ionicons name="heart-outline" size={24} />
+                </TouchableOpacity>
+            }>
+            <View style={styles.searchContainer}>
+                <View style={styles.searchSection}>
+                    <Ionicons
+                        name="search"
+                        style={styles.searchIcon}
+                        color={PALETTE.neutral[0]}
+                    />
+
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search"
+                        placeholderTextColor={PALETTE.neutral[3]}
+                        onChangeText={updateSearchText}
+                        onSubmitEditing={search}
+                        value={searchText}
+                        returnKeyType="search"
+                        selectTextOnFocus={true}
+                    />
+
+                    {searchText.length > 0 && (
+                        <Pressable
+                            onPress={() => {
+                                updateSearchText('');
+                            }}>
+                            <Feather
+                                name="x-circle"
+                                style={styles.searchIcon}
+                                color={PALETTE.neutral[0]}
+                                size={14}
+                            />
+                        </Pressable>
+                    )}
+                </View>
+            </View>
+        </HeaderTemplate>
+    );
+};
 
 export const OptionsHeader: React.FC<StackHeaderProps> = ({navigation}) => (
     <HeaderTemplate
@@ -238,5 +292,30 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'JosefinSans-Regular',
         textTransform: 'lowercase',
+    },
+    searchContainer: {
+        paddingVertical: 3,
+        paddingHorizontal: 10,
+        width: '100%',
+        flex: 1,
+    },
+    searchSection: {
+        backgroundColor: PALETTE.neutral[5],
+        borderRadius: 5,
+        marginVertical: 5,
+        width: '100%',
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    searchInput: {
+        color: PALETTE.neutral[0],
+        fontSize: 14,
+        alignSelf: 'center',
+        paddingVertical: 5,
+        flex: 1,
+    },
+    searchIcon: {
+        paddingHorizontal: 5,
     },
 });
