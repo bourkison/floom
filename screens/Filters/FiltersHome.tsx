@@ -13,6 +13,7 @@ import {PALETTE} from '@/constants';
 import {FiltersStackParamList} from '@/nav/FiltersNavigator';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {setGender} from '@/store/slices/product';
+import ExcludeFilters from '@/components/Utility/ExcludeFilters';
 
 const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
 const TOUCHABLE_ACTIVE_OPACITY = 0.7;
@@ -32,6 +33,10 @@ const FiltersHome = ({
 
     const selectedGender = useAppSelector(
         state => state.product.unsaved.filters.gender,
+    );
+
+    const selectedCategories = useAppSelector(
+        state => state.product.unsaved.filters.category,
     );
 
     const brandText = useMemo<string>(() => {
@@ -57,6 +62,22 @@ const FiltersHome = ({
 
         return `${selectedColors.length} selected`;
     }, [selectedColors]);
+
+    const categoryText = useMemo<string>(() => {
+        if (selectedCategories.length === 0) {
+            return 'All';
+        }
+
+        if (selectedCategories.length === 1) {
+            return selectedCategories[0];
+        }
+
+        return `${selectedCategories.length} selected`;
+    }, [selectedCategories]);
+
+    const priceText = useMemo<string>(() => {
+        return 'Any';
+    }, []);
 
     return (
         <ScrollView style={styles.container}>
@@ -116,10 +137,31 @@ const FiltersHome = ({
                             </Text>
                         </View>
                         <View>
-                            <Text style={styles.text}>{colorText}</Text>
+                            <Text style={styles.text}>{categoryText}</Text>
                         </View>
                     </View>
                 </TouchableHighlight>
+
+                <TouchableHighlight
+                    underlayColor={TOUCHABLE_UNDERLAY}
+                    activeOpacity={TOUCHABLE_ACTIVE_OPACITY}
+                    onPress={() => navigation.navigate('Price')}
+                    style={[styles.touchable, styles.noBorder]}>
+                    <View style={styles.touchableContentContainer}>
+                        <View>
+                            <Text style={[styles.text, styles.title]}>
+                                Price
+                            </Text>
+                        </View>
+                        <View>
+                            <Text style={styles.text}>{priceText}</Text>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+
+                <View style={styles.excludeContainer}>
+                    <ExcludeFilters />
+                </View>
             </View>
         </ScrollView>
     );
@@ -175,6 +217,18 @@ const styles = StyleSheet.create({
     },
     title: {
         fontWeight: '500',
+    },
+    excludeContainer: {
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: {
+            width: 0,
+            height: 0,
+        },
+        backgroundColor: '#FFF',
+        paddingHorizontal: 25,
+        paddingVertical: 25,
+        marginTop: 25,
     },
 });
 

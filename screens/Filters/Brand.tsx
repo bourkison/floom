@@ -6,6 +6,7 @@ import {
     StyleSheet,
     ScrollView,
     TouchableHighlight,
+    ActivityIndicator,
 } from 'react-native';
 
 import SearchInput from '@/components/Utility/SearchInput';
@@ -71,10 +72,15 @@ const Brand = () => {
     const [availableBrands, setAvailableBrands] = useState<
         {id: number; name: string}[]
     >([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchBrands = async () => {
+            setIsLoading(true);
+
             const {data, error} = await supabase.from('brands').select();
+
+            setIsLoading(false);
 
             if (error) {
                 // TODO: Handle error.
@@ -108,16 +114,20 @@ const Brand = () => {
                 />
             </View>
 
-            <ScrollView style={styles.scrollContainer}>
-                <View style={styles.listContainer}>
-                    {filteredSortedBrands.map(brand => (
-                        <BrandListItem
-                            brand={brand}
-                            key={brand.id.toString()}
-                        />
-                    ))}
-                </View>
-            </ScrollView>
+            {!isLoading ? (
+                <ScrollView style={styles.scrollContainer}>
+                    <View style={styles.listContainer}>
+                        {filteredSortedBrands.map(brand => (
+                            <BrandListItem
+                                brand={brand}
+                                key={brand.id.toString()}
+                            />
+                        ))}
+                    </View>
+                </ScrollView>
+            ) : (
+                <ActivityIndicator style={styles.activityIndicator} />
+            )}
         </View>
     );
 };
@@ -163,6 +173,9 @@ const styles = StyleSheet.create({
     brandText: {
         fontSize: 16,
         fontWeight: '500',
+    },
+    activityIndicator: {
+        marginTop: 25,
     },
 });
 

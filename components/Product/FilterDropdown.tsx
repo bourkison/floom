@@ -292,7 +292,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({obj}) => {
                             <View style={styles.column}>
                                 <Text style={styles.columnHeader}>Style</Text>
                                 {GENDER_OPTIONS.filter(
-                                    g => g.value !== 'other',
+                                    g => g.value !== 'both',
                                 ).map(g => (
                                     <FilterItem
                                         obj={obj}

@@ -292,6 +292,55 @@ export const ColorHeader: React.FC<StackHeaderProps> = ({navigation}) => {
     );
 };
 
+export const CategoryHeader: React.FC<StackHeaderProps> = ({navigation}) => {
+    const categoryFilters = useAppSelector(
+        state => state.product.unsaved.filters.category,
+    );
+
+    // TODO: Clear button
+
+    return (
+        <HeaderTemplate
+            leftIcon={
+                <Pressable
+                    style={styles.headerIcon}
+                    onPress={() => navigation.goBack()}>
+                    <Feather name="arrow-left" size={24} />
+                </Pressable>
+            }
+            rightIcon={
+                categoryFilters.length ? (
+                    <Pressable style={styles.headerIcon}>
+                        <View>
+                            {/* <Text style={{fontSize: 8}}>Clear</Text> */}
+                        </View>
+                    </Pressable>
+                ) : undefined
+            }
+            style={styles.hiddenShadowWithBorder}>
+            Product Type
+        </HeaderTemplate>
+    );
+};
+
+export const PriceHeader: React.FC<StackHeaderProps> = ({navigation}) => {
+    // TODO: Clear button
+
+    return (
+        <HeaderTemplate
+            leftIcon={
+                <Pressable
+                    style={styles.headerIcon}
+                    onPress={() => navigation.goBack()}>
+                    <Feather name="arrow-left" size={24} />
+                </Pressable>
+            }
+            style={styles.hiddenShadowWithBorder}>
+            Price
+        </HeaderTemplate>
+    );
+};
+
 const styles = StyleSheet.create({
     headerContainer: {
         flex: 1,
