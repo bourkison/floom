@@ -445,7 +445,7 @@ export const deleteAllDeletedProducts = createAsyncThunk<
     {rejectValue: PostgrestError | AuthError}
 >(
     'product/deleteAllDeletedProducts',
-    async (productId, {getState, rejectWithValue}) => {
+    async (_, {getState, rejectWithValue}) => {
         const state = getState() as RootState;
 
         if (state.user.isGuest) {
@@ -474,9 +474,108 @@ const productSlice = createSlice({
     name: 'product',
     initialState,
     reducers: {
+        buyProduct(state) {
+            state.animation = 'idle';
+        },
+        clearFilters(
+            state,
+            action: PayloadAction<{
+                filterType: 'saved' | 'unsaved' | 'deleted';
+                gender: Gender;
+            }>,
+        ) {
+            if (action.payload.filterType === 'saved') {
+                state.saved.filters.category = [];
+                state.saved.filters.color = [];
+                state.saved.filters.searchText = '';
+                state.saved.filters.gender = action.payload.gender;
+            } else if (action.payload.filterType === 'unsaved') {
+                state.unsaved.filters.category = [];
+                state.unsaved.filters.color = [];
+                state.unsaved.filters.searchText = '';
+                state.unsaved.filters.gender = action.payload.gender;
+            } else {
+                state.deleted.filters.category = [];
+                state.deleted.filters.color = [];
+                state.deleted.filters.searchText = '';
+                state.deleted.filters.gender = action.payload.gender;
+            }
+        },
         commenceAnimate(state, action: PayloadAction<AnimationState>) {
             state.animation = action.payload;
             state.action = action.payload;
+        },
+        setAction(state, action: PayloadAction<AnimationState>) {
+            state.action = action.payload;
+        },
+        toggleExclude(state, action: PayloadAction<'deleted' | 'saved'>) {
+            if (action.payload === 'saved') {
+                state.unsaved.filters.excludeSaved =
+                    !state.unsaved.filters.excludeSaved;
+            } else if (action.payload === 'deleted') {
+                state.unsaved.filters.excludeDeleted =
+                    !state.unsaved.filters.excludeDeleted;
+            }
+        },
+        toggleFilter(
+            state,
+            action: PayloadAction<{
+                item: string;
+                type: 'gender' | 'category' | 'color';
+                obj: 'unsaved' | 'saved' | 'deleted';
+            }>,
+        ) {
+            // Push to relevant filter if exists, other wise exclude it.
+            if (action.payload.type === 'gender') {
+                // TODO: Better typechecking for gender
+                if (
+                    action.payload.item === 'male' ||
+                    action.payload.item === 'female' ||
+                    action.payload.item === 'both'
+                ) {
+                    state[action.payload.obj].filters.gender =
+                        action.payload.item;
+                }
+            } else if (action.payload.type === 'category') {
+                if (
+                    !state[action.payload.obj].filters.category.includes(
+                        action.payload.item,
+                    )
+                ) {
+                    state[action.payload.obj].filters.category = [
+                        ...state[action.payload.obj].filters.category,
+                        action.payload.item,
+                    ];
+                } else {
+                    state[action.payload.obj].filters.category = state[
+                        action.payload.obj
+                    ].filters.category.filter(i => i !== action.payload.item);
+                }
+            } else if (action.payload.type === 'color') {
+                if (
+                    !state[action.payload.obj].filters.color.includes(
+                        action.payload.item,
+                    )
+                ) {
+                    state[action.payload.obj].filters.color = [
+                        ...state[action.payload.obj].filters.color,
+                        action.payload.item,
+                    ];
+                } else {
+                    state[action.payload.obj].filters.color = state[
+                        action.payload.obj
+                    ].filters.color.filter(i => i !== action.payload.item);
+                }
+            }
+        },
+        updateSearchFilter(
+            state,
+            action: PayloadAction<{
+                obj: 'saved' | 'unsaved' | 'deleted';
+                pl: string;
+            }>,
+        ) {
+            state[action.payload.obj].filters.searchText = action.payload.pl;
         },
     },
     extraReducers(builder) {
@@ -492,5 +591,13 @@ const productSlice = createSlice({
     },
 });
 
-export const {commenceAnimate} = productSlice.actions;
+export const {
+    buyProduct,
+    clearFilters,
+    commenceAnimate,
+    setAction,
+    toggleExclude,
+    toggleFilter,
+    updateSearchFilter,
+} = productSlice.actions;
 export default productSlice.reducer;

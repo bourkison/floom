@@ -71,10 +71,35 @@ export const LOCAL_KEY_DELETED_PRODUCTS = '@deletedProducts';
 export const MAX_LOCAL_SAVED_PRODUCTS = 100;
 export const MAX_LOCAL_DELETED_PRODUCTS = 100;
 
+export const ACTION_BUTTON_SIZE = 55;
+export const FEATURED_PRODUCT_SIZE = 64;
+
 export const GENDER_OPTIONS = [
     {value: 'male', label: 'Male'},
     {value: 'female', label: 'Female'},
     {value: 'other', label: 'Both'},
+] as const;
+export const CATEGORY_OPTIONS = [
+    'T-shirts',
+    'Shirts',
+    'Trousers',
+    'Jackets',
+    'Hats',
+    'Socks',
+    'Underwear',
+] as const;
+export const COLOR_OPTIONS = [
+    'Black',
+    'White',
+    'Green',
+    'Purple',
+    'Gray',
+    'Blue',
+    'Red',
+    'Yellow',
+    'Brown',
+    'Multicolour',
+    'Beige',
 ] as const;
 
 export const MIN_AGE = 16;

@@ -6,6 +6,7 @@ import Login from '@/screens/Auth/Login';
 import SignUp from '@/screens/Auth/SignUp';
 import Home from '@/screens/Main/Home';
 import {useAppSelector} from '@/store/hooks';
+import {Database} from '@/types/schema';
 
 export type AuthStackParamList = {
     HomeAuth: undefined;
@@ -17,7 +18,14 @@ export type AuthStackParamList = {
 };
 
 export type MainStackParamList = {
-    Home: undefined;
+    Home: {
+        imageIndex?: number;
+    };
+    ProductView: {
+        product: Database['public']['Views']['v_products']['Row'];
+        reference: 'swipe' | 'saved' | 'deleted' | 'featured';
+        imageIndex?: number;
+    };
 };
 
 const MainStack = createStackNavigator<MainStackParamList>();
