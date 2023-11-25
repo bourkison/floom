@@ -1,5 +1,5 @@
 import {StackScreenProps} from '@react-navigation/stack';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
     ScrollView,
     Text,
@@ -10,6 +10,7 @@ import {
 
 import {PALETTE} from '@/constants';
 import {FiltersStackParamList} from '@/nav/FiltersNavigator';
+import {useAppSelector} from '@/store/hooks';
 
 const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
 const TOUCHABLE_ACTIVE_OPACITY = 0.7;
@@ -17,6 +18,38 @@ const TOUCHABLE_ACTIVE_OPACITY = 0.7;
 const FiltersHome = ({
     navigation,
 }: StackScreenProps<FiltersStackParamList, 'FiltersHome'>) => {
+    const selectedBrands = useAppSelector(
+        state => state.product.unsaved.filters.brand,
+    );
+
+    const selectedColors = useAppSelector(
+        state => state.product.unsaved.filters.color,
+    );
+
+    const brandText = useMemo<string>(() => {
+        if (selectedBrands.length === 0) {
+            return 'All';
+        }
+
+        if (selectedBrands.length === 1) {
+            return selectedBrands[0].name;
+        }
+
+        return `${selectedBrands.length} selected`;
+    }, [selectedBrands]);
+
+    const colorText = useMemo<string>(() => {
+        if (selectedColors.length === 0) {
+            return 'All';
+        }
+
+        if (selectedColors.length === 1) {
+            return selectedColors[0];
+        }
+
+        return `${selectedColors.length} selected`;
+    }, [selectedColors]);
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.listContainer}>
@@ -32,7 +65,7 @@ const FiltersHome = ({
                             </Text>
                         </View>
                         <View>
-                            <Text style={styles.text}>All</Text>
+                            <Text style={styles.text}>{brandText}</Text>
                         </View>
                     </View>
                 </TouchableHighlight>
@@ -40,7 +73,7 @@ const FiltersHome = ({
                 <TouchableHighlight
                     underlayColor={TOUCHABLE_UNDERLAY}
                     activeOpacity={TOUCHABLE_ACTIVE_OPACITY}
-                    onPress={() => navigation.navigate('Brand')}
+                    onPress={() => navigation.navigate('Color')}
                     style={[styles.touchable, styles.noBorder]}>
                     <View style={styles.touchableContentContainer}>
                         <View>
@@ -49,7 +82,7 @@ const FiltersHome = ({
                             </Text>
                         </View>
                         <View>
-                            <Text style={styles.text}>All</Text>
+                            <Text style={styles.text}>{colorText}</Text>
                         </View>
                     </View>
                 </TouchableHighlight>

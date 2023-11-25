@@ -8,6 +8,7 @@ import {
 import {AuthError, PostgrestError} from '@supabase/supabase-js';
 
 import {
+    COLOR_OPTIONS,
     LOCAL_KEY_DELETED_PRODUCTS,
     LOCAL_KEY_SAVED_PRODUCTS,
     MAX_LOCAL_DELETED_PRODUCTS,
@@ -543,6 +544,29 @@ const productSlice = createSlice({
                 ];
             }
         },
+        toggleColor(
+            state,
+            action: PayloadAction<{
+                obj: 'unsaved' | 'saved' | 'deleted';
+                color: (typeof COLOR_OPTIONS)[number];
+            }>,
+        ) {
+            const index = state[action.payload.obj].filters.color.findIndex(
+                color => action.payload.color.value === color,
+            );
+
+            if (index < 0) {
+                state[action.payload.obj].filters.color = [
+                    ...state[action.payload.obj].filters.color,
+                    action.payload.color.value,
+                ];
+            } else {
+                state[action.payload.obj].filters.color = [
+                    ...state[action.payload.obj].filters.color.slice(0, index),
+                    ...state[action.payload.obj].filters.color.slice(index + 1),
+                ];
+            }
+        },
         toggleFilter(
             state,
             action: PayloadAction<{
@@ -742,6 +766,7 @@ export const {
     commenceAnimate,
     setAction,
     toggleBrand,
+    toggleColor,
     toggleExclude,
     toggleFilter,
     updateSearchFilter,

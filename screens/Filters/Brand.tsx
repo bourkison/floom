@@ -111,7 +111,10 @@ const Brand = () => {
             <ScrollView style={styles.scrollContainer}>
                 <View style={styles.listContainer}>
                     {filteredSortedBrands.map(brand => (
-                        <BrandListItem brand={brand} />
+                        <BrandListItem
+                            brand={brand}
+                            key={brand.id.toString()}
+                        />
                     ))}
                 </View>
             </ScrollView>

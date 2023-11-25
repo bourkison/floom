@@ -230,19 +230,67 @@ export const FiltersHomeHeader: React.FC<StackHeaderProps> = ({navigation}) => (
     </HeaderTemplate>
 );
 
-export const BrandHeader: React.FC<StackHeaderProps> = ({navigation}) => (
-    <HeaderTemplate
-        leftIcon={
-            <Pressable
-                style={styles.headerIcon}
-                onPress={() => navigation.goBack()}>
-                <Feather name="x" size={24} />
-            </Pressable>
-        }
-        style={styles.hiddenShadowWithBorder}>
-        Brand
-    </HeaderTemplate>
-);
+export const BrandHeader: React.FC<StackHeaderProps> = ({navigation}) => {
+    const brandFilters = useAppSelector(
+        state => state.product.unsaved.filters.brand,
+    );
+
+    // TODO: Clear button
+
+    return (
+        <HeaderTemplate
+            leftIcon={
+                <Pressable
+                    style={styles.headerIcon}
+                    onPress={() => navigation.goBack()}>
+                    <Feather name="arrow-left" size={24} />
+                </Pressable>
+            }
+            rightIcon={
+                brandFilters.length ? (
+                    <Pressable style={styles.headerIcon}>
+                        <View>
+                            {/* <Text style={{fontSize: 8}}>Clear</Text> */}
+                        </View>
+                    </Pressable>
+                ) : undefined
+            }
+            style={styles.hiddenShadowWithBorder}>
+            Brand
+        </HeaderTemplate>
+    );
+};
+
+export const ColorHeader: React.FC<StackHeaderProps> = ({navigation}) => {
+    const colorFilters = useAppSelector(
+        state => state.product.unsaved.filters.color,
+    );
+
+    // TODO: Clear button
+
+    return (
+        <HeaderTemplate
+            leftIcon={
+                <Pressable
+                    style={styles.headerIcon}
+                    onPress={() => navigation.goBack()}>
+                    <Feather name="arrow-left" size={24} />
+                </Pressable>
+            }
+            rightIcon={
+                colorFilters.length ? (
+                    <Pressable style={styles.headerIcon}>
+                        <View>
+                            {/* <Text style={{fontSize: 8}}>Clear</Text> */}
+                        </View>
+                    </Pressable>
+                ) : undefined
+            }
+            style={styles.hiddenShadowWithBorder}>
+            Colour
+        </HeaderTemplate>
+    );
+};
 
 const styles = StyleSheet.create({
     headerContainer: {
@@ -266,9 +314,8 @@ const styles = StyleSheet.create({
         width: '100%',
         alignSelf: 'stretch',
         flexDirection: 'row',
-        alignContent: 'center',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         zIndex: 999,
         elevation: 99,
     },
