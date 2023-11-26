@@ -21,7 +21,6 @@ import {Gender} from '@/types';
 import {Database} from '@/types/schema';
 
 type ProductType = Database['public']['Views']['v_products']['Row'];
-type AnimationState = 'idle' | 'save' | 'buy' | 'delete';
 
 const productAdapter = createEntityAdapter();
 
@@ -54,8 +53,6 @@ const initialState = productAdapter.getInitialState({
             searchText: '',
         },
     },
-    animation: 'idle' as AnimationState,
-    action: 'idle' as AnimationState,
 });
 
 export const loadUnsavedProducts = createAsyncThunk<
@@ -301,9 +298,6 @@ const productSlice = createSlice({
     name: 'product',
     initialState,
     reducers: {
-        buyProduct(state) {
-            state.animation = 'idle';
-        },
         clearFilters(
             state,
             action: PayloadAction<{
@@ -322,13 +316,6 @@ const productSlice = createSlice({
                 state.deleted.filters.searchText = '';
                 state.deleted.filters.gender = action.payload.gender;
             }
-        },
-        commenceAnimate(state, action: PayloadAction<AnimationState>) {
-            state.animation = action.payload;
-            state.action = action.payload;
-        },
-        setAction(state, action: PayloadAction<AnimationState>) {
-            state.action = action.payload;
         },
         setGender(
             state,
@@ -473,8 +460,6 @@ const productSlice = createSlice({
                 state.deleted.moreToLoad = false;
             })
             .addCase(deleteProduct.pending, (state, action) => {
-                state.animation = 'idle';
-
                 // Slice from unsaved if they are the same.
                 if (state.unsaved.products[0]?.id === action.meta.arg) {
                     state.unsaved.products = state.unsaved.products.slice(1);
@@ -515,10 +500,7 @@ const productSlice = createSlice({
 });
 
 export const {
-    buyProduct,
     clearFilters,
-    commenceAnimate,
-    setAction,
     setGender,
     toggleBrand,
     toggleCategory,
