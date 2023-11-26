@@ -12,10 +12,12 @@ import {
     TouchableOpacity,
     TouchableHighlight,
 } from 'react-native';
+import Animated, {Layout} from 'react-native-reanimated';
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import BrandLogo from '@/components/Utility/BrandLogo';
 import {BUY_TEXT, IMAGE_RATIO, PALETTE, SAVE_COLOR} from '@/constants';
+import {useSharedSavedContext} from '@/context/saved';
 import {MainStackParamList} from '@/nav/Navigator';
 import {formatPrice} from '@/services';
 import {Database} from '@/types/schema';
@@ -34,6 +36,8 @@ const SaveListItem = ({save}: SaveListItemProps) => {
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
 
     const onSale = useMemo(() => save.sale_price < save.price, [save]);
+
+    const {deleteSavedProduct} = useSharedSavedContext();
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
@@ -70,69 +74,75 @@ const SaveListItem = ({save}: SaveListItemProps) => {
     };
 
     return (
-        <TouchableHighlight
-            onPress={navigateTo}
-            underlayColor={TOUCHABLE_UNDERLAY}
-            activeOpacity={TOUCHABLE_ACTIVE_OPACITY}>
-            <View style={styles.container}>
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={{uri: save.images[0]}}
-                        style={{
-                            width: IMAGE_WIDTH,
-                            height: IMAGE_WIDTH / IMAGE_RATIO,
-                        }}
-                    />
-                </View>
-                <View style={styles.contentContainer}>
-                    <View style={styles.topRowContainer}>
-                        <View>
-                            <Text style={styles.priceText}>
-                                {formatPrice(save.price)}
+        <Animated.View layout={Layout}>
+            <TouchableHighlight
+                onPress={navigateTo}
+                underlayColor={TOUCHABLE_UNDERLAY}
+                activeOpacity={TOUCHABLE_ACTIVE_OPACITY}>
+                <View style={styles.container}>
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={{uri: save.images[0]}}
+                            style={{
+                                width: IMAGE_WIDTH,
+                                height: IMAGE_WIDTH / IMAGE_RATIO,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.contentContainer}>
+                        <View style={styles.topRowContainer}>
+                            <View>
+                                <Text style={styles.priceText}>
+                                    {formatPrice(save.price)}
+                                </Text>
+
+                                {onSale && (
+                                    <Text>{formatPrice(save.sale_price)}</Text>
+                                )}
+                            </View>
+
+                            <View>
+                                <TouchableOpacity>
+                                    <SimpleLineIcons name="options" size={16} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <View style={styles.titleContainer}>
+                            <Text style={styles.titleText}>{save.name}</Text>
+                        </View>
+
+                        <View style={styles.inStockContainer}>
+                            <Text style={styles.inStockText}>
+                                {save.in_stock ? 'In stock' : 'Out of stock'}
                             </Text>
-
-                            {onSale && (
-                                <Text>{formatPrice(save.sale_price)}</Text>
-                            )}
                         </View>
 
-                        <View>
-                            <TouchableOpacity>
-                                <SimpleLineIcons name="options" size={16} />
-                            </TouchableOpacity>
+                        <View style={styles.logoContainer}>
+                            <BrandLogo brand={save.brand} />
                         </View>
-                    </View>
 
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.titleText}>{save.name}</Text>
-                    </View>
-
-                    <View style={styles.inStockContainer}>
-                        <Text style={styles.inStockText}>
-                            {save.in_stock ? 'In stock' : 'Out of stock'}
-                        </Text>
-                    </View>
-
-                    <View style={styles.logoContainer}>
-                        <BrandLogo brand={save.brand} />
-                    </View>
-
-                    <View style={styles.buttonsContainer}>
-                        <AnimatedButton style={styles.deleteButton}>
-                            <Text style={styles.deleteText}>Remove</Text>
-                        </AnimatedButton>
-
-                        <View style={styles.flexOne}>
+                        <View style={styles.buttonsContainer}>
                             <AnimatedButton
-                                style={styles.buyButton}
-                                onPress={buyProduct}>
-                                <Text style={styles.buyText}>{BUY_TEXT}</Text>
+                                style={styles.deleteButton}
+                                onPress={() => deleteSavedProduct(save.id)}>
+                                <Text style={styles.deleteText}>Remove</Text>
                             </AnimatedButton>
+
+                            <View style={styles.flexOne}>
+                                <AnimatedButton
+                                    style={styles.buyButton}
+                                    onPress={buyProduct}>
+                                    <Text style={styles.buyText}>
+                                        {BUY_TEXT}
+                                    </Text>
+                                </AnimatedButton>
+                            </View>
                         </View>
                     </View>
                 </View>
-            </View>
-        </TouchableHighlight>
+            </TouchableHighlight>
+        </Animated.View>
     );
 };
 

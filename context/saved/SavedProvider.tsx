@@ -124,14 +124,23 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         [saves, dispatch],
     );
 
-    const deleteSavedProduct = useCallback(async (id: number) => {
-        const {error} = await supabase.from('saves').delete().eq('id', id);
+    const deleteSavedProduct = useCallback(
+        async (id: number) => {
+            const index = saves.findIndex(save => save.id === id);
 
-        if (error) {
-            console.error(error);
-            throw new Error(error.message);
-        }
-    }, []);
+            console.log('DELETE INDEX', index);
+
+            setSaves([...saves.slice(0, index), ...saves.slice(index + 1)]);
+
+            const {error} = await supabase.from('saves').delete().eq('id', id);
+
+            if (error) {
+                console.error(error);
+                throw new Error(error.message);
+            }
+        },
+        [saves],
+    );
 
     return (
         <SavedContext.Provider
