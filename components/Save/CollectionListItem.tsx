@@ -59,15 +59,18 @@ const CollectionListItem = ({collection}: CollectionListItemProps) => {
             underlayColor={TOUCHABLE_UNDERLAY}
             activeOpacity={TOUCHABLE_ACTIVE_OPACITY}>
             <View style={styles.container}>
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={{uri: imageUrl}}
-                        style={{
-                            width: IMAGE_WIDTH,
-                            height: IMAGE_WIDTH / IMAGE_RATIO,
-                        }}
-                    />
-                </View>
+                {imageUrl && (
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={{uri: imageUrl}}
+                            style={{
+                                width: IMAGE_WIDTH,
+                                height: IMAGE_WIDTH / IMAGE_RATIO,
+                            }}
+                        />
+                    </View>
+                )}
+
                 <View style={styles.contentContainer}>
                     <View style={styles.leftColumn}>
                         <Text style={styles.titleText}>{collection.name}</Text>

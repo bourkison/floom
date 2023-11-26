@@ -17,7 +17,9 @@ export type CollectionType = {
 };
 
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingSaves, setIsLoadingSaves] = useState(false);
+    const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+
     const [searchText, setSearchText] = useState('');
 
     const [collections, setCollections] = useState<CollectionType[]>([]);
@@ -41,14 +43,15 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
 
     useEffect(() => {
         const fetchSaves = async () => {
-            setIsLoading(true);
+            setIsLoadingSaves(true);
 
             const {data, error} = await supabase
                 .from('v_saves')
                 .select()
+                .is('collection_id', null)
                 .order('created_at', {ascending: false});
 
-            setIsLoading(false);
+            setIsLoadingSaves(false);
 
             if (error) {
                 // TODO: Handle error.
@@ -56,53 +59,78 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                 return;
             }
 
-            const tempCollections: CollectionType[] = [];
-            const tempSaves: Database['public']['Views']['v_saves']['Row'][] =
-                [];
-
-            // Loop through the response, and push to either the relevant collection,
-            // or to the saves array (if no collection associated).
-            data.forEach(save => {
-                if (
-                    save.collection_id !== null &&
-                    save.collection_name !== null
-                ) {
-                    const collId = save.collection_id;
-                    const collName = save.collection_name;
-
-                    // First check to see if the collection has already been added.
-                    let collectionIndex = tempCollections.findIndex(
-                        collection => (collection.id = collId),
-                    );
-
-                    // If not, add it.
-                    if (collectionIndex < 0) {
-                        tempCollections.push({
-                            name: collName,
-                            id: collId,
-                            products: [],
-                        });
-                        collectionIndex = tempCollections.length - 1;
-                    }
-
-                    // Finally, add this save in.
-                    tempCollections[collectionIndex].products.push(save);
-
-                    return;
-                }
-
-                tempSaves.push(save);
-            });
-
-            setCollections(tempCollections);
-            setSaves(tempSaves);
-
-            console.log('COLLECTIONS:', tempCollections);
-            console.log('SAVES:', tempSaves);
+            setSaves(data);
         };
 
         fetchSaves();
     }, []);
+
+    useEffect(() => {
+        const fetchCollections = async () => {
+            setIsLoadingCollections(true);
+
+            const {data: collData, error: collError} = await supabase
+                .from('collections')
+                .select()
+                .order('created_at', {ascending: false});
+
+            if (collError) {
+                setIsLoadingCollections(false);
+                console.error(collError);
+                return;
+            }
+
+            const promises: Promise<CollectionType>[] = [];
+
+            collData.forEach(collection => {
+                promises.push(
+                    new Promise(async (resolve, reject) => {
+                        const {data: saveData, error: saveError} =
+                            await supabase
+                                .from('v_saves')
+                                .select()
+                                .eq('collection_id', collection.id)
+                                .order('created_at', {ascending: false});
+
+                        if (saveError) {
+                            return reject(saveError);
+                        }
+
+                        resolve({
+                            id: collection.id,
+                            name: collection.name,
+                            products: saveData,
+                        });
+                    }),
+                );
+            });
+
+            const response = await Promise.allSettled(promises);
+            const tempCollections: CollectionType[] = [];
+
+            response.forEach(r => {
+                if (r.status === 'rejected') {
+                    console.error('SAVES ERROR:', r.reason);
+                    return;
+                }
+
+                tempCollections.push(r.value);
+            });
+
+            setIsLoadingCollections(false);
+            setCollections(tempCollections);
+        };
+
+        fetchCollections();
+    }, []);
+
+    const isLoading = useMemo<boolean>(() => {
+        if (isLoadingSaves || isLoadingCollections) {
+            return true;
+        }
+
+        return false;
+    }, [isLoadingSaves, isLoadingCollections]);
 
     return (
         <View style={styles.scrollContainer}>

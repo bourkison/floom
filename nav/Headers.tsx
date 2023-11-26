@@ -157,7 +157,7 @@ export const CollectionViewHeader: React.FC<StackHeaderProps> = ({
             leftIcon={
                 <Pressable
                     onPress={() => {
-                        navigation.navigate('Home');
+                        navigation.navigate('SavedHome');
                     }}
                     style={styles.headerIcon}>
                     <Feather name="chevron-left" size={24} />
