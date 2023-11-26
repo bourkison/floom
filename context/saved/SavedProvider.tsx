@@ -3,6 +3,8 @@ import React, {useCallback, useState} from 'react';
 import {SavedContext, CollectionType} from '@/context/saved';
 import {convertProductToSave} from '@/services/conversions';
 import {supabase} from '@/services/supabase';
+import {useAppDispatch} from '@/store/hooks';
+import {unshiftProducts} from '@/store/slices/product';
 import {Database} from '@/types/schema';
 
 type SavedProviderProps = {
@@ -22,6 +24,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
     const [saves, setSaves] = useState<
         Database['public']['Views']['v_saves']['Row'][]
     >([]);
+
+    const dispatch = useAppDispatch();
 
     const initFetchSaves = useCallback(async () => {
         setIsLoadingSaves(true);
@@ -115,9 +119,9 @@ const SavedProvider = ({children}: SavedProviderProps) => {
 
             setSaves([convertProductToSave(product, data), ...saves]);
 
-            // TODO: Dispatch to remove from store.
+            dispatch(unshiftProducts());
         },
-        [saves],
+        [saves, dispatch],
     );
 
     const deleteSavedProduct = useCallback(async (id: number) => {

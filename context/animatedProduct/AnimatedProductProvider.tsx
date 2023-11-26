@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
     runOnJS,
     useDerivedValue,
@@ -128,117 +128,116 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
         return Math.min(-offsetX.value / ACTION_THRESHOLD, 1);
     });
 
-    const setAction = (to: ActionType) => {
-        'worklet';
+    const setAction = useCallback(
+        (to: ActionType) => {
+            'worklet';
 
-        const from = action.value;
+            const from = action.value;
 
-        if (from === to) {
-            return;
-        }
+            if (from === to) {
+                return;
+            }
 
-        action.value = to;
-        runOnJS(setActionJs)(to);
+            action.value = to;
+            runOnJS(setActionJs)(to);
 
-        if (from === 'buy') {
-            buyPing.value = withTiming(0, {duration: PING_DURATION});
-        } else if (from === 'delete') {
-            deletePing.value = withTiming(0, {duration: PING_DURATION});
-        } else if (from === 'save') {
-            savePing.value = withTiming(0, {duration: PING_DURATION});
-        }
+            if (from === 'buy') {
+                buyPing.value = withTiming(0, {duration: PING_DURATION});
+            } else if (from === 'delete') {
+                deletePing.value = withTiming(0, {duration: PING_DURATION});
+            } else if (from === 'save') {
+                savePing.value = withTiming(0, {duration: PING_DURATION});
+            }
 
-        if (to === 'buy') {
-            buyPing.value = withTiming(1, {duration: PING_DURATION});
-        } else if (to === 'delete') {
-            deletePing.value = withTiming(1, {duration: PING_DURATION});
-        } else if (to === 'save') {
-            savePing.value = withTiming(1, {duration: PING_DURATION});
-        }
-    };
+            if (to === 'buy') {
+                buyPing.value = withTiming(1, {duration: PING_DURATION});
+            } else if (to === 'delete') {
+                deletePing.value = withTiming(1, {duration: PING_DURATION});
+            } else if (to === 'save') {
+                savePing.value = withTiming(1, {duration: PING_DURATION});
+            }
+        },
+        [buyPing, deletePing, savePing, action],
+    );
 
-    const animateRight = (
-        amount: number,
-        withReset: boolean,
-        callback: () => void,
-    ) => {
-        setAction('save');
-        isAnimating.value = true;
+    const reset = useCallback(
+        (withAnimation: boolean) => {
+            'worklet';
+            setAction('idle');
+            isAnimating.value = false;
 
-        offsetX.value = withTiming(
-            amount,
-            {duration: ANIMATION_DURATION},
-            () => {
-                setAction('idle');
-                isAnimating.value = false;
+            if (withAnimation) {
+                offsetX.value = withSpring(0);
+                offsetY.value = withSpring(0);
 
-                if (withReset) {
-                    reset(false);
-                }
+                return;
+            }
 
-                runOnJS(callback)();
-            },
-        );
-    };
+            offsetX.value = 0;
+            offsetY.value = 0;
+        },
+        [setAction, offsetX, offsetY, isAnimating],
+    );
 
-    const animateLeft = (
-        amount: number,
-        withReset: boolean,
-        callback: () => void,
-    ) => {
-        'worklet';
-        setAction('delete');
-        isAnimating.value = true;
+    const animateRight = useCallback(
+        (amount: number, callback: () => void) => {
+            setAction('save');
+            isAnimating.value = true;
 
-        offsetX.value = withTiming(
-            -amount,
-            {duration: ANIMATION_DURATION},
-            () => {
-                setAction('idle');
-                isAnimating.value = false;
+            offsetX.value = withTiming(
+                amount,
+                {duration: ANIMATION_DURATION},
+                () => {
+                    setAction('idle');
+                    isAnimating.value = false;
 
-                if (withReset) {
-                    reset(false);
-                }
-
-                runOnJS(callback)();
-            },
-        );
-    };
-
-    const animateUp = (amount: number, callback?: () => void) => {
-        'worklet';
-        setAction('buy');
-        isAnimating.value = true;
-
-        offsetY.value = withTiming(
-            -amount,
-            {duration: ANIMATION_DURATION},
-            () => {
-                'worklet';
-
-                if (callback) {
                     runOnJS(callback)();
-                }
-            },
-        );
-    };
+                },
+            );
+        },
+        [setAction, isAnimating, offsetX],
+    );
 
-    const reset = (withAnimation: boolean) => {
-        'worklet';
-        setAction('idle');
-        isAnimating.value = false;
+    const animateLeft = useCallback(
+        (amount: number, callback: () => void) => {
+            'worklet';
+            setAction('delete');
+            isAnimating.value = true;
 
-        if (withAnimation) {
-            offsetX.value = withSpring(0);
-            offsetY.value = withSpring(0);
+            offsetX.value = withTiming(
+                -amount,
+                {duration: ANIMATION_DURATION},
+                () => {
+                    setAction('idle');
+                    isAnimating.value = false;
 
-            return;
-        }
+                    runOnJS(callback)();
+                },
+            );
+        },
+        [setAction, isAnimating, offsetX],
+    );
 
-        offsetX.value = 0;
-        offsetY.value = 0;
-    };
+    const animateUp = useCallback(
+        (amount: number, callback?: () => void) => {
+            'worklet';
+            setAction('buy');
+            isAnimating.value = true;
+
+            offsetY.value = withTiming(
+                -amount,
+                {duration: ANIMATION_DURATION},
+                () => {
+                    'worklet';
+
+                    if (callback) {
+                        runOnJS(callback)();
+                    }
+                },
+            );
+        },
+        [setAction, offsetY, isAnimating],
+    );
 
     return (
         <AnimatedProductContext.Provider

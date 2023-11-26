@@ -418,6 +418,9 @@ const productSlice = createSlice({
         ) {
             state[action.payload.obj].filters.searchText = action.payload.pl;
         },
+        unshiftProducts(state) {
+            state.unsaved.products = state.unsaved.products.slice(1);
+        },
     },
     extraReducers(builder) {
         builder
@@ -507,5 +510,6 @@ export const {
     toggleColor,
     toggleExclude,
     updateSearchFilter,
+    unshiftProducts,
 } = productSlice.actions;
 export default productSlice.reducer;

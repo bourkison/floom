@@ -20,16 +20,8 @@ type AnimatedProductType = {
     deletePing: SharedValue<number>;
 
     setAction: (to: ActionType) => void;
-    animateRight: (
-        amount: number,
-        withReset: boolean,
-        callback: () => void,
-    ) => void;
-    animateLeft: (
-        amount: number,
-        withReset: boolean,
-        callback: () => void,
-    ) => void;
+    animateRight: (amount: number, callback: () => void) => void;
+    animateLeft: (amount: number, callback: () => void) => void;
     animateUp: (amount: number, callback?: () => void) => void;
     reset: (withAnimation: boolean) => void;
 };

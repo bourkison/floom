@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import * as Haptics from 'expo-haptics';
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {
     View,
     StyleSheet,
@@ -12,8 +12,10 @@ import {
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
     useAnimatedStyle,
+    FadeOut,
     withSpring,
     runOnJS,
+    runOnUI,
 } from 'react-native-reanimated';
 
 import {
@@ -37,6 +39,7 @@ type AnimatedProductProps = {
     product: Database['public']['Views']['v_products']['Row'];
     imageIndex: number;
     setImageIndex: (imageIndex: number) => void;
+    index: number;
 };
 
 const LEFT_RIGHT_TAP_WIDTH = 80;
@@ -46,6 +49,7 @@ const AnimatedProduct = ({
     product,
     imageIndex,
     setImageIndex,
+    index,
 }: AnimatedProductProps) => {
     const {
         offsetX,
@@ -57,11 +61,16 @@ const AnimatedProduct = ({
         buyOpacity,
         deleteOpacity,
         setAction,
+        reset,
     } = useAnimatedProductContext();
 
     const {saveProduct} = useSharedSavedContext();
     const {width} = useWindowDimensions();
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+
+    useEffect(() => {
+        runOnUI(reset)(false);
+    }, [reset, product]);
 
     const rTileStyle = useAnimatedStyle(() => ({
         transform: [
@@ -187,7 +196,9 @@ const AnimatedProduct = ({
     };
 
     return (
-        <Animated.View style={rTileStyle}>
+        <Animated.View
+            style={index === 0 && rTileStyle}
+            exiting={FadeOut.duration(500)}>
             <GestureDetector gesture={panGesture}>
                 <View>
                     <View
@@ -197,7 +208,8 @@ const AnimatedProduct = ({
                         ]}>
                         <Animated.View
                             style={[
-                                rSaveStyle,
+                                styles.noOpacity,
+                                index === 0 && rSaveStyle,
                                 styles.saveTextContainer,
                                 {
                                     width:
@@ -216,7 +228,8 @@ const AnimatedProduct = ({
                         ]}>
                         <Animated.View
                             style={[
-                                rDeleteStyle,
+                                styles.noOpacity,
+                                index === 0 && rDeleteStyle,
                                 styles.deleteTextContainer,
                                 {
                                     width:
@@ -235,7 +248,8 @@ const AnimatedProduct = ({
                         ]}>
                         <Animated.View
                             style={[
-                                rBuyStyle,
+                                styles.noOpacity,
+                                index === 0 && rBuyStyle,
                                 styles.buyTextContainer,
                                 {
                                     width:
@@ -294,6 +308,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         position: 'absolute',
+        zIndex: 10,
     },
     saveText: {
         color: SAVE_COLOR,
@@ -362,6 +377,9 @@ const styles = StyleSheet.create({
         top: 0,
         bottom: 0,
         zIndex: 50,
+    },
+    noOpacity: {
+        opacity: 0,
     },
 });
 

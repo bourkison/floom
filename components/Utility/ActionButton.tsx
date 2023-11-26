@@ -139,7 +139,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         }
 
         if (type === 'save') {
-            animateRight(width * 0.75, true, () => {
+            animateRight(width * 0.75, () => {
                 saveProduct(product);
             });
 
@@ -147,7 +147,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         }
 
         if (type === 'delete') {
-            animateLeft(width * 0.75, true, () => {
+            animateLeft(width * 0.75, () => {
                 console.log('LEFT');
             });
 
