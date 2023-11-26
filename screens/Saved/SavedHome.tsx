@@ -6,30 +6,23 @@ import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
 import SaveListItem from '@/components/Save/SaveListItem';
 import SearchInput from '@/components/Utility/SearchInput';
+import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
-import {supabase} from '@/services/supabase';
-import {Database} from '@/types/schema';
-
-export type CollectionType = {
-    name: string;
-    id: number;
-    products: Database['public']['Views']['v_saves']['Row'][];
-};
 
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
-    const [isLoadingSaves, setIsLoadingSaves] = useState(false);
-    const [isLoadingCollections, setIsLoadingCollections] = useState(false);
-
     const [searchText, setSearchText] = useState('');
-
-    const [collections, setCollections] = useState<CollectionType[]>([]);
-    // Saves are saves that do not have a collection.
-    const [saves, setSaves] = useState<
-        Database['public']['Views']['v_saves']['Row'][]
-    >([]);
 
     const [collectionsExpanded, setCollectionsExpanded] = useState(true);
     const [savesExpanded, setSavesExpanded] = useState(true);
+
+    const {
+        initFetchCollections,
+        initFetchSaves,
+        collections,
+        saves,
+        isLoadingSaves,
+        isLoadingCollections,
+    } = useSharedSavedContext();
 
     const filteredCollections = useMemo(() => {
         return collections.filter(collection =>
@@ -42,87 +35,9 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     }, [saves, searchText]);
 
     useEffect(() => {
-        const fetchSaves = async () => {
-            setIsLoadingSaves(true);
-
-            const {data, error} = await supabase
-                .from('v_saves')
-                .select()
-                .is('collection_id', null)
-                .order('created_at', {ascending: false});
-
-            setIsLoadingSaves(false);
-
-            if (error) {
-                // TODO: Handle error.
-                console.error(error);
-                return;
-            }
-
-            setSaves(data);
-        };
-
-        fetchSaves();
-    }, []);
-
-    useEffect(() => {
-        const fetchCollections = async () => {
-            setIsLoadingCollections(true);
-
-            const {data: collData, error: collError} = await supabase
-                .from('collections')
-                .select()
-                .order('created_at', {ascending: false});
-
-            if (collError) {
-                setIsLoadingCollections(false);
-                console.error(collError);
-                return;
-            }
-
-            const promises: Promise<CollectionType>[] = [];
-
-            collData.forEach(collection => {
-                promises.push(
-                    new Promise(async (resolve, reject) => {
-                        const {data: saveData, error: saveError} =
-                            await supabase
-                                .from('v_saves')
-                                .select()
-                                .eq('collection_id', collection.id)
-                                .order('created_at', {ascending: false});
-
-                        if (saveError) {
-                            return reject(saveError);
-                        }
-
-                        resolve({
-                            id: collection.id,
-                            name: collection.name,
-                            products: saveData,
-                        });
-                    }),
-                );
-            });
-
-            const response = await Promise.allSettled(promises);
-            const tempCollections: CollectionType[] = [];
-
-            response.forEach(r => {
-                if (r.status === 'rejected') {
-                    console.error('SAVES ERROR:', r.reason);
-                    return;
-                }
-
-                tempCollections.push(r.value);
-            });
-
-            setIsLoadingCollections(false);
-            setCollections(tempCollections);
-        };
-
-        fetchCollections();
-    }, []);
+        initFetchCollections();
+        initFetchSaves();
+    }, [initFetchSaves, initFetchCollections]);
 
     const isLoading = useMemo<boolean>(() => {
         if (isLoadingSaves || isLoadingCollections) {

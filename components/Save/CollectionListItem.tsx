@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 
 import {IMAGE_RATIO, PALETTE} from '@/constants';
+import {CollectionType} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
-import {CollectionType} from '@/screens/Saved/SavedHome';
 
 type CollectionListItemProps = {
     collection: CollectionType;
