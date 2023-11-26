@@ -1,3 +1,4 @@
+import {SimpleLineIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
@@ -8,6 +9,7 @@ import {
     useWindowDimensions,
     Image,
     TouchableHighlight,
+    TouchableOpacity,
 } from 'react-native';
 
 import {IMAGE_RATIO, PALETTE} from '@/constants';
@@ -67,11 +69,19 @@ const CollectionListItem = ({collection}: CollectionListItemProps) => {
                     />
                 </View>
                 <View style={styles.contentContainer}>
-                    <Text style={styles.titleText}>{collection.name}</Text>
-                    <Text style={styles.subtitleText}>
-                        {collection.products.length} product
-                        {collection.products.length !== 1 && 's'}
-                    </Text>
+                    <View style={styles.leftColumn}>
+                        <Text style={styles.titleText}>{collection.name}</Text>
+                        <Text style={styles.subtitleText}>
+                            {collection.products.length} product
+                            {collection.products.length !== 1 && 's'}
+                        </Text>
+                    </View>
+
+                    <View style={styles.rightColumn}>
+                        <TouchableOpacity>
+                            <SimpleLineIcons name="options" size={16} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </TouchableHighlight>
@@ -92,7 +102,16 @@ const styles = StyleSheet.create({
     imageContainer: {},
     contentContainer: {
         marginLeft: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        flex: 1,
+        height: '100%',
+        paddingTop: 10,
     },
+    leftColumn: {
+        justifyContent: 'center',
+    },
+    rightColumn: {},
     titleText: {
         fontWeight: '500',
         fontSize: 15,
