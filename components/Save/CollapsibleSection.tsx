@@ -54,6 +54,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderColor: PALETTE.neutral[2],
     },
     headerText: {
         fontWeight: '400',

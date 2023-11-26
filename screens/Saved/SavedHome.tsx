@@ -136,7 +136,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                     <CollapsibleSection
                         showIcon={false}
                         disabled
-                        headerText="Saves"
+                        headerText="Saved"
                         onHeaderPress={() => setSavesExpanded(!savesExpanded)}
                         expanded={savesExpanded}>
                         {filteredSaves.map(save => (

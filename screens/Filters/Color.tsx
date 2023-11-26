@@ -11,8 +11,8 @@ type ColorListItemProps = {
     color: (typeof COLOR_OPTIONS)[number];
 };
 
-const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
-const TOUCHABLE_ACTIVE_OPACITY = 0.7;
+const TOUCHABLE_UNDERLAY = PALETTE.neutral[1];
+const TOUCHABLE_ACTIVE_OPACITY = 0.6;
 
 const COLOR_PREVIEW_DIAMETER = 24;
 

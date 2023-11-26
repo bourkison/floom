@@ -1,4 +1,4 @@
-import {Entypo, Ionicons, Feather} from '@expo/vector-icons';
+import {Entypo, Ionicons, Feather, AntDesign} from '@expo/vector-icons';
 import {StackHeaderProps} from '@react-navigation/stack';
 import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
@@ -128,11 +128,16 @@ export const SavedProductsHeader: React.FC<StackHeaderProps> = ({
         style={styles.hiddenShadowWithBorder}
         leftIcon={
             <Pressable
-                onPress={() => {
-                    navigation.navigate('Home');
-                }}
+                onPress={() => navigation.navigate('Home')}
                 style={styles.headerIcon}>
                 <Feather name="chevron-left" size={24} />
+            </Pressable>
+        }
+        rightIcon={
+            <Pressable
+                onPress={() => navigation.navigate('CollectionNew')}
+                style={styles.headerIcon}>
+                <AntDesign name="plus" size={24} />
             </Pressable>
         }>
         Saved
