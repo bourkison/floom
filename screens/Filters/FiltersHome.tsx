@@ -245,7 +245,8 @@ const styles = StyleSheet.create({
     excludeContainer: {
         backgroundColor: '#FFF',
         paddingHorizontal: 25,
-        paddingVertical: 25,
+        paddingTop: 20,
+        paddingBottom: 10,
     },
 });
 

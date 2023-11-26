@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     titleContainer: {
-        marginTop: 10,
+        marginTop: 7,
     },
     titleText: {
         fontWeight: '300',

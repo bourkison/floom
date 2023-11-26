@@ -1,3 +1,4 @@
+import {AntDesign} from '@expo/vector-icons';
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Collapsible from 'react-native-collapsible';
@@ -22,7 +23,16 @@ const CollapsibleSection = ({
             <TouchableOpacity
                 style={styles.headerContainer}
                 onPress={onHeaderPress}>
-                <Text style={styles.headerText}>{headerText}</Text>
+                <View>
+                    <Text style={styles.headerText}>{headerText}</Text>
+                </View>
+                <View>
+                    {expanded ? (
+                        <AntDesign name="minus" size={14} />
+                    ) : (
+                        <AntDesign name="plus" size={14} />
+                    )}
+                </View>
             </TouchableOpacity>
 
             <Collapsible collapsed={!expanded}>{children}</Collapsible>
@@ -35,6 +45,9 @@ const styles = StyleSheet.create({
         backgroundColor: PALETTE.neutral[1],
         paddingVertical: 10,
         paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
     headerText: {
         fontWeight: '400',
