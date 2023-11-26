@@ -110,6 +110,9 @@ type NonNullVSaves = MergeDeep<
         product_type: NonNullable<
             DatabaseGenerated['public']['Views']['v_saves']['Row']['product_type']
         >;
+        product_id: NonNullable<
+            DatabaseGenerated['public']['Views']['v_saves']['Row']['product_id']
+        >;
     }
 >;
 

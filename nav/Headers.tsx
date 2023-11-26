@@ -125,6 +125,7 @@ export const SavedProductsHeader: React.FC<StackHeaderProps> = ({
     navigation,
 }) => (
     <HeaderTemplate
+        style={styles.hiddenShadowWithBorder}
         leftIcon={
             <Pressable
                 onPress={() => {

@@ -105,7 +105,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     }, []);
 
     return (
-        <View>
+        <View style={styles.scrollContainer}>
             <View style={styles.searchContainer}>
                 <SearchInput
                     value={searchText}
@@ -115,7 +115,10 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
             </View>
 
             {!isLoading ? (
-                <ScrollView>
+                <ScrollView
+                    style={styles.scrollContainer}
+                    keyboardDismissMode="on-drag"
+                    showsVerticalScrollIndicator={false}>
                     <CollapsibleSection
                         headerText="Collections"
                         onHeaderPress={() =>
@@ -159,6 +162,10 @@ const styles = StyleSheet.create({
             width: -1,
         },
         shadowOpacity: 0.3,
+    },
+    scrollContainer: {
+        flex: 1,
+        width: '100%',
     },
 });
 
