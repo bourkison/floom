@@ -1,4 +1,4 @@
-import {createContext, useContext} from 'react';
+import {Dispatch, SetStateAction, createContext, useContext} from 'react';
 
 import {Database} from '@/types/schema';
 
@@ -31,6 +31,9 @@ type SavedContextType = {
 
     hasInitiallyLoadedSaves: boolean;
     hasInitiallyLoadedCollections: boolean;
+
+    collectionsExpanded: boolean;
+    setCollectionsExpanded: Dispatch<SetStateAction<boolean>>;
 };
 
 export const SavedContext = createContext<SavedContextType | null>(null);

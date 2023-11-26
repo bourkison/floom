@@ -28,6 +28,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         Database['public']['Views']['v_saves']['Row'][]
     >([]);
 
+    const [collectionsExpanded, setCollectionsExpanded] = useState(false);
+
     const dispatch = useAppDispatch();
 
     const fetchSaves = useCallback(
@@ -205,6 +207,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 hasInitiallyLoadedCollections,
                 isLoadingMoreSaves,
                 moreSavesToLoad,
+                collectionsExpanded,
+                setCollectionsExpanded,
             }}>
             {children}
         </SavedContext.Provider>

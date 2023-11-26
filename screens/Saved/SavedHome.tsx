@@ -14,9 +14,6 @@ const INITIAL_SAVE_LOAD_AMOUNT = 10;
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [searchText, setSearchText] = useState('');
 
-    const [collectionsExpanded, setCollectionsExpanded] = useState(true);
-    const [savesExpanded, setSavesExpanded] = useState(true);
-
     const {
         initFetchCollections,
         fetchSaves,
@@ -26,6 +23,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         isLoadingCollections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
+        collectionsExpanded,
+        setCollectionsExpanded,
     } = useSharedSavedContext();
 
     const filteredCollections = useMemo(() => {
@@ -95,8 +94,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                         showIcon={false}
                         disabled
                         headerText="Saved"
-                        onHeaderPress={() => setSavesExpanded(!savesExpanded)}
-                        expanded={savesExpanded}>
+                        onHeaderPress={() => {}}
+                        expanded>
                         {filteredSaves.map(save => (
                             <SaveListItem save={save} key={save.id} />
                         ))}
