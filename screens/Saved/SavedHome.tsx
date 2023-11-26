@@ -9,6 +9,8 @@ import SearchInput from '@/components/Utility/SearchInput';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 
+const INITIAL_SAVE_LOAD_AMOUNT = 10;
+
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [searchText, setSearchText] = useState('');
 
@@ -17,7 +19,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
 
     const {
         initFetchCollections,
-        initFetchSaves,
+        fetchSaves,
         collections,
         saves,
         isLoadingSaves,
@@ -43,10 +45,10 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         }
 
         if (!hasInitiallyLoadedSaves) {
-            initFetchSaves();
+            fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, true);
         }
     }, [
-        initFetchSaves,
+        fetchSaves,
         initFetchCollections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,

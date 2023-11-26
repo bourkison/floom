@@ -13,6 +13,9 @@ type SavedProviderProps = {
 
 const SavedProvider = ({children}: SavedProviderProps) => {
     const [isLoadingSaves, setIsLoadingSaves] = useState(false);
+    const [isLoadingMoreSaves, setIsLoadingMoreSaves] = useState(false);
+    const [moreSavesToLoad, setMoreSavesToLoad] = useState(false);
+
     const [isLoadingCollections, setIsLoadingCollections] = useState(false);
 
     const [hasInitiallyLoadedSaves, setHasInitiallyLoadedSaves] =
@@ -27,26 +30,59 @@ const SavedProvider = ({children}: SavedProviderProps) => {
 
     const dispatch = useAppDispatch();
 
-    const initFetchSaves = useCallback(async () => {
-        setIsLoadingSaves(true);
-        setHasInitiallyLoadedSaves(true);
+    const fetchSaves = useCallback(
+        async (loadAmount: number, isInitialLoad: boolean = true) => {
+            setHasInitiallyLoadedSaves(true);
 
-        const {data, error} = await supabase
-            .from('v_saves')
-            .select()
-            .is('collection_id', null)
-            .order('created_at', {ascending: false});
+            if (isInitialLoad) {
+                setSaves([]);
+                setIsLoadingSaves(true);
+                setMoreSavesToLoad(true);
+            } else {
+                setIsLoadingMoreSaves(true);
+            }
 
-        setIsLoadingSaves(false);
+            const {data, error} = await supabase
+                .from('v_saves')
+                .select()
+                .is('collection_id', null)
+                .order('created_at', {ascending: false})
+                .range(saves.length, saves.length + loadAmount - 1);
 
-        if (error) {
-            // TODO: Handle error.
-            console.error(error);
-            throw new Error(error.message);
-        }
+            setIsLoadingSaves(false);
+            setIsLoadingMoreSaves(false);
 
-        setSaves(data);
-    }, []);
+            if (error) {
+                // TODO: Handle error.
+                console.error(error);
+                throw new Error(error.message);
+            }
+
+            console.log('SAVES AMOUNT', data.length);
+
+            // If saves pulled < amount we requested, then we know there are no more to load.
+            if (data.length < loadAmount) {
+                setMoreSavesToLoad(false);
+            }
+
+            // Ensure that there are no duplicates.
+            const temp: Database['public']['Views']['v_saves']['Row'][] = [];
+
+            data.forEach(save => {
+                const duplicateIndex = saves.findIndex(s => save.id === s.id);
+
+                if (duplicateIndex > -1) {
+                    console.warn('Duplicate save found;', save.id, save.name);
+                    return;
+                }
+
+                temp.push(save);
+            });
+
+            setSaves([...saves, ...temp]);
+        },
+        [saves],
+    );
 
     const initFetchCollections = useCallback(async () => {
         setIsLoadingCollections(true);
@@ -158,7 +194,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         <SavedContext.Provider
             value={{
                 collections,
-                initFetchSaves,
+                fetchSaves,
                 saves,
                 initFetchCollections,
                 isLoadingSaves,
@@ -167,6 +203,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 deleteSavedProduct,
                 hasInitiallyLoadedSaves,
                 hasInitiallyLoadedCollections,
+                isLoadingMoreSaves,
+                moreSavesToLoad,
             }}>
             {children}
         </SavedContext.Provider>
