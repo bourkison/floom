@@ -139,6 +139,30 @@ export const SavedProductsHeader: React.FC<StackHeaderProps> = ({
     </HeaderTemplate>
 );
 
+export const CollectionViewHeader: React.FC<StackHeaderProps> = ({
+    navigation,
+    route,
+}) => {
+    // @ts-ignore
+    const header: string = route.params?.name || 'Collection';
+
+    return (
+        <HeaderTemplate
+            style={styles.hiddenShadowWithBorder}
+            leftIcon={
+                <Pressable
+                    onPress={() => {
+                        navigation.navigate('Home');
+                    }}
+                    style={styles.headerIcon}>
+                    <Feather name="chevron-left" size={24} />
+                </Pressable>
+            }>
+            {header}
+        </HeaderTemplate>
+    );
+};
+
 export const DeletedProductsHeader: React.FC<StackHeaderProps> = ({
     navigation,
 }) => (

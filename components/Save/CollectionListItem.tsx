@@ -1,7 +1,17 @@
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, useWindowDimensions, Image} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    useWindowDimensions,
+    Image,
+    TouchableHighlight,
+} from 'react-native';
 
 import {IMAGE_RATIO, PALETTE} from '@/constants';
+import {SavedStackParamList} from '@/nav/SavedNavigator';
 import {CollectionType} from '@/screens/Saved/SavedHome';
 
 type CollectionListItemProps = {
@@ -10,11 +20,24 @@ type CollectionListItemProps = {
 
 const IMAGE_WIDTH_RATIO = 0.25;
 
+const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
+const TOUCHABLE_ACTIVE_OPACITY = 0.7;
+
 const CollectionListItem = ({collection}: CollectionListItemProps) => {
     const {width} = useWindowDimensions();
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
 
     const [imageUrl, setImageUrl] = useState('');
+
+    const navigation =
+        useNavigation<StackNavigationProp<SavedStackParamList, 'SavedHome'>>();
+
+    const navigateTo = () => {
+        navigation.navigate('CollectionView', {
+            name: collection.name,
+            products: collection.products,
+        });
+    };
 
     // Set image url to use on load
     useEffect(() => {
@@ -29,24 +52,29 @@ const CollectionListItem = ({collection}: CollectionListItemProps) => {
     }, [collection]);
 
     return (
-        <View style={styles.container}>
-            <View style={styles.imageContainer}>
-                <Image
-                    source={{uri: imageUrl}}
-                    style={{
-                        width: IMAGE_WIDTH,
-                        height: IMAGE_WIDTH / IMAGE_RATIO,
-                    }}
-                />
+        <TouchableHighlight
+            onPress={navigateTo}
+            underlayColor={TOUCHABLE_UNDERLAY}
+            activeOpacity={TOUCHABLE_ACTIVE_OPACITY}>
+            <View style={styles.container}>
+                <View style={styles.imageContainer}>
+                    <Image
+                        source={{uri: imageUrl}}
+                        style={{
+                            width: IMAGE_WIDTH,
+                            height: IMAGE_WIDTH / IMAGE_RATIO,
+                        }}
+                    />
+                </View>
+                <View style={styles.contentContainer}>
+                    <Text style={styles.titleText}>{collection.name}</Text>
+                    <Text style={styles.subtitleText}>
+                        {collection.products.length} product
+                        {collection.products.length !== 1 && 's'}
+                    </Text>
+                </View>
             </View>
-            <View style={styles.contentContainer}>
-                <Text style={styles.titleText}>{collection.name}</Text>
-                <Text style={styles.subtitleText}>
-                    {collection.products.length} product
-                    {collection.products.length !== 1 && 's'}
-                </Text>
-            </View>
-        </View>
+        </TouchableHighlight>
     );
 };
 

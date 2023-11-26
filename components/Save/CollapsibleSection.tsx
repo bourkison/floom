@@ -10,6 +10,8 @@ type CollapsibleSectionProps = {
     expanded: boolean;
     onHeaderPress: () => void;
     headerText: string;
+    showIcon?: boolean;
+    disabled?: boolean;
 };
 
 const CollapsibleSection = ({
@@ -17,21 +19,25 @@ const CollapsibleSection = ({
     onHeaderPress,
     headerText,
     expanded,
+    showIcon = true,
+    disabled = false,
 }: CollapsibleSectionProps) => {
     return (
         <View>
             <TouchableOpacity
+                disabled={disabled}
                 style={styles.headerContainer}
                 onPress={onHeaderPress}>
                 <View>
                     <Text style={styles.headerText}>{headerText}</Text>
                 </View>
                 <View>
-                    {expanded ? (
-                        <AntDesign name="minus" size={14} />
-                    ) : (
-                        <AntDesign name="plus" size={14} />
-                    )}
+                    {showIcon &&
+                        (expanded ? (
+                            <AntDesign name="minus" size={14} />
+                        ) : (
+                            <AntDesign name="plus" size={14} />
+                        ))}
                 </View>
             </TouchableOpacity>
 
