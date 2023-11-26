@@ -1,11 +1,18 @@
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {useEffect, useMemo, useState} from 'react';
-import {View, StyleSheet, ActivityIndicator, ScrollView} from 'react-native';
+import {
+    View,
+    StyleSheet,
+    ActivityIndicator,
+    FlatList,
+    Text,
+} from 'react-native';
 
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
 import SaveListItem from '@/components/Save/SaveListItem';
 import SearchInput from '@/components/Utility/SearchInput';
+import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 
@@ -72,35 +79,31 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
             </View>
 
             {!isLoading ? (
-                <ScrollView
-                    style={styles.scrollContainer}
-                    keyboardDismissMode="on-drag"
-                    showsVerticalScrollIndicator={false}>
-                    <CollapsibleSection
-                        headerText="Collections"
-                        onHeaderPress={() =>
-                            setCollectionsExpanded(!collectionsExpanded)
-                        }
-                        expanded={collectionsExpanded}>
-                        {filteredCollections.map(collection => (
-                            <CollectionListItem
-                                collection={collection}
-                                key={collection.id}
-                            />
-                        ))}
-                    </CollapsibleSection>
-
-                    <CollapsibleSection
-                        showIcon={false}
-                        disabled
-                        headerText="Saved"
-                        onHeaderPress={() => {}}
-                        expanded>
-                        {filteredSaves.map(save => (
-                            <SaveListItem save={save} key={save.id} />
-                        ))}
-                    </CollapsibleSection>
-                </ScrollView>
+                <FlatList
+                    ListHeaderComponent={
+                        <>
+                            <CollapsibleSection
+                                headerText="Collections"
+                                onHeaderPress={() =>
+                                    setCollectionsExpanded(!collectionsExpanded)
+                                }
+                                expanded={collectionsExpanded}>
+                                {filteredCollections.map(collection => (
+                                    <CollectionListItem
+                                        collection={collection}
+                                        key={collection.id}
+                                    />
+                                ))}
+                            </CollapsibleSection>
+                            <View style={styles.headerContainer}>
+                                <Text style={styles.headerText}>Saves</Text>
+                            </View>
+                        </>
+                    }
+                    data={filteredSaves}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => <SaveListItem save={item} />}
+                />
             ) : (
                 <ActivityIndicator />
             )}
@@ -125,6 +128,20 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flex: 1,
         width: '100%',
+    },
+    headerContainer: {
+        backgroundColor: PALETTE.neutral[1],
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderColor: PALETTE.neutral[2],
+    },
+    headerText: {
+        fontWeight: '400',
+        fontSize: 14,
     },
 });
 
