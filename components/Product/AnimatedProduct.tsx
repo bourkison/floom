@@ -24,10 +24,10 @@ import {
     SAVE_TEXT,
     DELETE_TEXT,
 } from '@/constants';
+import {useSharedSavedContext} from '@/context/saved';
 import {MainStackParamList} from '@/nav/Navigator';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {
-    saveProduct as storeSaveProduct,
     deleteProduct as storeDeleteProduct,
     buyProduct as storeBuyProduct,
     setAction as storeSetAction,
@@ -74,6 +74,8 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
     const scale = useSharedValue(SCALE_MULTIPLIER);
     const ctx = useSharedValue({x: 0, y: 0});
 
+    const {saveProduct} = useSharedSavedContext();
+
     const action = useSharedValue<'idle' | 'buy' | 'save' | 'delete'>('idle');
 
     const dispatch = useAppDispatch();
@@ -109,9 +111,9 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
         [dispatch],
     );
 
-    const saveProduct = useCallback(() => {
-        dispatch(storeSaveProduct(product.id));
-    }, [dispatch, product]);
+    const cbSaveProduct = useCallback(() => {
+        saveProduct(product);
+    }, [saveProduct, product]);
 
     const deleteProduct = useCallback(() => {
         dispatch(storeDeleteProduct(product.id));
@@ -130,12 +132,12 @@ const AnimatedProduct: React.FC<AnimatedProductProps> = ({
         (type: typeof animationAction) => {
             'worklet';
             if (type === 'save') {
-                tileOpacity.value = withTiming(0, {}, runOnJS(saveProduct));
+                tileOpacity.value = withTiming(0, {}, runOnJS(cbSaveProduct));
             } else if (type === 'delete') {
                 tileOpacity.value = withTiming(0, {}, runOnJS(deleteProduct));
             }
         },
-        [deleteProduct, saveProduct, tileOpacity],
+        [deleteProduct, cbSaveProduct, tileOpacity],
     );
 
     // Called when an action button is pressed (by watching store).

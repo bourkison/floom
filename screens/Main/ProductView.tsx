@@ -28,13 +28,12 @@ import ActionButton from '@/components/Utility/ActionButton';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import BrandLogo from '@/components/Utility/BrandLogo';
 import {IMAGE_RATIO, PALETTE, IMAGE_PREFETCH_AMOUNT} from '@/constants';
+import {useSharedSavedContext} from '@/context/saved';
 import {MainStackParamList} from '@/nav/Navigator';
 import {capitaliseString, formatPrice, stringifyColors} from '@/services';
 import {useAppDispatch} from '@/store/hooks';
 import {
     commenceAnimate as storeCommenceAnimate,
-    deleteSavedProduct,
-    saveProduct as storeSaveProduct,
     setAction,
 } from '@/store/slices/product';
 
@@ -53,6 +52,8 @@ const ProductView = ({
     const [isGoingBack, setIsGoingBack] = useState(false);
 
     const dispatch = useAppDispatch();
+
+    const {saveProduct, deleteSavedProduct} = useSharedSavedContext();
 
     const [containerHeight, setContainerHeight] = useState(0);
     const [contentHeight, setContentHeight] = useState(0);
@@ -242,7 +243,7 @@ const ProductView = ({
                     commenceAnimate('delete');
                 }
             } else {
-                dispatch(deleteSavedProduct(route.params.product.id));
+                deleteSavedProduct(route.params.product.id);
             }
 
             goBack();
@@ -253,7 +254,7 @@ const ProductView = ({
             dispatch(setAction('idle'));
         };
 
-        const saveProduct = () => {
+        const localSaveProduct = () => {
             if (route.params.reference === 'swipe') {
                 if (translateY.value !== 0) {
                     translateY.value = withTiming(0, {duration: 150}, () => {
@@ -264,7 +265,7 @@ const ProductView = ({
                     commenceAnimate('save');
                 }
             } else {
-                dispatch(storeSaveProduct(route.params.product.id));
+                saveProduct(route.params.product);
             }
 
             goBack();
@@ -287,13 +288,20 @@ const ProductView = ({
                 {!route.params.product.saved && (
                     <ActionButton
                         type="save"
-                        onPress={saveProduct}
+                        onPress={localSaveProduct}
                         disabled={false}
                     />
                 )}
             </View>
         );
-    }, [dispatch, goBack, route.params, translateY]);
+    }, [
+        dispatch,
+        goBack,
+        route.params,
+        translateY,
+        deleteSavedProduct,
+        saveProduct,
+    ]);
 
     return (
         <View style={styles.container}>

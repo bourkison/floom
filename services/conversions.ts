@@ -1,0 +1,31 @@
+import {Database} from '@/types/schema';
+
+export const convertProductToSave = (
+    product: Database['public']['Views']['v_products']['Row'],
+    save: Database['public']['Tables']['saves']['Row'],
+): Database['public']['Views']['v_saves']['Row'] => ({
+    brand: product.brand,
+    brand_id: product.brand_id,
+    collection_id: null,
+    collection_name: null,
+    colors: product.colors,
+    created_at: new Date().toString(),
+    deleted: false,
+    description: product.description,
+    gender: product.gender,
+    id: save.id,
+    images: product.images,
+    in_stock: product.in_stock,
+    link: product.link,
+    name: product.name,
+    partner: product.partner,
+    partner_id: product.partner_id,
+    price: product.price,
+    product_id: product.id,
+    product_type: product.product_type,
+    sale_price: product.sale_price,
+    saved: true,
+    updated_at: new Date().toString(),
+    user_id: save.user_id,
+    vendor_product_id: product.vendor_product_id,
+});

@@ -1,6 +1,7 @@
 import React, {useCallback, useState} from 'react';
 
 import {SavedContext, CollectionType} from '@/context/saved';
+import {convertProductToSave} from '@/services/conversions';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
 
@@ -91,6 +92,34 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         setCollections(tempCollections);
     }, []);
 
+    const saveProduct = useCallback(
+        async (product: Database['public']['Views']['v_products']['Row']) => {
+            const {data, error} = await supabase
+                .from('saves')
+                .insert({product_id: product.id})
+                .select()
+                .limit(1)
+                .single();
+
+            if (error) {
+                console.error(error);
+                throw new Error(error.message);
+            }
+
+            setSaves([convertProductToSave(product, data), ...saves]);
+        },
+        [saves],
+    );
+
+    const deleteSavedProduct = useCallback(async (id: number) => {
+        const {error} = await supabase.from('saves').delete().eq('id', id);
+
+        if (error) {
+            console.error(error);
+            throw new Error(error.message);
+        }
+    }, []);
+
     return (
         <SavedContext.Provider
             value={{
@@ -100,6 +129,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 initFetchCollections,
                 isLoadingSaves,
                 isLoadingCollections,
+                saveProduct,
+                deleteSavedProduct,
             }}>
             {children}
         </SavedContext.Provider>

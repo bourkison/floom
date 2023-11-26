@@ -14,6 +14,11 @@ type SavedContextType = {
     initFetchSaves: () => Promise<void>;
     initFetchCollections: () => Promise<void>;
 
+    saveProduct: (
+        product: Database['public']['Views']['v_products']['Row'],
+    ) => Promise<void>;
+    deleteSavedProduct: (id: number) => Promise<void>;
+
     isLoadingSaves: boolean;
     isLoadingCollections: boolean;
 };

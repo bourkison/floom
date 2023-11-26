@@ -180,7 +180,7 @@ export interface Database {
           created_at?: string | null
           id?: number
           product_id: number
-          user_id: string
+          user_id?: string
         }
         Update: {
           collection_id?: number | null

@@ -25,10 +25,9 @@ import Animated, {
 
 import BrandLogo from '@/components/Utility/BrandLogo';
 import {BUY_COLOR, PALETTE, SAVE_COLOR, SAVE_TEXT, BUY_TEXT} from '@/constants';
+import {useSharedSavedContext} from '@/context/saved';
 import {MainStackParamList} from '@/nav/Navigator';
 import {capitaliseString, formatPrice} from '@/services';
-import {useAppDispatch} from '@/store/hooks';
-import {deleteSavedProduct, saveProduct} from '@/store/slices/product';
 import {Database} from '@/types/schema';
 
 export type ProductListItemProps = {
@@ -64,12 +63,13 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     const isAnimating = useSharedValue(false);
 
     const {width} = useWindowDimensions();
-    const dispatch = useAppDispatch();
 
     const [imageContSize, setImageContSize] = useState(1);
     const [imageSize, setImageSize] = useState({width: 0, height: 0});
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+
+    const {saveProduct, deleteSavedProduct} = useSharedSavedContext();
 
     // Reset shared values when _id changes (as view has been recycled) as per:
     // https://shopify.github.io/flash-list/docs/guides/reanimated
@@ -133,7 +133,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         prepAnimation();
 
         if (type === 'saved') {
-            dispatch(deleteSavedProduct(product.id));
+            deleteSavedProduct(product.id);
         }
 
         if (onDelete) {
@@ -146,7 +146,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
             buyProduct();
         } else if (type === 'deleted') {
             prepAnimation();
-            dispatch(saveProduct(product.id));
+            saveProduct(product);
         }
     };
 

@@ -20,10 +20,10 @@ type Filters = {
     excludeDeleted?: boolean;
 };
 
-export function applyProductFilters(
+export const applyProductFilters = (
     query: VProductsFilterBuilder,
     filters: Filters,
-): VProductsFilterBuilder {
+): VProductsFilterBuilder => {
     if (filters.searchText) {
         query = query.textSearch(
             'name',
@@ -54,7 +54,7 @@ export function applyProductFilters(
     }
 
     return query;
-}
+};
 
 export const capitaliseString = (str: string): string => {
     const capitaliseFirstLetter = (s: string) => {
@@ -115,9 +115,9 @@ export const stringifyColors = (colors: string[]): string => {
         .join(', ');
 };
 
-export function filtersApplied(
-    filters: RootState['product']['saved']['filters'],
-) {
+export const filtersApplied = (
+    filters: RootState['product']['unsaved']['filters'],
+) => {
     if (
         filters.category.length ||
         filters.color.length ||
@@ -128,4 +128,4 @@ export function filtersApplied(
     }
 
     return false;
-}
+};

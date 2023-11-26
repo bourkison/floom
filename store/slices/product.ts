@@ -13,7 +13,6 @@ import {
     LOCAL_KEY_DELETED_PRODUCTS,
     LOCAL_KEY_SAVED_PRODUCTS,
     MAX_LOCAL_DELETED_PRODUCTS,
-    MAX_LOCAL_SAVED_PRODUCTS,
 } from '@/constants';
 import {alreadyExists, applyProductFilters} from '@/services';
 import {supabase} from '@/services/supabase';
@@ -27,19 +26,6 @@ type AnimationState = 'idle' | 'save' | 'buy' | 'delete';
 const productAdapter = createEntityAdapter();
 
 const initialState = productAdapter.getInitialState({
-    saved: {
-        products: [] as ProductType[],
-        isLoading: false,
-        moreToLoad: true,
-        isLoadingMore: false,
-        filters: {
-            gender: 'both' as Gender,
-            category: [] as (typeof CATEGORY_OPTIONS)[number][],
-            color: [] as (typeof COLOR_OPTIONS)[number][],
-            brand: [] as {id: number; name: string}[],
-            searchText: '',
-        },
-    },
     unsaved: {
         products: [] as ProductType[],
         isLoading: false,
@@ -124,39 +110,6 @@ export const loadUnsavedProducts = createAsyncThunk<
     }
 });
 
-export const loadSavedProducts = createAsyncThunk<
-    Database['public']['Views']['v_products']['Row'][],
-    void,
-    {rejectValue: PostgrestError}
->('product/loadSavedProducts', async (_, {getState, rejectWithValue}) => {
-    const state = getState() as RootState;
-
-    let query = supabase.from('v_products').select();
-    query = applyProductFilters(query, state.product.saved.filters);
-
-    if (state.user.isGuest) {
-        const savedProducts = JSON.parse(
-            (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
-        );
-
-        const {data, error} = await query.in('id', savedProducts);
-
-        if (error) {
-            return rejectWithValue(error);
-        }
-
-        return data;
-    } else {
-        const {data, error} = await query.eq('saved', true);
-
-        if (error) {
-            return rejectWithValue(error);
-        }
-
-        return data;
-    }
-});
-
 export const loadDeletedProducts = createAsyncThunk<
     Database['public']['Views']['v_products']['Row'][],
     void,
@@ -165,7 +118,7 @@ export const loadDeletedProducts = createAsyncThunk<
     const state = getState() as RootState;
 
     let query = supabase.from('v_products').select();
-    query = applyProductFilters(query, state.product.saved.filters);
+    query = applyProductFilters(query, state.product.deleted.filters);
 
     if (state.user.isGuest) {
         const deletedProducts = JSON.parse(
@@ -189,128 +142,6 @@ export const loadDeletedProducts = createAsyncThunk<
         return data;
     }
 });
-
-export const saveProduct = createAsyncThunk<
-    void,
-    number,
-    {rejectValue: PostgrestError | AuthError}
->('product/saveProduct', async (productId, {getState, rejectWithValue}) => {
-    const state = getState() as RootState;
-
-    if (state.user.isGuest) {
-        let currentSavedProducts: string[] = JSON.parse(
-            (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
-        );
-
-        let currentDeletedProducts: string[] = JSON.parse(
-            (await AsyncStorage.getItem(LOCAL_KEY_DELETED_PRODUCTS)) || '[]',
-        );
-
-        // Remove from deleted if there.
-        const deletedIndex = currentDeletedProducts.findIndex(
-            i => i === productId.toString(),
-        );
-        if (deletedIndex > -1) {
-            currentDeletedProducts = [
-                ...currentDeletedProducts.slice(0, deletedIndex),
-                ...currentDeletedProducts.slice(deletedIndex + 1),
-            ];
-
-            await AsyncStorage.setItem(
-                LOCAL_KEY_DELETED_PRODUCTS,
-                JSON.stringify(currentDeletedProducts),
-            );
-        }
-
-        // Add to saved if not there already.
-        if (currentSavedProducts.includes(productId.toString())) {
-            return;
-        }
-
-        currentSavedProducts.unshift(productId.toString());
-
-        if (currentSavedProducts.length > MAX_LOCAL_SAVED_PRODUCTS) {
-            currentSavedProducts = currentSavedProducts.slice(
-                0,
-                MAX_LOCAL_SAVED_PRODUCTS,
-            );
-
-            // TODO: Display warning to user announcing they have gone over their deleted amount
-        }
-
-        await AsyncStorage.setItem(
-            LOCAL_KEY_SAVED_PRODUCTS,
-            JSON.stringify(currentSavedProducts),
-        );
-    } else {
-        const {data: userData, error: userError} =
-            await supabase.auth.getUser();
-
-        if (userError) {
-            return rejectWithValue(userError);
-        }
-
-        const {error} = await supabase
-            .from('saves')
-            .insert({product_id: productId, user_id: userData.user.id});
-
-        if (error) {
-            return rejectWithValue(error);
-        }
-    }
-});
-
-export const deleteSavedProduct = createAsyncThunk<
-    void,
-    number,
-    {rejectValue: PostgrestError | AuthError}
->(
-    'product/deleteSavedProduct',
-    async (productId, {getState, rejectWithValue}) => {
-        const state = getState() as RootState;
-
-        if (state.user.isGuest) {
-            let currentSavedProducts: string[] = JSON.parse(
-                (await AsyncStorage.getItem(LOCAL_KEY_SAVED_PRODUCTS)) || '[]',
-            );
-
-            const index = currentSavedProducts.findIndex(
-                p => p === productId.toString(),
-            );
-
-            if (index > -1) {
-                currentSavedProducts = [
-                    ...currentSavedProducts.slice(0, index),
-                    ...currentSavedProducts.slice(index + 1),
-                ];
-
-                await AsyncStorage.setItem(
-                    LOCAL_KEY_SAVED_PRODUCTS,
-                    JSON.stringify(currentSavedProducts),
-                );
-            } else {
-                throw new Error('Product not found');
-            }
-        } else {
-            const {data: userData, error: userError} =
-                await supabase.auth.getUser();
-
-            if (userError) {
-                return rejectWithValue(userError);
-            }
-
-            const {error} = await supabase
-                .from('saves')
-                .delete()
-                .eq('product_id', productId)
-                .eq('user_id', userData.user.id);
-
-            if (error) {
-                return rejectWithValue(error);
-            }
-        }
-    },
-);
 
 export const deleteProduct = createAsyncThunk<
     void,
@@ -476,16 +307,11 @@ const productSlice = createSlice({
         clearFilters(
             state,
             action: PayloadAction<{
-                filterType: 'saved' | 'unsaved' | 'deleted';
+                filterType: 'unsaved' | 'deleted';
                 gender: Gender;
             }>,
         ) {
-            if (action.payload.filterType === 'saved') {
-                state.saved.filters.category = [];
-                state.saved.filters.color = [];
-                state.saved.filters.searchText = '';
-                state.saved.filters.gender = action.payload.gender;
-            } else if (action.payload.filterType === 'unsaved') {
+            if (action.payload.filterType === 'unsaved') {
                 state.unsaved.filters.category = [];
                 state.unsaved.filters.color = [];
                 state.unsaved.filters.searchText = '';
@@ -507,7 +333,7 @@ const productSlice = createSlice({
         setGender(
             state,
             action: PayloadAction<{
-                obj: 'unsaved' | 'saved' | 'deleted';
+                obj: 'unsaved' | 'deleted';
                 gender: Gender;
             }>,
         ) {
@@ -525,7 +351,7 @@ const productSlice = createSlice({
         toggleBrand(
             state,
             action: PayloadAction<{
-                obj: 'unsaved' | 'saved' | 'deleted';
+                obj: 'unsaved' | 'deleted';
                 brand: {id: number; name: string};
             }>,
         ) {
@@ -548,7 +374,7 @@ const productSlice = createSlice({
         toggleCategory(
             state,
             action: PayloadAction<{
-                obj: 'unsaved' | 'saved' | 'deleted';
+                obj: 'unsaved' | 'deleted';
                 category: (typeof CATEGORY_OPTIONS)[number];
             }>,
         ) {
@@ -576,7 +402,7 @@ const productSlice = createSlice({
         toggleColor(
             state,
             action: PayloadAction<{
-                obj: 'unsaved' | 'saved' | 'deleted';
+                obj: 'unsaved' | 'deleted';
                 color: (typeof COLOR_OPTIONS)[number];
             }>,
         ) {
@@ -599,7 +425,7 @@ const productSlice = createSlice({
         updateSearchFilter(
             state,
             action: PayloadAction<{
-                obj: 'saved' | 'unsaved' | 'deleted';
+                obj: 'unsaved' | 'deleted';
                 pl: string;
             }>,
         ) {
@@ -638,15 +464,6 @@ const productSlice = createSlice({
             .addCase(loadUnsavedProducts.rejected, (_, {meta, payload}) => {
                 console.error('error loading', payload, meta);
             })
-            .addCase(loadSavedProducts.pending, state => {
-                state.saved.isLoading = true;
-            })
-            .addCase(loadSavedProducts.fulfilled, (state, action) => {
-                state.saved.products = action.payload;
-                state.saved.isLoading = false;
-                state.saved.isLoadingMore = false;
-                state.saved.moreToLoad = false;
-            })
             .addCase(loadDeletedProducts.pending, state => {
                 state.deleted.isLoading = true;
             })
@@ -655,46 +472,6 @@ const productSlice = createSlice({
                 state.deleted.isLoading = false;
                 state.deleted.isLoadingMore = false;
                 state.deleted.moreToLoad = false;
-            })
-            .addCase(saveProduct.pending, (state, action) => {
-                state.animation = 'idle';
-                state.action = 'idle';
-
-                // Slice from unsaved if they are the same.
-                if (state.unsaved.products[0].id === action.meta.arg) {
-                    state.unsaved.products = state.unsaved.products.slice(1);
-                }
-
-                // // Unshift into saved if not saved from API response, and not already in our array (to avoid duplicates), and no filters applied.
-                // if (
-                //     !action.meta.arg.saved &&
-                //     !alreadyExists(action.meta.arg.id, state.saved.products) &&
-                //     !filtersApplied(state.saved.filters)
-                // ) {
-                //     state.saved.products.unshift({
-                //         ...action.meta.arg,
-                //         deleted: false,
-                //         saved: true,
-                //     });
-
-                //     // Ensure we don't overload on memory by only storing SAVED_STORED_PRODUCTS_AMOUNT of products.
-                //     if (
-                //         state.saved.products.length >
-                //         SAVED_STORED_PRODUCTS_AMOUNT
-                //     ) {
-                //         state.saved.products = state.saved.products.slice(
-                //             0,
-                //             SAVED_STORED_PRODUCTS_AMOUNT,
-                //         );
-                //         state.saved.moreToLoad = true;
-                //     }
-                // }
-
-                // if (action.meta.arg.deleted) {
-                //     state.deleted.products = state.deleted.products.filter(
-                //         p => p._id !== action.meta.arg._id,
-                //     );
-                // }
             })
             .addCase(deleteProduct.pending, (state, action) => {
                 state.animation = 'idle';
