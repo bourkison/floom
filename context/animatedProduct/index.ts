@@ -9,6 +9,9 @@ type AnimatedProductType = {
     rotation: SharedValue<number>;
     context: SharedValue<{x: number; y: number}>;
     action: SharedValue<ActionType>;
+    buyOpacity: SharedValue<number>;
+    saveOpacity: SharedValue<number>;
+    deleteOpacity: SharedValue<number>;
 };
 
 export const AnimatedProductContext = createContext<AnimatedProductType | null>(
