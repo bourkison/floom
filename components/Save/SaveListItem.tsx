@@ -125,7 +125,12 @@ const SaveListItem = ({save}: SaveListItemProps) => {
                         <View style={styles.buttonsContainer}>
                             <AnimatedButton
                                 style={styles.deleteButton}
-                                onPress={() => deleteSavedProduct(save.id)}>
+                                onPress={() =>
+                                    deleteSavedProduct(
+                                        save.id,
+                                        save.collection_id,
+                                    )
+                                }>
                                 <Text style={styles.deleteText}>Remove</Text>
                             </AnimatedButton>
 

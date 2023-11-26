@@ -68,11 +68,16 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         collData.forEach(collection => {
             promises.push(
                 new Promise(async (resolve, reject) => {
-                    const {data: saveData, error: saveError} = await supabase
+                    const {
+                        data: saveData,
+                        error: saveError,
+                        count,
+                    } = await supabase
                         .from('v_saves')
-                        .select()
+                        .select('*', {count: 'exact'})
                         .eq('collection_id', collection.id)
-                        .order('created_at', {ascending: false});
+                        .order('created_at', {ascending: false})
+                        .limit(1);
 
                     if (saveError) {
                         return reject(saveError);
@@ -81,7 +86,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                     resolve({
                         id: collection.id,
                         name: collection.name,
-                        products: saveData,
+                        imageUrls: [saveData[0]?.images[0] || ''],
+                        productsAmount: count || 0,
                     });
                 }),
             );
@@ -125,12 +131,17 @@ const SavedProvider = ({children}: SavedProviderProps) => {
     );
 
     const deleteSavedProduct = useCallback(
-        async (id: number) => {
-            const index = saves.findIndex(save => save.id === id);
+        async (id: number, collectionId: number | null) => {
+            if (collectionId === null) {
+                const index = saves.findIndex(save => save.id === id);
 
-            console.log('DELETE INDEX', index);
-
-            setSaves([...saves.slice(0, index), ...saves.slice(index + 1)]);
+                if (index > -1) {
+                    setSaves([
+                        ...saves.slice(0, index),
+                        ...saves.slice(index + 1),
+                    ]);
+                }
+            }
 
             const {error} = await supabase.from('saves').delete().eq('id', id);
 

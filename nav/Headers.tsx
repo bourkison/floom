@@ -2,7 +2,7 @@ import {Entypo, Ionicons, Feather, AntDesign} from '@expo/vector-icons';
 import {StackHeaderProps} from '@react-navigation/stack';
 import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -14,6 +14,7 @@ import {
 
 import SearchInput from '@/components/Utility/SearchInput';
 import {PALETTE} from '@/constants';
+import {CollectionType, useSharedSavedContext} from '@/context/saved';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {loadUnsavedProducts, updateSearchFilter} from '@/store/slices/product';
 
@@ -148,8 +149,23 @@ export const CollectionViewHeader: React.FC<StackHeaderProps> = ({
     navigation,
     route,
 }) => {
-    // @ts-ignore
-    const header: string = route.params?.name || 'Collection';
+    const {collections} = useSharedSavedContext();
+    const [collection, setCollection] = useState<CollectionType>();
+
+    useEffect(() => {
+        // @ts-ignore
+        const collectionId: number = route.params?.collectionId;
+
+        const tempCollection = collections.filter(
+            c => c.id === collectionId,
+        )[0];
+
+        if (!tempCollection) {
+            throw new Error('Collection not in context');
+        }
+
+        setCollection(tempCollection);
+    }, [route, collections]);
 
     return (
         <HeaderTemplate
@@ -163,7 +179,7 @@ export const CollectionViewHeader: React.FC<StackHeaderProps> = ({
                     <Feather name="chevron-left" size={24} />
                 </Pressable>
             }>
-            {header}
+            {collection?.name || ''}
         </HeaderTemplate>
     );
 };

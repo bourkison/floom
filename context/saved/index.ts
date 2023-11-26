@@ -5,7 +5,8 @@ import {Database} from '@/types/schema';
 export type CollectionType = {
     name: string;
     id: number;
-    products: Database['public']['Views']['v_saves']['Row'][];
+    imageUrls: string[];
+    productsAmount: number;
 };
 
 type SavedContextType = {
@@ -17,7 +18,10 @@ type SavedContextType = {
     saveProduct: (
         product: Database['public']['Views']['v_products']['Row'],
     ) => Promise<void>;
-    deleteSavedProduct: (id: number) => Promise<void>;
+    deleteSavedProduct: (
+        id: number,
+        collectionId: number | null,
+    ) => Promise<void>;
 
     isLoadingSaves: boolean;
     isLoadingCollections: boolean;

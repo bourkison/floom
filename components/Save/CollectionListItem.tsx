@@ -1,7 +1,7 @@
 import {SimpleLineIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -29,29 +29,14 @@ const CollectionListItem = ({collection}: CollectionListItemProps) => {
     const {width} = useWindowDimensions();
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
 
-    const [imageUrl, setImageUrl] = useState('');
-
     const navigation =
         useNavigation<StackNavigationProp<SavedStackParamList, 'SavedHome'>>();
 
     const navigateTo = () => {
         navigation.navigate('CollectionView', {
-            name: collection.name,
-            products: collection.products,
+            collectionId: collection.id,
         });
     };
-
-    // Set image url to use on load
-    useEffect(() => {
-        for (let i = 0; i < collection.products.length; i++) {
-            const product = collection.products[i];
-
-            if (product.images && product.images[0]) {
-                setImageUrl(product.images[0]);
-                return;
-            }
-        }
-    }, [collection]);
 
     return (
         <TouchableHighlight
@@ -59,10 +44,10 @@ const CollectionListItem = ({collection}: CollectionListItemProps) => {
             underlayColor={TOUCHABLE_UNDERLAY}
             activeOpacity={TOUCHABLE_ACTIVE_OPACITY}>
             <View style={styles.container}>
-                {imageUrl && (
+                {collection.imageUrls[0] && (
                     <View style={styles.imageContainer}>
                         <Image
-                            source={{uri: imageUrl}}
+                            source={{uri: collection.imageUrls[0]}}
                             style={{
                                 width: IMAGE_WIDTH,
                                 height: IMAGE_WIDTH / IMAGE_RATIO,
@@ -75,8 +60,8 @@ const CollectionListItem = ({collection}: CollectionListItemProps) => {
                     <View style={styles.leftColumn}>
                         <Text style={styles.titleText}>{collection.name}</Text>
                         <Text style={styles.subtitleText}>
-                            {collection.products.length} product
-                            {collection.products.length !== 1 && 's'}
+                            {collection.productsAmount} product
+                            {collection.productsAmount !== 1 && 's'}
                         </Text>
                     </View>
 

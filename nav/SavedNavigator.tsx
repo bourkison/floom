@@ -5,13 +5,11 @@ import {CollectionViewHeader, SavedProductsHeader} from '@/nav/Headers';
 import CollectionNew from '@/screens/Saved/CollectionNew';
 import CollectionView from '@/screens/Saved/CollectionView';
 import SavedHome from '@/screens/Saved/SavedHome';
-import {Database} from '@/types/schema';
 
 export type SavedStackParamList = {
     SavedHome: undefined;
     CollectionView: {
-        products: Database['public']['Views']['v_saves']['Row'][];
-        name: string;
+        collectionId: number;
     };
     CollectionNew: undefined;
 };
