@@ -21,6 +21,9 @@ type SavedContextType = {
 
     isLoadingSaves: boolean;
     isLoadingCollections: boolean;
+
+    hasInitiallyLoadedSaves: boolean;
+    hasInitiallyLoadedCollections: boolean;
 };
 
 export const SavedContext = createContext<SavedContextType | null>(null);

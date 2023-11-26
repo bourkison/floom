@@ -15,6 +15,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SelectableSaveListItem from '@/components/Save/SelectableSaveListItem';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
+import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
@@ -23,41 +24,22 @@ const CollectionNew = ({
     navigation,
 }: StackScreenProps<SavedStackParamList, 'CollectionNew'>) => {
     const [isCreating, setIsCreating] = useState(false);
-    const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
     const [name, setName] = useState('');
-    const [products, setProducts] = useState<
-        Database['public']['Views']['v_saves']['Row'][]
-    >([]);
     const [selectedProducts, setSelectedProducts] = useState<
         Database['public']['Views']['v_saves']['Row'][]
     >([]);
 
     const {bottom} = useSafeAreaInsets();
 
+    const {saves, hasInitiallyLoadedSaves, isLoadingSaves, initFetchSaves} =
+        useSharedSavedContext();
+
     useEffect(() => {
-        const fetchProducts = async () => {
-            setIsLoadingProducts(true);
-
-            const {data, error} = await supabase
-                .from('v_saves')
-                .select()
-                .order('created_at', {ascending: false})
-                .is('collection_id', null);
-
-            setIsLoadingProducts(false);
-
-            if (error) {
-                // TODO: Handle error
-                console.error(error);
-                return;
-            }
-
-            setProducts(data);
-        };
-
-        fetchProducts();
-    }, []);
+        if (!hasInitiallyLoadedSaves) {
+            initFetchSaves();
+        }
+    }, [hasInitiallyLoadedSaves, initFetchSaves]);
 
     const createCollection = async () => {
         setIsCreating(true);
@@ -173,16 +155,16 @@ const CollectionNew = ({
                         Add Products (optional)
                     </Text>
 
-                    {isLoadingProducts ? (
+                    {isLoadingSaves ? (
                         <ActivityIndicator style={styles.activityIndicator} />
                     ) : (
                         <View style={styles.savedProductsContainer}>
-                            {products.map(product => (
+                            {saves.map(save => (
                                 <SelectableSaveListItem
-                                    key={product.id}
-                                    save={product}
+                                    key={save.id}
+                                    save={save}
                                     onSelect={productSelected}
-                                    selected={isProductSelected(product)}
+                                    selected={isProductSelected(save)}
                                 />
                             ))}
                         </View>

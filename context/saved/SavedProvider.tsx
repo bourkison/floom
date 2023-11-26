@@ -13,6 +13,11 @@ const SavedProvider = ({children}: SavedProviderProps) => {
     const [isLoadingSaves, setIsLoadingSaves] = useState(false);
     const [isLoadingCollections, setIsLoadingCollections] = useState(false);
 
+    const [hasInitiallyLoadedSaves, setHasInitiallyLoadedSaves] =
+        useState(false);
+    const [hasInitiallyLoadedCollections, setHasInitiallyLoadedCollections] =
+        useState(false);
+
     const [collections, setCollections] = useState<CollectionType[]>([]);
     const [saves, setSaves] = useState<
         Database['public']['Views']['v_saves']['Row'][]
@@ -20,6 +25,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
 
     const initFetchSaves = useCallback(async () => {
         setIsLoadingSaves(true);
+        setHasInitiallyLoadedSaves(true);
 
         const {data, error} = await supabase
             .from('v_saves')
@@ -40,6 +46,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
 
     const initFetchCollections = useCallback(async () => {
         setIsLoadingCollections(true);
+        setHasInitiallyLoadedCollections(true);
 
         const {data: collData, error: collError} = await supabase
             .from('collections')
@@ -131,6 +138,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 isLoadingCollections,
                 saveProduct,
                 deleteSavedProduct,
+                hasInitiallyLoadedSaves,
+                hasInitiallyLoadedCollections,
             }}>
             {children}
         </SavedContext.Provider>

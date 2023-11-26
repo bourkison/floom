@@ -22,6 +22,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         saves,
         isLoadingSaves,
         isLoadingCollections,
+        hasInitiallyLoadedSaves,
+        hasInitiallyLoadedCollections,
     } = useSharedSavedContext();
 
     const filteredCollections = useMemo(() => {
@@ -35,9 +37,20 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     }, [saves, searchText]);
 
     useEffect(() => {
-        initFetchCollections();
-        initFetchSaves();
-    }, [initFetchSaves, initFetchCollections]);
+        console.log('init loaded', hasInitiallyLoadedSaves);
+        if (!hasInitiallyLoadedCollections) {
+            initFetchCollections();
+        }
+
+        if (!hasInitiallyLoadedSaves) {
+            initFetchSaves();
+        }
+    }, [
+        initFetchSaves,
+        initFetchCollections,
+        hasInitiallyLoadedSaves,
+        hasInitiallyLoadedCollections,
+    ]);
 
     const isLoading = useMemo<boolean>(() => {
         if (isLoadingSaves || isLoadingCollections) {
