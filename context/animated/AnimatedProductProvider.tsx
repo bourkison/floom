@@ -15,7 +15,7 @@ import {
     OPACITY_MINIMUM,
     PING_DURATION,
 } from '@/constants/animations';
-import {AnimatedProductContext} from '@/context/animatedProduct';
+import {AnimatedProductContext} from '@/context/animated';
 
 type AnimatedProductProviderProps = {
     children: React.JSX.Element;

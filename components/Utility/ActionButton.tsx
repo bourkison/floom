@@ -16,7 +16,8 @@ import {
     ACTION_BUTTON_SIZE,
     PALETTE,
 } from '@/constants';
-import {useAnimatedProductContext} from '@/context/animatedProduct';
+import {useAnimatedProductContext} from '@/context/animated';
+import {useDeletedContext} from '@/context/deleted';
 import {useSharedSavedContext} from '@/context/saved';
 import {Database} from '@/types/schema';
 
@@ -51,6 +52,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         reset,
     } = useAnimatedProductContext();
     const {saveProduct} = useSharedSavedContext();
+    const {deleteProduct} = useDeletedContext();
 
     const pingValue = useDerivedValue(() => {
         if (type === 'buy') {
@@ -148,7 +150,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
         if (type === 'delete') {
             animateLeft(width * 0.75, () => {
-                console.log('LEFT');
+                deleteProduct(product);
             });
 
             return;

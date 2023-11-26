@@ -4,7 +4,9 @@ import {
 } from '@react-navigation/stack';
 import React from 'react';
 
-import AnimatedProductProvider from '@/context/animatedProduct/AnimatedProductProvider';
+import AnimatedProductProvider from '@/context/animated/AnimatedProductProvider';
+import DeletedProvider from '@/context/deleted/DeletedProvider';
+import SavedProvider from '@/context/saved/SavedProvider';
 import FiltersNavigator from '@/nav/FiltersNavigator';
 import {HEADER_HEIGHT_W_STATUS_BAR, HomeHeader} from '@/nav/Headers';
 import OptionsNavigator from '@/nav/OptionsNavigator';
@@ -70,66 +72,70 @@ export default function Navigator() {
     }
 
     return (
-        <AnimatedProductProvider>
-            <MainStack.Navigator
-                initialRouteName="Home"
-                screenOptions={{
-                    cardStyleInterpolator:
-                        CardStyleInterpolators.forHorizontalIOS,
-                    gestureEnabled: true,
-                    headerStyle: {
-                        height: HEADER_HEIGHT_W_STATUS_BAR,
-                        elevation: 999,
-                        zIndex: 999,
-                    },
-                }}>
-                <MainStack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{header: HomeHeader}}
-                />
-                <MainStack.Screen
-                    name="Filters"
-                    component={FiltersNavigator}
-                    options={{
-                        gestureDirection: 'vertical',
-                        headerShown: false,
-                        gestureEnabled: false,
-                        cardStyleInterpolator:
-                            CardStyleInterpolators.forVerticalIOS,
-                    }}
-                />
-                <MainStack.Screen
-                    name="ProductView"
-                    component={ProductView}
-                    options={{
-                        cardStyleInterpolator:
-                            CardStyleInterpolators.forModalPresentationIOS,
-                        presentation: 'modal',
-                        gestureDirection: 'vertical',
-                        headerShown: false,
-                        gestureEnabled: true,
-                    }}
-                />
-                <MainStack.Screen
-                    name="SavedProducts"
-                    component={SavedNavigator}
-                    options={{
-                        gestureDirection: 'horizontal',
-                        gestureEnabled: true,
-                        headerShown: false,
-                    }}
-                />
-                <MainStack.Screen
-                    name="Options"
-                    component={OptionsNavigator}
-                    options={{
-                        gestureDirection: 'horizontal-inverted',
-                        headerShown: false,
-                        gestureEnabled: true,
-                    }}
-                />
-            </MainStack.Navigator>
-        </AnimatedProductProvider>
+        <SavedProvider>
+            <DeletedProvider>
+                <AnimatedProductProvider>
+                    <MainStack.Navigator
+                        initialRouteName="Home"
+                        screenOptions={{
+                            cardStyleInterpolator:
+                                CardStyleInterpolators.forHorizontalIOS,
+                            gestureEnabled: true,
+                            headerStyle: {
+                                height: HEADER_HEIGHT_W_STATUS_BAR,
+                                elevation: 999,
+                                zIndex: 999,
+                            },
+                        }}>
+                        <MainStack.Screen
+                            name="Home"
+                            component={Home}
+                            options={{header: HomeHeader}}
+                        />
+                        <MainStack.Screen
+                            name="Filters"
+                            component={FiltersNavigator}
+                            options={{
+                                gestureDirection: 'vertical',
+                                headerShown: false,
+                                gestureEnabled: false,
+                                cardStyleInterpolator:
+                                    CardStyleInterpolators.forVerticalIOS,
+                            }}
+                        />
+                        <MainStack.Screen
+                            name="ProductView"
+                            component={ProductView}
+                            options={{
+                                cardStyleInterpolator:
+                                    CardStyleInterpolators.forModalPresentationIOS,
+                                presentation: 'modal',
+                                gestureDirection: 'vertical',
+                                headerShown: false,
+                                gestureEnabled: true,
+                            }}
+                        />
+                        <MainStack.Screen
+                            name="SavedProducts"
+                            component={SavedNavigator}
+                            options={{
+                                gestureDirection: 'horizontal',
+                                gestureEnabled: true,
+                                headerShown: false,
+                            }}
+                        />
+                        <MainStack.Screen
+                            name="Options"
+                            component={OptionsNavigator}
+                            options={{
+                                gestureDirection: 'horizontal-inverted',
+                                headerShown: false,
+                                gestureEnabled: true,
+                            }}
+                        />
+                    </MainStack.Navigator>
+                </AnimatedProductProvider>
+            </DeletedProvider>
+        </SavedProvider>
     );
 }

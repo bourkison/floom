@@ -30,7 +30,7 @@ const CategoryListItem = ({category}: CategoryProps) => {
     }, [selectedCategories, category]);
 
     const toggle = () => {
-        dispatch(toggleCategory({obj: 'unsaved', category}));
+        dispatch(toggleCategory({category}));
     };
 
     return (

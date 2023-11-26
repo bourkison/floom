@@ -32,7 +32,7 @@ const ColorListItem = ({color}: ColorListItemProps) => {
     }, [selectedColors, color]);
 
     const toggle = () => {
-        dispatch(toggleColor({obj: 'unsaved', color}));
+        dispatch(toggleColor({color}));
     };
 
     return (

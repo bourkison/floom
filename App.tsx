@@ -8,7 +8,6 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 
 import AppLoader from '@/AppLoader';
-import SavedProvider from '@/context/saved/SavedProvider';
 import Navigator from '@/nav/Navigator';
 import store from '@/store';
 
@@ -30,12 +29,10 @@ export default function App() {
                     <AppLoader
                         appIsReady={appIsReady}
                         setAppIsReady={setAppIsReady}>
-                        <SavedProvider>
-                            <NavigationContainer>
-                                <StatusBar style="dark" />
-                                <Navigator />
-                            </NavigationContainer>
-                        </SavedProvider>
+                        <NavigationContainer>
+                            <StatusBar style="dark" />
+                            <Navigator />
+                        </NavigationContainer>
                     </AppLoader>
                 </GestureHandlerRootView>
             </SafeAreaProvider>

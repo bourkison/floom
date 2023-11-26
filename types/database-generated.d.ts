@@ -82,7 +82,7 @@ export interface Database {
           created_at?: string | null
           id?: number
           product_id: number
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string | null
@@ -224,6 +224,29 @@ export interface Database {
       }
     }
     Views: {
+      v_deletes: {
+        Row: {
+          brand: string | null
+          colors: string[] | null
+          created_at: string | null
+          deleted: boolean | null
+          description: string | null
+          gender: string | null
+          id: number | null
+          images: string[] | null
+          in_stock: boolean | null
+          link: string | null
+          name: string | null
+          partner: string | null
+          price: number | null
+          product_id: number | null
+          product_type: string | null
+          sale_price: number | null
+          saved: boolean | null
+          user_id: string | null
+          vendor_product_id: string | null
+        }
+      }
       v_products: {
         Row: {
           brand: string | null

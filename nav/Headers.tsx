@@ -65,7 +65,7 @@ export const HomeHeader: React.FC<StackHeaderProps> = ({navigation}) => {
     );
 
     const updateSearchText = (val: string) => {
-        dispatch(updateSearchFilter({obj: 'unsaved', pl: val}));
+        dispatch(updateSearchFilter({pl: val}));
     };
 
     const search = () => {

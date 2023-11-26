@@ -14,7 +14,7 @@ import {
     useWindowDimensions,
 } from 'react-native';
 
-import AnimatedProduct from '@/components/Product/AnimatedProductNew';
+import AnimatedProduct from '@/components/Product/AnimatedProduct';
 import BrandLogo from '@/components/Utility/BrandLogo';
 import {
     IMAGE_RATIO,

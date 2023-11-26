@@ -11,123 +11,82 @@ import {
     useWindowDimensions,
 } from 'react-native';
 
-import FilterDropdown, {
-    FILTER_DROPDOWN_CLOSED_HEIGHT,
-} from '@/components/Product/FilterDropdown';
 import ProductListItem, {
     PRODUCT_LIST_ITEM_HEIGHT,
 } from '@/components/Product/ProductListItem';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import SectionHeader from '@/components/Utility/SectionHeader';
 import {PALETTE} from '@/constants';
+import {useDeletedContext} from '@/context/deleted';
 import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
-import {filtersApplied} from '@/services';
-import {useAppSelector, useAppDispatch} from '@/store/hooks';
-import {
-    clearFilters,
-    deleteAllDeletedProducts,
-    deleteDeletedProduct,
-    loadDeletedProducts,
-} from '@/store/slices/product';
 import {Database} from '@/types/schema';
 
-const INITIAL_LOAD_AMOUNT = 10;
+// const INITIAL_LOAD_AMOUNT = 10;
 // const SUBSEQUENT_LOAD_AMOUNT = 10;
 const ON_END_REACHED_THRESHOLD = 1;
 
 const DeletedProducts = () => {
-    const [loadAttempted, setLoadAttempted] = useState(false);
-
-    const isLoading = useAppSelector(state => state.product.deleted.isLoading);
-    const products = useAppSelector(state => state.product.deleted.products);
-    const moreToLoad = useAppSelector(
-        state => state.product.deleted.moreToLoad,
-    );
-    const isLoadingMore = useAppSelector(
-        state => state.product.deleted.isLoadingMore,
-    );
-    const filters = useAppSelector(state => state.product.deleted.filters);
-    const gender = useAppSelector(
-        state => state.user.userData?.gender || 'both',
-    );
-
-    const [isRefreshing, setIsRefreshing] = useState(false);
-
     const [modalVisible, setModalVisible] = useState(false);
     const [isDeletingAll, setIsDeletingAll] = useState(false);
 
+    const {
+        deletes,
+        isLoadingDeletes,
+        initFetchDeletes,
+        hasInitiallyLoadedDeletes,
+        deleteDeletedProduct,
+        deleteAllDeletedProducts,
+    } = useDeletedContext();
     const {height} = useWindowDimensions();
 
     const ListRef =
-        useRef<FlashList<Database['public']['Views']['v_products']['Row']>>(
+        useRef<FlashList<Database['public']['Views']['v_deletes']['Row']>>(
             null,
         );
 
-    const dispatch = useAppDispatch();
-
     useEffect(() => {
-        const initFetch = async () => {
-            await dispatch(loadDeletedProducts());
-        };
-
-        if (
-            products.length < INITIAL_LOAD_AMOUNT &&
-            !isLoading &&
-            !loadAttempted
-        ) {
-            setLoadAttempted(true);
-            initFetch();
-        } else if (!loadAttempted) {
-            setLoadAttempted(true);
+        if (!hasInitiallyLoadedDeletes) {
+            initFetchDeletes();
         }
-    }, [products, isLoading, loadAttempted, dispatch]);
+    }, [hasInitiallyLoadedDeletes, initFetchDeletes]);
 
     const refresh = async () => {
-        setIsRefreshing(true);
-        await dispatch(loadDeletedProducts());
-        setIsRefreshing(false);
+        console.log('REFRESH');
     };
 
-    const retry = useCallback(
-        async (cFilters: boolean) => {
-            await dispatch(loadDeletedProducts());
-
-            if (cFilters) {
-                dispatch(clearFilters({filterType: 'deleted', gender}));
-            }
+    const reload = useCallback(
+        async (_: boolean) => {
+            initFetchDeletes();
         },
-        [dispatch, gender],
+        [initFetchDeletes],
     );
 
-    const loadMore = async () => {
-        if (moreToLoad) {
-            dispatch(loadDeletedProducts());
-        }
-    };
+    // const loadMore = async () => {
+    //     // TODO: Load more.
+    // };
 
     const removeProduct = (
         product: Database['public']['Views']['v_products']['Row'],
     ) => {
-        dispatch(deleteDeletedProduct(product.id));
+        deleteDeletedProduct(product.id);
     };
 
     const deleteAllProducts = async () => {
-        setIsDeletingAll(!isDeletingAll);
-        await dispatch(deleteAllDeletedProducts());
+        setIsDeletingAll(true);
+        await deleteAllDeletedProducts();
         setIsDeletingAll(false);
-        setModalVisible(false);
     };
 
-    const isEmpty = useCallback(() => {
-        if (!isLoading && !products.length && !moreToLoad) {
+    const isEmpty = useMemo(() => {
+        if (!isLoadingDeletes && !deletes.length) {
             return true;
         }
 
         return false;
-    }, [isLoading, products, moreToLoad]);
+    }, [isLoadingDeletes, deletes]);
 
     const EmptyComponent = useMemo(() => {
-        if (isLoading) {
+        if (isLoadingDeletes) {
             return (
                 <View style={styles.loadingIndicator}>
                     <ActivityIndicator />
@@ -135,53 +94,35 @@ const DeletedProducts = () => {
             );
         }
 
-        if (isEmpty()) {
-            const remainingHeight =
-                height -
-                HEADER_HEIGHT_W_STATUS_BAR -
-                FILTER_DROPDOWN_CLOSED_HEIGHT;
-
-            const hasFilters = filtersApplied(filters);
+        if (isEmpty) {
+            const remainingHeight = height - HEADER_HEIGHT_W_STATUS_BAR;
 
             return (
                 <View
                     style={[styles.emptyContainer, {height: remainingHeight}]}>
                     <Text style={styles.noProductsText}>
-                        {hasFilters
-                            ? 'No products found. Clear filters, or retry.'
-                            : 'No deleted products. Get swiping, or try again.'}
+                        No deleted products. Get swiping, or try again.
                     </Text>
                     <View style={styles.refreshButtonContainer}>
                         <AnimatedButton
                             style={styles.refreshButton}
                             textStyle={styles.refreshButtonText}
-                            onPress={() => retry(false)}>
+                            onPress={() => reload(false)}>
                             Refresh
                         </AnimatedButton>
-                        {hasFilters ? (
-                            <AnimatedButton
-                                onPress={() => retry(true)}
-                                style={styles.clearFiltersRefreshButton}
-                                textStyle={
-                                    styles.clearFiltersRefreshButtonText
-                                }>
-                                Clear Filters and Refresh
-                            </AnimatedButton>
-                        ) : undefined}
                     </View>
                 </View>
             );
         }
 
         return <View />;
-    }, [isLoading, filters, height, isEmpty, retry]);
+    }, [isLoadingDeletes, height, isEmpty, reload]);
 
     return (
         <View style={styles.container}>
-            <FilterDropdown obj="deleted" />
             <FlashList
                 ref={ListRef}
-                data={products}
+                data={deletes}
                 keyExtractor={item => item.id.toString()}
                 ListEmptyComponent={EmptyComponent}
                 renderItem={({item, index}) => (
@@ -190,17 +131,12 @@ const DeletedProducts = () => {
                         index={index}
                         type="deleted"
                         onDelete={removeProduct}
-                        listRef={ListRef}
                     />
                 )}
-                onEndReached={() => {
-                    if (moreToLoad && !isLoadingMore) {
-                        loadMore();
-                    }
-                }}
+                onEndReached={undefined}
                 estimatedItemSize={PRODUCT_LIST_ITEM_HEIGHT}
                 ListHeaderComponent={
-                    !isEmpty() && !isLoading ? (
+                    !isEmpty && !isLoadingDeletes ? (
                         <View style={styles.resetAllButtonContainer}>
                             <AnimatedButton
                                 onPress={() => {
@@ -213,16 +149,12 @@ const DeletedProducts = () => {
                         </View>
                     ) : undefined
                 }
-                ListFooterComponent={
-                    isLoadingMore ? (
-                        <ActivityIndicator style={styles.activityIndicator} />
-                    ) : undefined
-                }
+                ListFooterComponent={undefined}
                 refreshControl={
-                    !isLoading ? (
+                    !isLoadingDeletes ? (
                         <RefreshControl
                             onRefresh={refresh}
-                            refreshing={isRefreshing}
+                            refreshing={isLoadingDeletes}
                         />
                     ) : undefined
                 }

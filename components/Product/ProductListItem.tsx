@@ -1,9 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {FlashList} from '@shopify/flash-list';
 import * as Haptics from 'expo-haptics';
 import * as WebBrowser from 'expo-web-browser';
-import React, {useCallback, useEffect, useState, RefObject} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -11,7 +10,6 @@ import {
     useWindowDimensions,
     Image,
     TouchableOpacity,
-    LayoutAnimation,
 } from 'react-native';
 import {GestureDetector, Gesture} from 'react-native-gesture-handler';
 import Animated, {
@@ -21,6 +19,7 @@ import Animated, {
     useSharedValue,
     Easing,
     withTiming,
+    Layout,
 } from 'react-native-reanimated';
 
 import BrandLogo from '@/components/Utility/BrandLogo';
@@ -37,9 +36,6 @@ export type ProductListItemProps = {
     onDelete?: (
         product: Database['public']['Views']['v_products']['Row'],
     ) => void;
-    listRef: RefObject<
-        FlashList<Database['public']['Views']['v_products']['Row']>
-    >;
 };
 
 export const PRODUCT_LIST_ITEM_HEIGHT = 108;
@@ -50,7 +46,6 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     index,
     type,
     onDelete,
-    listRef,
 }) => {
     const contextX = useSharedValue(0);
     const offsetX = useSharedValue(0);
@@ -69,7 +64,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
-    const {saveProduct, deleteSavedProduct} = useSharedSavedContext();
+    const {saveProduct} = useSharedSavedContext();
 
     // Reset shared values when _id changes (as view has been recycled) as per:
     // https://shopify.github.io/flash-list/docs/guides/reanimated
@@ -110,31 +105,10 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         };
     });
 
-    const prepAnimation = () => {
-        const layoutAnimConfig = {
-            duration: 300,
-            update: {
-                type: LayoutAnimation.Types.easeInEaseOut,
-            },
-            delete: {
-                duration: 100,
-                type: LayoutAnimation.Types.easeInEaseOut,
-                property: LayoutAnimation.Properties.opacity,
-            },
-        };
-
-        // This must be called before `LayoutAnimation.configureNext` in order for the animation to run properly.
-        // As per: https://shopify.github.io/flash-list/docs/guides/layout-animation
-        listRef.current?.prepareForLayoutAnimationRender();
-        LayoutAnimation.configureNext(layoutAnimConfig);
-    };
-
     const deleteProduct = () => {
-        prepAnimation();
-
-        if (type === 'saved') {
-            deleteSavedProduct(product.id);
-        }
+        // if (type === 'saved') {
+        //     deleteSavedProduct(product.id);
+        // }
 
         if (onDelete) {
             onDelete(product);
@@ -145,7 +119,6 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         if (type === 'saved') {
             buyProduct();
         } else if (type === 'deleted') {
-            prepAnimation();
             saveProduct(product);
         }
     };
@@ -225,7 +198,9 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
 
     return (
         <View style={styles.container}>
-            <Animated.View style={[styles.deleteContainer, rLeftSwipeStyle]}>
+            <Animated.View
+                style={[styles.deleteContainer, rLeftSwipeStyle]}
+                layout={Layout}>
                 <Text style={styles.deleteText}>Remove</Text>
             </Animated.View>
             <Animated.View

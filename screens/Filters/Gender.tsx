@@ -13,10 +13,7 @@ const Gender = () => {
 
     return (
         <View style={styles.container}>
-            <SetGender
-                value={gender}
-                onChange={g => dispatch(setGender({obj: 'unsaved', gender: g}))}
-            />
+            <SetGender value={gender} onChange={g => dispatch(setGender(g))} />
         </View>
     );
 };

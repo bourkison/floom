@@ -1,7 +1,7 @@
 import {Feather} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
     View,
     Image,
@@ -12,59 +12,44 @@ import {
 } from 'react-native';
 
 import {PALETTE} from '@/constants';
+import {useDeletedContext} from '@/context/deleted';
 import {OptionsStackParamList} from '@/nav/OptionsNavigator';
-import {useAppDispatch, useAppSelector} from '@/store/hooks';
-import {loadDeletedProducts} from '@/store/slices/product';
 
 const NUM_PRODUCTS = 5;
 
 const DeletedProductsWidget = () => {
-    const [loadAttempted, setLoadAttempted] = useState(false);
+    const {
+        deletes,
+        initFetchDeletes,
+        isLoadingDeletes,
+        hasInitiallyLoadedDeletes,
+    } = useDeletedContext();
 
-    const deletedProducts = useAppSelector(state => {
-        const t = state.product.deleted.products.slice();
-        return t.slice(0, NUM_PRODUCTS);
-    });
-
-    const isLoading = useAppSelector(state => state.product.deleted.isLoading);
     const [imageSize, setImageSize] = useState({width: 0, height: 0});
 
     const navigation =
         useNavigation<StackNavigationProp<OptionsStackParamList>>();
 
-    const dispatch = useAppDispatch();
-
     useEffect(() => {
-        const initFetch = async () => {
-            await dispatch(loadDeletedProducts());
-        };
-
-        if (
-            deletedProducts.length < NUM_PRODUCTS &&
-            !isLoading &&
-            !loadAttempted
-        ) {
-            setLoadAttempted(true);
-            initFetch();
-        } else if (!loadAttempted) {
-            setLoadAttempted(true);
+        if (deletes.length < NUM_PRODUCTS && !hasInitiallyLoadedDeletes) {
+            initFetchDeletes();
         }
-    }, [dispatch, deletedProducts, isLoading, loadAttempted]);
+    }, [deletes, hasInitiallyLoadedDeletes, initFetchDeletes]);
 
-    const isEmpty = useCallback(() => {
-        if (!isLoading && !deletedProducts.length) {
+    const isEmpty = useMemo(() => {
+        if (!isLoadingDeletes && !deletes.length) {
             return true;
         }
 
         return false;
-    }, [isLoading, deletedProducts]);
+    }, [deletes, isLoadingDeletes]);
 
     const content = () => {
-        if (isLoading) {
+        if (isLoadingDeletes) {
             return <ActivityIndicator />;
         }
 
-        if (isEmpty()) {
+        if (isEmpty) {
             return (
                 <View style={styles.noProductTextContainer}>
                     <Text style={styles.noProductText}>
@@ -76,7 +61,7 @@ const DeletedProductsWidget = () => {
 
         return (
             <View style={styles.imageContainer}>
-                {deletedProducts.map(product => (
+                {deletes.map(product => (
                     <Image
                         key={product.id}
                         style={[imageSize]}

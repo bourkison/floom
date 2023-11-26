@@ -41,7 +41,7 @@ const BrandListItem = ({brand}: BrandListItemProps) => {
     }, [selectedBrands, brand]);
 
     const toggle = () => {
-        dispatch(toggleBrand({obj: 'unsaved', brand}));
+        dispatch(toggleBrand({brand}));
     };
 
     return (
