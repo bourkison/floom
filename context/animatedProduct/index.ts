@@ -12,6 +12,14 @@ type AnimatedProductType = {
     buyOpacity: SharedValue<number>;
     saveOpacity: SharedValue<number>;
     deleteOpacity: SharedValue<number>;
+
+    actionJs: ActionType;
+
+    buyPing: SharedValue<number>;
+    savePing: SharedValue<number>;
+    deletePing: SharedValue<number>;
+
+    setAction: (to: ActionType) => void;
 };
 
 export const AnimatedProductContext = createContext<AnimatedProductType | null>(

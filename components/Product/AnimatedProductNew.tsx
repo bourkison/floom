@@ -56,6 +56,7 @@ const AnimatedProduct = ({
         saveOpacity,
         buyOpacity,
         deleteOpacity,
+        setAction,
     } = useAnimatedProductContext();
 
     const {saveProduct} = useSharedSavedContext();
@@ -109,7 +110,7 @@ const AnimatedProduct = ({
                 Math.abs(offsetX.value) < ACTION_THRESHOLD &&
                 -offsetY.value < ACTION_THRESHOLD
             ) {
-                action.value = 'idle';
+                setAction('idle');
                 runOnJS(Haptics.impactAsync)();
             }
             // else if we're not buying and we should be (i.e. offsetY value above 2x action threshold)
@@ -119,7 +120,7 @@ const AnimatedProduct = ({
                 offsetX.value < ACTION_THRESHOLD &&
                 offsetX.value > -ACTION_THRESHOLD
             ) {
-                action.value = 'buy';
+                setAction('buy');
                 runOnJS(Haptics.impactAsync)();
             }
             // else if we're not saving and we should be (i.e. offsetX value above action threshold)
@@ -127,7 +128,7 @@ const AnimatedProduct = ({
                 action.value !== 'save' &&
                 offsetX.value >= ACTION_THRESHOLD
             ) {
-                action.value = 'save';
+                setAction('save');
                 runOnJS(Haptics.impactAsync)();
             }
             // finally, if we're not deleting and we should be (i.e. offsetX value below action threshold)
@@ -135,7 +136,7 @@ const AnimatedProduct = ({
                 action.value !== 'delete' &&
                 offsetX.value <= -ACTION_THRESHOLD
             ) {
-                action.value = 'delete';
+                setAction('delete');
                 runOnJS(Haptics.impactAsync)();
             }
         })
@@ -151,7 +152,7 @@ const AnimatedProduct = ({
                 offsetY.value = withSpring(0);
             }
 
-            action.value = 'idle';
+            setAction('idle');
         });
 
     const actionContainerPosition = useMemo(

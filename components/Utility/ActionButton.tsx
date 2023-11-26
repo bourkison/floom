@@ -1,12 +1,11 @@
 import {Ionicons, MaterialCommunityIcons, Octicons} from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import React, {useCallback, useEffect} from 'react';
+import React, {useMemo} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import Animated, {
     interpolateColor,
     useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+    useDerivedValue,
 } from 'react-native-reanimated';
 
 import {
@@ -16,8 +15,7 @@ import {
     ACTION_BUTTON_SIZE,
     PALETTE,
 } from '@/constants';
-import {useAppDispatch, useAppSelector} from '@/store/hooks';
-import {commenceAnimate, setAction} from '@/store/slices/product';
+import {useAnimatedProductContext} from '@/context/animatedProduct';
 
 type ActionButtonProps = {
     type: 'save' | 'buy' | 'delete';
@@ -31,20 +29,25 @@ const BOX_SHADOW_START = 0.5;
 const BOX_SHADOW_END = 0.4;
 const BORDER_WIDTH = 4;
 
-const PROGRESS_DURATION = 250;
-
 const ActionButton: React.FC<ActionButtonProps> = ({
     type,
     onPress,
     disabled,
 }) => {
-    const dispatch = useAppDispatch();
-    const action = useAppSelector(state => state.product.action);
+    const {buyPing, savePing, deletePing, actionJs} =
+        useAnimatedProductContext();
 
-    // Goes from 0 to 1 based on progress.
-    const sProgress = useSharedValue(0);
+    const pingValue = useDerivedValue(() => {
+        if (type === 'buy') {
+            return buyPing.value;
+        } else if (type === 'save') {
+            return savePing.value;
+        } else {
+            return deletePing.value;
+        }
+    });
 
-    const activeColor = useCallback(() => {
+    const activeColor = useMemo(() => {
         if (type === 'save') {
             return SAVE_COLOR;
         } else if (type === 'buy') {
@@ -54,43 +57,41 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         }
     }, [type]);
 
-    const ACTIVE_COLOR = activeColor();
-
     const rStyle = useAnimatedStyle(() => {
         const backgroundColor = interpolateColor(
-            sProgress.value,
+            pingValue.value,
             [0, 1],
-            ['#FFF', ACTIVE_COLOR],
+            ['#FFF', activeColor],
         );
 
         const borderColor = interpolateColor(
-            sProgress.value,
+            pingValue.value,
             [0, 1],
-            [PALETTE.neutral[0], ACTIVE_COLOR],
+            [PALETTE.neutral[0], activeColor],
         );
 
         return {
             transform: [
                 {
                     // Goes from 1 to SCALE_AMOUNT based on progress
-                    scale: 1 - (1 - SCALE_AMOUNT) * sProgress.value,
+                    scale: 1 - (1 - SCALE_AMOUNT) * pingValue.value,
                 },
             ],
             // Goes from 0.5 to 0.4 based on progress
             shadowOpacity:
-                BOX_SHADOW_START - (1 - BOX_SHADOW_END) * sProgress.value,
-            elevation: 5 - sProgress.value * 5,
+                BOX_SHADOW_START - (1 - BOX_SHADOW_END) * pingValue.value,
+            elevation: 5 - pingValue.value * 5,
             borderColor,
             backgroundColor,
         };
     });
 
-    const icon = useCallback(() => {
+    const icon = useMemo(() => {
         if (type === 'save') {
             return (
                 <Ionicons
                     name="heart"
-                    color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
+                    color={actionJs === type ? PALETTE.neutral[1] : activeColor}
                     size={ACTION_BUTTON_SIZE / 2.5}
                 />
             );
@@ -99,7 +100,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
                 <MaterialCommunityIcons
                     name="cart"
                     size={ACTION_BUTTON_SIZE / 2}
-                    color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
+                    color={actionJs === type ? PALETTE.neutral[1] : activeColor}
                 />
             );
         } else {
@@ -107,36 +108,28 @@ const ActionButton: React.FC<ActionButtonProps> = ({
                 <Octicons
                     name="x"
                     size={ACTION_BUTTON_SIZE / 2}
-                    color={action === type ? PALETTE.neutral[1] : ACTIVE_COLOR}
+                    color={actionJs === type ? PALETTE.neutral[1] : activeColor}
                 />
             );
         }
-    }, [type, action, ACTIVE_COLOR]);
-
-    useEffect(() => {
-        if (action === type) {
-            sProgress.value = withTiming(1, {duration: PROGRESS_DURATION});
-        } else {
-            sProgress.value = withTiming(0, {duration: PROGRESS_DURATION});
-        }
-    }, [action, sProgress, type]);
+    }, [type, actionJs, activeColor]);
 
     const press = () => {
         Haptics.impactAsync();
 
-        dispatch(setAction(type));
+        // dispatch(setAction(type));
 
         if (onPress) {
             onPress();
         } else {
-            dispatch(commenceAnimate(type));
+            // dispatch(commenceAnimate(type));
         }
     };
 
     return (
         <Animated.View style={[styles.buttonContainer, rStyle]}>
             <Pressable onPress={press} disabled={disabled}>
-                <View style={[styles.button]}>{icon()}</View>
+                <View style={[styles.button]}>{icon}</View>
             </Pressable>
         </Animated.View>
     );

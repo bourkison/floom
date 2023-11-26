@@ -114,6 +114,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
             }
 
             setSaves([convertProductToSave(product, data), ...saves]);
+
+            // TODO: Dispatch to remove from store.
         },
         [saves],
     );

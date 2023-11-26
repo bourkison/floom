@@ -1,11 +1,17 @@
-import React from 'react';
-import {useDerivedValue, useSharedValue} from 'react-native-reanimated';
+import React, {useState} from 'react';
+import {
+    runOnJS,
+    useDerivedValue,
+    useSharedValue,
+    withTiming,
+} from 'react-native-reanimated';
 
 import {
     ACTION_THRESHOLD,
     ActionType,
     MAX_ROTATION,
     OPACITY_MINIMUM,
+    PING_DURATION,
 } from '@/constants/animations';
 import {AnimatedProductContext} from '@/context/animatedProduct';
 
@@ -14,10 +20,17 @@ type AnimatedProductProviderProps = {
 };
 
 const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
+    const [actionJs, setActionJs] = useState<ActionType>('idle');
+
     const action = useSharedValue<ActionType>('idle');
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
     const context = useSharedValue({x: 0, y: 0});
+
+    // Pings between 0 and 1 for animations in action button.
+    const savePing = useSharedValue(0);
+    const deletePing = useSharedValue(0);
+    const buyPing = useSharedValue(0);
 
     const rotation = useDerivedValue<number>(() => {
         let percentageToActionX = offsetX.value / ACTION_THRESHOLD;
@@ -107,6 +120,35 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
         return Math.min(-offsetX.value / ACTION_THRESHOLD, 1);
     });
 
+    const setAction = (to: ActionType) => {
+        'worklet';
+
+        const from = action.value;
+
+        if (from === to) {
+            return;
+        }
+
+        action.value = to;
+        runOnJS(setActionJs)(to);
+
+        if (from === 'buy') {
+            buyPing.value = withTiming(0, {duration: PING_DURATION});
+        } else if (from === 'delete') {
+            deletePing.value = withTiming(0, {duration: PING_DURATION});
+        } else if (from === 'save') {
+            savePing.value = withTiming(0, {duration: PING_DURATION});
+        }
+
+        if (to === 'buy') {
+            buyPing.value = withTiming(1, {duration: PING_DURATION});
+        } else if (to === 'delete') {
+            deletePing.value = withTiming(1, {duration: PING_DURATION});
+        } else if (to === 'save') {
+            savePing.value = withTiming(1, {duration: PING_DURATION});
+        }
+    };
+
     return (
         <AnimatedProductContext.Provider
             value={{
@@ -118,6 +160,11 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
                 buyOpacity,
                 saveOpacity,
                 deleteOpacity,
+                buyPing,
+                savePing,
+                deletePing,
+                setAction,
+                actionJs,
             }}>
             {children}
         </AnimatedProductContext.Provider>
