@@ -1,5 +1,5 @@
 import {StackScreenProps} from '@react-navigation/stack';
-import React, {useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {View, StyleSheet, useWindowDimensions} from 'react-native';
 
 import FeaturedProduct from '@/components/Product/FeaturedProduct';
@@ -28,6 +28,10 @@ const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
         state => state.product.unsaved.products.length,
     );
 
+    const topProduct = useAppSelector(
+        state => state.product.unsaved.products[0],
+    );
+
     // Calculate margins for different device heights.
     const calculateMargins = useCallback((): number => {
         const headerHeight = HEADER_HEIGHT_W_STATUS_BAR;
@@ -47,7 +51,7 @@ const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
         return remainingHeight / 5;
     }, [height, width]);
 
-    const actionButtonDisabled = useCallback((): boolean => {
+    const actionButtonDisabled = useMemo((): boolean => {
         if (!productsLength && !moreToLoad && !isLoading) {
             return true;
         }
@@ -81,15 +85,18 @@ const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
                     ]}>
                     <ActionButton
                         type="delete"
-                        disabled={actionButtonDisabled()}
+                        product={topProduct}
+                        disabled={actionButtonDisabled}
                     />
                     <ActionButton
                         type="buy"
-                        disabled={actionButtonDisabled()}
+                        product={topProduct}
+                        disabled={actionButtonDisabled}
                     />
                     <ActionButton
                         type="save"
-                        disabled={actionButtonDisabled()}
+                        product={topProduct}
+                        disabled={actionButtonDisabled}
                     />
                 </View>
             </View>

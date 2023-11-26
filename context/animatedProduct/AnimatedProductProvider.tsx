@@ -3,11 +3,13 @@ import {
     runOnJS,
     useDerivedValue,
     useSharedValue,
+    withSpring,
     withTiming,
 } from 'react-native-reanimated';
 
 import {
     ACTION_THRESHOLD,
+    ANIMATION_DURATION,
     ActionType,
     MAX_ROTATION,
     OPACITY_MINIMUM,
@@ -26,6 +28,8 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
     const context = useSharedValue({x: 0, y: 0});
+
+    const isAnimating = useSharedValue(false);
 
     // Pings between 0 and 1 for animations in action button.
     const savePing = useSharedValue(0);
@@ -99,6 +103,10 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
     });
 
     const saveOpacity = useDerivedValue<number>(() => {
+        if (isAnimating.value && action.value === 'save') {
+            return 1;
+        }
+
         if (
             calculateOpacity(offsetX.value, offsetY.value, action.value) !==
             'save'
@@ -149,6 +157,89 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
         }
     };
 
+    const animateRight = (
+        amount: number,
+        withReset: boolean,
+        callback: () => void,
+    ) => {
+        setAction('save');
+        isAnimating.value = true;
+
+        offsetX.value = withTiming(
+            amount,
+            {duration: ANIMATION_DURATION},
+            () => {
+                setAction('idle');
+                isAnimating.value = false;
+
+                if (withReset) {
+                    reset(false);
+                }
+
+                runOnJS(callback)();
+            },
+        );
+    };
+
+    const animateLeft = (
+        amount: number,
+        withReset: boolean,
+        callback: () => void,
+    ) => {
+        'worklet';
+        setAction('delete');
+        isAnimating.value = true;
+
+        offsetX.value = withTiming(
+            -amount,
+            {duration: ANIMATION_DURATION},
+            () => {
+                setAction('idle');
+                isAnimating.value = false;
+
+                if (withReset) {
+                    reset(false);
+                }
+
+                runOnJS(callback)();
+            },
+        );
+    };
+
+    const animateUp = (amount: number, callback?: () => void) => {
+        'worklet';
+        setAction('buy');
+        isAnimating.value = true;
+
+        offsetY.value = withTiming(
+            -amount,
+            {duration: ANIMATION_DURATION},
+            () => {
+                'worklet';
+
+                if (callback) {
+                    runOnJS(callback)();
+                }
+            },
+        );
+    };
+
+    const reset = (withAnimation: boolean) => {
+        'worklet';
+        setAction('idle');
+        isAnimating.value = false;
+
+        if (withAnimation) {
+            offsetX.value = withSpring(0);
+            offsetY.value = withSpring(0);
+
+            return;
+        }
+
+        offsetX.value = 0;
+        offsetY.value = 0;
+    };
+
     return (
         <AnimatedProductContext.Provider
             value={{
@@ -165,6 +256,10 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
                 deletePing,
                 setAction,
                 actionJs,
+                animateRight,
+                animateLeft,
+                reset,
+                animateUp,
             }}>
             {children}
         </AnimatedProductContext.Provider>
