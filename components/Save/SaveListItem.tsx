@@ -2,7 +2,7 @@ import {SimpleLineIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import * as WebBrowser from 'expo-web-browser';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
     View,
     Text,
@@ -32,6 +32,8 @@ const TOUCHABLE_ACTIVE_OPACITY = 0.7;
 const SaveListItem = ({save}: SaveListItemProps) => {
     const {width} = useWindowDimensions();
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
+
+    const onSale = useMemo(() => save.sale_price < save.price, [save]);
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
@@ -88,6 +90,10 @@ const SaveListItem = ({save}: SaveListItemProps) => {
                             <Text style={styles.priceText}>
                                 {formatPrice(save.price)}
                             </Text>
+
+                            {onSale && (
+                                <Text>{formatPrice(save.sale_price)}</Text>
+                            )}
                         </View>
 
                         <View>

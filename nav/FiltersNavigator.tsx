@@ -6,12 +6,14 @@ import {
     CategoryHeader,
     ColorHeader,
     FiltersHomeHeader,
+    GenderHeader,
     PriceHeader,
 } from '@/nav/Headers';
 import Brand from '@/screens/Filters/Brand';
 import Category from '@/screens/Filters/Category';
 import Color from '@/screens/Filters/Color';
 import FiltersHome from '@/screens/Filters/FiltersHome';
+import Gender from '@/screens/Filters/Gender';
 import Price from '@/screens/Filters/Price';
 
 export type FiltersStackParamList = {
@@ -19,6 +21,7 @@ export type FiltersStackParamList = {
     Brand: undefined;
     Color: undefined;
     Category: undefined;
+    Gender: undefined;
     Price: undefined;
 };
 
@@ -46,6 +49,11 @@ const FiltersNavigator = () => {
                 name="Category"
                 component={Category}
                 options={{header: CategoryHeader}}
+            />
+            <FiltersStack.Screen
+                name="Gender"
+                component={Gender}
+                options={{header: GenderHeader}}
             />
             <FiltersStack.Screen
                 name="Price"

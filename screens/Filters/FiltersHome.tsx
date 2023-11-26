@@ -8,12 +8,10 @@ import {
     View,
 } from 'react-native';
 
-import SetGender from '@/components/User/SetGender';
 import ExcludeFilters from '@/components/Utility/ExcludeFilters';
 import {PALETTE} from '@/constants';
 import {FiltersStackParamList} from '@/nav/FiltersNavigator';
-import {useAppDispatch, useAppSelector} from '@/store/hooks';
-import {setGender} from '@/store/slices/product';
+import {useAppSelector} from '@/store/hooks';
 
 const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
 const TOUCHABLE_ACTIVE_OPACITY = 0.7;
@@ -21,8 +19,6 @@ const TOUCHABLE_ACTIVE_OPACITY = 0.7;
 const FiltersHome = ({
     navigation,
 }: StackScreenProps<FiltersStackParamList, 'FiltersHome'>) => {
-    const dispatch = useAppDispatch();
-
     const selectedBrands = useAppSelector(
         state => state.product.unsaved.filters.brand,
     );
@@ -82,15 +78,6 @@ const FiltersHome = ({
     return (
         <ScrollView style={styles.container}>
             <View style={styles.listContainer}>
-                <View style={styles.genderContainer}>
-                    <SetGender
-                        value={selectedGender}
-                        onChange={gender =>
-                            dispatch(setGender({obj: 'unsaved', gender}))
-                        }
-                    />
-                </View>
-
                 <TouchableHighlight
                     underlayColor={TOUCHABLE_UNDERLAY}
                     activeOpacity={TOUCHABLE_ACTIVE_OPACITY}
@@ -155,6 +142,26 @@ const FiltersHome = ({
                         </View>
                         <View>
                             <Text style={styles.text}>{priceText}</Text>
+                        </View>
+                    </View>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    underlayColor={TOUCHABLE_UNDERLAY}
+                    activeOpacity={TOUCHABLE_ACTIVE_OPACITY}
+                    onPress={() => navigation.navigate('Gender')}
+                    style={[styles.touchable, styles.noBorder]}>
+                    <View style={styles.touchableContentContainer}>
+                        <View>
+                            <Text style={[styles.text, styles.title]}>
+                                Style
+                            </Text>
+                        </View>
+                        <View>
+                            <Text style={styles.text}>
+                                {selectedGender.charAt(0).toUpperCase() +
+                                    selectedGender.slice(1)}
+                            </Text>
                         </View>
                     </View>
                 </TouchableHighlight>
@@ -236,16 +243,9 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     excludeContainer: {
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: {
-            width: 0,
-            height: 0,
-        },
         backgroundColor: '#FFF',
         paddingHorizontal: 25,
         paddingVertical: 25,
-        marginTop: 25,
     },
 });
 

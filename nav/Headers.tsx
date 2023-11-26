@@ -293,6 +293,22 @@ export const ColorHeader: React.FC<StackHeaderProps> = ({navigation}) => {
     );
 };
 
+export const GenderHeader: React.FC<StackHeaderProps> = ({navigation}) => {
+    return (
+        <HeaderTemplate
+            leftIcon={
+                <Pressable
+                    style={styles.headerIcon}
+                    onPress={() => navigation.goBack()}>
+                    <Feather name="arrow-left" size={24} />
+                </Pressable>
+            }
+            style={styles.hiddenShadowWithBorder}>
+            Style
+        </HeaderTemplate>
+    );
+};
+
 export const CategoryHeader: React.FC<StackHeaderProps> = ({navigation}) => {
     const categoryFilters = useAppSelector(
         state => state.product.unsaved.filters.category,
