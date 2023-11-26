@@ -24,7 +24,6 @@ import {
     SAVE_COLOR,
     IMAGE_PREFETCH_AMOUNT,
     PALETTE,
-    IMAGE_ANIMATED_AMOUNT,
 } from '@/constants';
 import {MainStackParamList} from '@/nav/Navigator';
 import {capitaliseString, formatPrice} from '@/services';
@@ -39,7 +38,7 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
     const route = useRoute<RouteProp<MainStackParamList, 'Home'>>();
 
-    const {width, height: windowHeight} = useWindowDimensions();
+    const {width} = useWindowDimensions();
 
     const [imageIndex, setImageIndex] = useState(0);
     const [prefetchedImages, setPrefetchedImages] = useState<string[]>([]);
@@ -202,15 +201,12 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     );
 
     // Animated more images to prevent flickering on component change.
-    if (index < IMAGE_ANIMATED_AMOUNT) {
+    if (index === 0) {
         return (
             <AnimatedProduct
-                index={index}
                 imageIndex={imageIndex}
                 setImageIndex={setImageIndex}
-                product={product}
-                width={width}
-                windowHeight={windowHeight}>
+                product={product}>
                 {baseComponent}
             </AnimatedProduct>
         );

@@ -1,6 +1,14 @@
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 import * as Haptics from 'expo-haptics';
 import React, {useMemo} from 'react';
-import {View, StyleSheet, useWindowDimensions, Text} from 'react-native';
+import {
+    View,
+    StyleSheet,
+    useWindowDimensions,
+    Text,
+    Pressable,
+} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
     useAnimatedStyle,
@@ -21,14 +29,24 @@ import {
 import {ACTION_THRESHOLD, OVERLAY_PERCENTAGE} from '@/constants/animations';
 import {useAnimatedProductContext} from '@/context/animatedProduct';
 import {useSharedSavedContext} from '@/context/saved';
+import {MainStackParamList} from '@/nav/Navigator';
 import {Database} from '@/types/schema';
 
 type AnimatedProductProps = {
     children: React.JSX.Element;
     product: Database['public']['Views']['v_products']['Row'];
+    imageIndex: number;
+    setImageIndex: (imageIndex: number) => void;
 };
 
-const AnimatedProduct = ({children, product}: AnimatedProductProps) => {
+const LEFT_RIGHT_TAP_WIDTH = 80;
+
+const AnimatedProduct = ({
+    children,
+    product,
+    imageIndex,
+    setImageIndex,
+}: AnimatedProductProps) => {
     const {
         offsetX,
         offsetY,
@@ -42,6 +60,7 @@ const AnimatedProduct = ({children, product}: AnimatedProductProps) => {
 
     const {saveProduct} = useSharedSavedContext();
     const {width} = useWindowDimensions();
+    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
     const rTileStyle = useAnimatedStyle(() => ({
         transform: [
@@ -66,6 +85,9 @@ const AnimatedProduct = ({children, product}: AnimatedProductProps) => {
     const rDeleteStyle = useAnimatedStyle(() => ({
         opacity: deleteOpacity.value,
     }));
+
+    const TILE_WIDTH = width - IMAGE_PADDING;
+    const TILE_HEIGHT = TILE_WIDTH / IMAGE_RATIO;
 
     const panGesture = Gesture.Pan()
         .activeOffsetX([-5, 5])
@@ -118,8 +140,6 @@ const AnimatedProduct = ({children, product}: AnimatedProductProps) => {
             }
         })
         .onFinalize(() => {
-            console.log(action.value);
-
             if (action.value === 'save') {
                 runOnJS(saveProduct)(product);
             } else if (action.value === 'delete') {
@@ -138,6 +158,32 @@ const AnimatedProduct = ({children, product}: AnimatedProductProps) => {
         () => (width - IMAGE_PADDING) / IMAGE_RATIO / 2,
         [width],
     );
+
+    const centerPress = () => {
+        Haptics.selectionAsync();
+
+        navigation.navigate('ProductView', {
+            product,
+            imageIndex,
+            reference: 'swipe',
+        });
+    };
+
+    const leftPress = () => {
+        Haptics.selectionAsync();
+
+        if (imageIndex > 0) {
+            setImageIndex(imageIndex - 1);
+        }
+    };
+
+    const rightPress = () => {
+        Haptics.selectionAsync();
+
+        if (imageIndex < product.images.length - 1) {
+            setImageIndex(imageIndex + 1);
+        }
+    };
 
     return (
         <Animated.View style={rTileStyle}>
@@ -199,7 +245,41 @@ const AnimatedProduct = ({children, product}: AnimatedProductProps) => {
                             <Text style={styles.buyText}>{BUY_TEXT}</Text>
                         </Animated.View>
                     </View>
-                    {children}
+
+                    <Pressable
+                        onPress={leftPress}
+                        style={[
+                            styles.leftPressable,
+                            {
+                                width: LEFT_RIGHT_TAP_WIDTH,
+                                height: TILE_HEIGHT,
+                            },
+                        ]}
+                    />
+
+                    <Pressable
+                        onPress={rightPress}
+                        style={[
+                            styles.rightPressable,
+                            {
+                                width: LEFT_RIGHT_TAP_WIDTH,
+                                height: TILE_HEIGHT,
+                            },
+                        ]}
+                    />
+
+                    <Pressable
+                        onPress={centerPress}
+                        style={[
+                            styles.centerPressable,
+                            {
+                                left: LEFT_RIGHT_TAP_WIDTH,
+                                width: TILE_WIDTH - 2 * LEFT_RIGHT_TAP_WIDTH,
+                                height: TILE_HEIGHT,
+                            },
+                        ]}
+                    />
+                    <View>{children}</View>
                 </View>
             </GestureDetector>
         </Animated.View>
@@ -261,6 +341,26 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         alignItems: 'center',
         zIndex: 40,
+    },
+    centerPressable: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        zIndex: 50,
+    },
+    rightPressable: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        zIndex: 50,
+    },
+    leftPressable: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        zIndex: 50,
     },
 });
 
