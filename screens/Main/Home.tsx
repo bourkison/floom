@@ -13,6 +13,7 @@ import {
     ACTION_BUTTON_SIZE,
     FEATURED_PRODUCT_SIZE,
 } from '@/constants';
+import AnimatedProductProvider from '@/context/animatedProduct/AnimatedProductProvider';
 import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
 import {MainStackParamList} from '@/nav/Navigator';
 import {useAppSelector} from '@/store/hooks';
@@ -56,44 +57,47 @@ const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
     }, [moreToLoad, productsLength, isLoading]);
 
     return (
-        <View style={styles.flexOne}>
-            <SortFilter obj="unsaved" />
-            <View style={[styles.container, {marginTop: calculateMargins()}]}>
+        <AnimatedProductProvider>
+            <View style={styles.flexOne}>
+                <SortFilter obj="unsaved" />
                 <View
-                    style={[
-                        styles.productContainer,
-                        {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
-                    ]}>
-                    <ProductList />
-                </View>
-                <View
-                    style={[
-                        styles.featuredProductContainer,
-                        {marginTop: calculateMargins()},
-                    ]}>
-                    <FeaturedProduct />
-                </View>
+                    style={[styles.container, {marginTop: calculateMargins()}]}>
+                    <View
+                        style={[
+                            styles.productContainer,
+                            {flexBasis: (width - IMAGE_PADDING) / IMAGE_RATIO},
+                        ]}>
+                        <ProductList />
+                    </View>
+                    <View
+                        style={[
+                            styles.featuredProductContainer,
+                            {marginTop: calculateMargins()},
+                        ]}>
+                        <FeaturedProduct />
+                    </View>
 
-                <View
-                    style={[
-                        styles.buttonsContainer,
-                        {marginTop: calculateMargins()},
-                    ]}>
-                    <ActionButton
-                        type="delete"
-                        disabled={actionButtonDisabled()}
-                    />
-                    <ActionButton
-                        type="buy"
-                        disabled={actionButtonDisabled()}
-                    />
-                    <ActionButton
-                        type="save"
-                        disabled={actionButtonDisabled()}
-                    />
+                    <View
+                        style={[
+                            styles.buttonsContainer,
+                            {marginTop: calculateMargins()},
+                        ]}>
+                        <ActionButton
+                            type="delete"
+                            disabled={actionButtonDisabled()}
+                        />
+                        <ActionButton
+                            type="buy"
+                            disabled={actionButtonDisabled()}
+                        />
+                        <ActionButton
+                            type="save"
+                            disabled={actionButtonDisabled()}
+                        />
+                    </View>
                 </View>
             </View>
-        </View>
+        </AnimatedProductProvider>
     );
 };
 

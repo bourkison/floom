@@ -440,7 +440,6 @@ const productSlice = createSlice({
             })
             .addCase(loadUnsavedProducts.fulfilled, (state, action) => {
                 state.unsaved.isLoading = false;
-                console.log('LOADED', action.payload);
 
                 // Only add to local state if it doesn't already exist (to avoid duplicates).
                 for (let i = 0; i < action.payload.length; i++) {

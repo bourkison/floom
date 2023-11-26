@@ -14,7 +14,7 @@ import {
     useWindowDimensions,
 } from 'react-native';
 
-import AnimatedProduct from '@/components/Product/AnimatedProduct';
+import AnimatedProduct from '@/components/Product/AnimatedProductNew';
 import BrandLogo from '@/components/Utility/BrandLogo';
 import {
     IMAGE_RATIO,
@@ -60,7 +60,6 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
     useEffect(() => {
         for (let i = 1; i < IMAGE_PREFETCH_AMOUNT; i++) {
             const img = product.images[imageIndex + i];
-            console.log('image fetching', img);
 
             if (img && !prefetchedImages.includes(img)) {
                 Image.prefetch(img);
