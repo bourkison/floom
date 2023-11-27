@@ -6,6 +6,7 @@ import {
     ActivityIndicator,
     FlatList,
     Text,
+    RefreshControl,
 } from 'react-native';
 
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
@@ -46,7 +47,6 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     }, [saves, searchText]);
 
     useEffect(() => {
-        console.log('init loaded', hasInitiallyLoadedSaves);
         if (!hasInitiallyLoadedCollections) {
             initFetchCollections();
         }
@@ -60,6 +60,10 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
     ]);
+
+    const refresh = async () => {
+        fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, 'refresh');
+    };
 
     const isLoading = useMemo<boolean>(() => {
         if (loadingSavesState === 'load' || isLoadingCollections) {
@@ -81,6 +85,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
 
             {!isLoading ? (
                 <FlatList
+                    keyboardDismissMode="on-drag"
+                    keyboardShouldPersistTaps="never"
                     ListHeaderComponent={
                         <>
                             <CollapsibleSection
@@ -101,9 +107,18 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                             </View>
                         </>
                     }
+                    refreshControl={
+                        <RefreshControl
+                            onRefresh={refresh}
+                            refreshing={loadingSavesState === 'refresh'}
+                        />
+                    }
+                    refreshing={loadingSavesState === 'refresh'}
                     data={filteredSaves}
                     keyExtractor={item => item.id.toString()}
-                    renderItem={({item}) => <SaveListItem save={item} />}
+                    renderItem={({item}) => (
+                        <SaveListItem save={item} key={item.id.toString()} />
+                    )}
                     ListFooterComponent={
                         loadingSavesState === 'additional' ? (
                             <ActivityIndicator

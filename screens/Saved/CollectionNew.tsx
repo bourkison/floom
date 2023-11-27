@@ -21,7 +21,6 @@ import {
     INITIAL_SAVE_LOAD_AMOUNT,
     SUBSEQUENT_SAVE_LOAD_AMOUNT,
 } from '@/screens/Saved/SavedHome';
-import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
 
 const CollectionNew = ({
@@ -36,8 +35,13 @@ const CollectionNew = ({
 
     const {bottom} = useSafeAreaInsets();
 
-    const {saves, hasInitiallyLoadedSaves, loadingSavesState, fetchSaves} =
-        useSharedSavedContext();
+    const {
+        saves,
+        hasInitiallyLoadedSaves,
+        loadingSavesState,
+        fetchSaves,
+        createCollection,
+    } = useSharedSavedContext();
 
     useEffect(() => {
         if (!hasInitiallyLoadedSaves) {
@@ -45,43 +49,12 @@ const CollectionNew = ({
         }
     }, [hasInitiallyLoadedSaves, fetchSaves]);
 
-    const createCollection = async () => {
+    const create = async () => {
         setIsCreating(true);
 
-        // First create the collection.
-        const {data: collData, error: collError} = await supabase
-            .from('collections')
-            .insert({name})
-            .select()
-            .limit(1)
-            .single();
-
-        if (collError) {
-            // TODO: Handle error
-            console.error('coll error', collError);
-            setIsCreating(false);
-            return;
-        }
-
-        if (!selectedProducts.length) {
-            setIsCreating(false);
-            return;
-        }
-
-        const {error: saveError} = await supabase
-            .from('saves')
-            .update({collection_id: collData.id})
-            .in(
-                'id',
-                selectedProducts.map(save => save.id),
-            );
+        await createCollection({name}, selectedProducts);
 
         setIsCreating(false);
-
-        if (saveError) {
-            console.error('save error', saveError);
-            return;
-        }
 
         navigation.goBack();
     };
@@ -121,6 +94,8 @@ const CollectionNew = ({
             </View>
 
             <FlatList
+                keyboardDismissMode="on-drag"
+                keyboardShouldPersistTaps="never"
                 ListHeaderComponent={
                     <>
                         <View style={styles.collectionInputContainer}>
@@ -177,7 +152,7 @@ const CollectionNew = ({
                 <AnimatedButton
                     style={styles.createButton}
                     textStyle={styles.createButtonText}
-                    onPress={createCollection}
+                    onPress={create}
                     disabled={isCreating}>
                     {isCreating ? (
                         <ActivityIndicator size={14} />
@@ -222,6 +197,7 @@ const styles = StyleSheet.create({
     },
     collectionInputContainer: {
         paddingHorizontal: 25,
+        marginTop: 15,
     },
     titleText: {
         fontSize: 12,
@@ -230,6 +206,7 @@ const styles = StyleSheet.create({
     addProductText: {
         paddingHorizontal: 25,
         marginBottom: 10,
+        marginTop: 20,
     },
     textInput: {
         paddingVertical: 10,

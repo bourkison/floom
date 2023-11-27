@@ -16,6 +16,8 @@ type SavedProviderProps = {
     children: React.JSX.Element;
 };
 
+const MAX_STORED_SAVED_PRODUCTS = 50;
+
 const SavedProvider = ({children}: SavedProviderProps) => {
     const [loadingSavesState, setLoadingSavesState] =
         useState<LoadingState>('idle');
@@ -35,6 +37,18 @@ const SavedProvider = ({children}: SavedProviderProps) => {
     const [collectionsExpanded, setCollectionsExpanded] = useState(false);
 
     const dispatch = useAppDispatch();
+
+    // Ensure we don't overload memory by clearing up amount of
+    // Saved products we have stored.
+    const sliceSaves = useCallback(() => {
+        if (saves.length > MAX_STORED_SAVED_PRODUCTS) {
+            setSaves(saves.slice(0, MAX_STORED_SAVED_PRODUCTS));
+
+            if (loadingSavesState === 'complete') {
+                setLoadingSavesState('idle');
+            }
+        }
+    }, [saves, loadingSavesState]);
 
     const fetchSaves = useCallback(
         async (loadAmount: number, type: FetchType = 'initial') => {
@@ -56,12 +70,14 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 setLoadingSavesState('additional');
             }
 
+            const startAt = type === 'loadMore' ? saves.length : 0;
+
             const {data, error} = await supabase
                 .from('v_saves')
                 .select()
                 .is('collection_id', null)
                 .order('created_at', {ascending: false})
-                .range(saves.length, saves.length + loadAmount - 1);
+                .range(startAt, saves.length + loadAmount - 1);
 
             setLoadingSavesState('idle');
 
@@ -176,11 +192,12 @@ const SavedProvider = ({children}: SavedProviderProps) => {
             }
 
             setSaves([convertProductToSave(product, data), ...saves]);
+            sliceSaves();
 
             // TODO: May not want to unshift here, as products might be coming from elsewhere.
             dispatch(unshiftProducts());
         },
-        [saves, dispatch],
+        [saves, dispatch, sliceSaves],
     );
 
     const deleteSavedProduct = useCallback(
@@ -206,6 +223,73 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         [saves],
     );
 
+    const createCollection = useCallback(
+        async (
+            input: Database['public']['Tables']['collections']['Insert'],
+            selectedProducts: Database['public']['Views']['v_saves']['Row'][],
+        ) => {
+            // First create the collection.
+            const {data: collData, error: collError} = await supabase
+                .from('collections')
+                .insert(input)
+                .select()
+                .limit(1)
+                .single();
+
+            if (collError) {
+                // TODO: Handle error
+                console.error('coll error', collError);
+                throw new Error(collError.message);
+            }
+
+            setCollections([
+                {
+                    id: collData.id,
+                    imageUrls: [selectedProducts[0]?.images[0] || ''],
+                    name: collData.name,
+                    productsAmount: selectedProducts.length,
+                },
+                ...collections,
+            ]);
+
+            if (!selectedProducts.length) {
+                return;
+            }
+
+            const {error: saveError} = await supabase
+                .from('saves')
+                .update({collection_id: collData.id})
+                .in(
+                    'id',
+                    selectedProducts.map(save => save.id),
+                );
+
+            if (saveError) {
+                console.error('save error', saveError);
+                throw new Error(saveError.message);
+            }
+
+            // Now remove from our products array so it doesn't show on SavedHome
+            let tempArr = saves;
+
+            selectedProducts.forEach(save => {
+                const index = tempArr.findIndex(t => t.id === save.id);
+
+                if (index < 0) {
+                    return;
+                }
+
+                tempArr = [
+                    ...tempArr.slice(0, index),
+                    ...tempArr.slice(index + 1),
+                ];
+            });
+
+            setSaves(tempArr);
+        },
+        [collections, saves],
+    );
+
     return (
         <SavedContext.Provider
             value={{
@@ -221,6 +305,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 loadingSavesState,
                 collectionsExpanded,
                 setCollectionsExpanded,
+                createCollection,
+                sliceSaves,
             }}>
             {children}
         </SavedContext.Provider>

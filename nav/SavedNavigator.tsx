@@ -1,7 +1,9 @@
-import {createStackNavigator} from '@react-navigation/stack';
+import {StackScreenProps, createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 
+import {useSharedSavedContext} from '@/context/saved';
 import {CollectionViewHeader, SavedProductsHeader} from '@/nav/Headers';
+import {MainStackParamList} from '@/nav/Navigator';
 import CollectionNew from '@/screens/Saved/CollectionNew';
 import CollectionView from '@/screens/Saved/CollectionView';
 import SavedHome from '@/screens/Saved/SavedHome';
@@ -16,7 +18,13 @@ export type SavedStackParamList = {
 
 const SavedStack = createStackNavigator<SavedStackParamList>();
 
-const SavedNavigator = () => {
+const SavedNavigator = ({
+    navigation,
+}: StackScreenProps<MainStackParamList, 'SavedProducts'>) => {
+    const {sliceSaves} = useSharedSavedContext();
+
+    navigation.addListener('beforeRemove', sliceSaves);
+
     return (
         <SavedStack.Navigator initialRouteName="SavedHome">
             <SavedStack.Screen

@@ -40,6 +40,13 @@ type SavedContextType = {
 
     collectionsExpanded: boolean;
     setCollectionsExpanded: Dispatch<SetStateAction<boolean>>;
+
+    sliceSaves: () => void;
+
+    createCollection: (
+        input: Database['public']['Tables']['collections']['Insert'],
+        selectedProducts: Database['public']['Views']['v_saves']['Row'][],
+    ) => Promise<void>;
 };
 
 export const SavedContext = createContext<SavedContextType | null>(null);

@@ -74,7 +74,7 @@ const SaveListItem = ({save}: SaveListItemProps) => {
     };
 
     return (
-        <Animated.View layout={Layout}>
+        <Animated.View layout={Layout.duration(1000)}>
             <TouchableHighlight
                 onPress={navigateTo}
                 underlayColor={TOUCHABLE_UNDERLAY}
