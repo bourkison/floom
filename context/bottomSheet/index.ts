@@ -1,29 +1,28 @@
-import {BottomSheetModal} from '@gorhom/bottom-sheet';
-import {RefObject, createContext, useContext} from 'react';
+import {Dispatch, SetStateAction, createContext, useContext} from 'react';
+import {SharedValue} from 'react-native-reanimated';
 
 import {Database} from '@/types/schema';
 
-type AddToCollectionContextType = {
-    bottomSheetRef: RefObject<BottomSheetModal>;
-    snapPoints: (string | number)[];
+type BottomSheetContextType = {
+    translateY: SharedValue<number>;
+    setSnapPoints: Dispatch<SetStateAction<number[]>>;
 
-    saves: Database['public']['Views']['v_deletes']['Row'][];
+    openBottomSheet: () => void;
+    closeBottomSheet: () => void;
 
-    openModal: (
-        saves: Database['public']['Views']['v_deletes']['Row'][],
-    ) => void;
-    closeModal: () => void;
+    saves: Database['public']['Views']['v_saves']['Row'][];
 };
 
-export const AddToCollectionContext =
-    createContext<AddToCollectionContextType | null>(null);
+export const BottomSheetContext = createContext<BottomSheetContextType | null>(
+    null,
+);
 
-export const useAddToCollectionContext = () => {
-    const context = useContext(AddToCollectionContext);
+export const useBottomSheetContext = () => {
+    const context = useContext(BottomSheetContext);
 
     if (!context) {
         throw new Error(
-            "'useAddToCollectionContext' must be used within AddToCollectionContext",
+            "'useBottomSheetContext' must be used within BottomSheetContext",
         );
     }
 

@@ -21,7 +21,7 @@ import CollectionListItem from '@/components/Save/CollectionListItem';
 import SaveListItem from '@/components/Save/SaveListItem';
 import SearchInput from '@/components/Utility/SearchInput';
 import {DELETE_COLOR, PALETTE} from '@/constants';
-import {useAddToCollectionContext} from '@/context/bottomSheet';
+import {useBottomSheetContext} from '@/context/BottomSheet';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 import {Database} from '@/types/schema';
@@ -52,7 +52,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         collectionsExpanded,
     } = useSharedSavedContext();
 
-    const {openModal} = useAddToCollectionContext();
+    const {openBottomSheet} = useBottomSheetContext();
 
     const filteredCollections = useMemo(() => {
         return collections.filter(collection =>
@@ -232,7 +232,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
 
                     <TouchableOpacity
                         onPress={() => {
-                            openModal(selectedProducts);
+                            openBottomSheet();
                         }}>
                         <Text
                             style={[

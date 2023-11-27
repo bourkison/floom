@@ -49,7 +49,7 @@ const ProductList = () => {
 
     const retry = async (clear: boolean) => {
         if (clear) {
-            dispatch(clearFilters({filterType: 'unsaved', gender}));
+            dispatch(clearFilters({gender}));
         }
 
         await dispatch(loadUnsavedProducts());

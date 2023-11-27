@@ -1,29 +1,26 @@
-import {BottomSheetView} from '@gorhom/bottom-sheet';
-import React, {useEffect} from 'react';
-import {View, Text} from 'react-native';
+import React, {useEffect, useMemo} from 'react';
+import {View, Text, TouchableOpacity} from 'react-native';
 
-import {useAddToCollectionContext} from '@/context/bottomSheet';
+import BottomSheet from '@/components/BottomSheet/BottomSheet';
+import {useBottomSheetContext} from '@/context/BottomSheet';
 
 const AddToCollectionBottomSheet = () => {
-    const {saves, bottomSheetRef, snapPoints} = useAddToCollectionContext();
+    const {closeBottomSheet} = useBottomSheetContext();
+
+    const snapPoints = useMemo(() => [0.4], []);
 
     useEffect(() => {
         console.log('ADD TO COLL');
     }, []);
 
     return (
-        <BottomSheetView
-            ref={bottomSheetRef}
-            snapPoints={snapPoints}
-            index={-1}>
+        <BottomSheet snapPoints={snapPoints}>
             <View>
-                {saves.map(save => (
-                    <View key={save.id}>
-                        <Text>{save.name}</Text>
-                    </View>
-                ))}
+                <TouchableOpacity onPress={closeBottomSheet}>
+                    <Text>Close</Text>
+                </TouchableOpacity>
             </View>
-        </BottomSheetView>
+        </BottomSheet>
     );
 };
 
