@@ -5,12 +5,15 @@ import {Database} from '@/types/schema';
 
 type BottomSheetContextType = {
     translateY: SharedValue<number>;
+    overlayColor: SharedValue<string>;
+
     setSnapPoints: Dispatch<SetStateAction<number[]>>;
 
     openBottomSheet: () => void;
     closeBottomSheet: () => void;
 
     saves: Database['public']['Views']['v_saves']['Row'][];
+    modalExpanded: boolean;
 };
 
 export const BottomSheetContext = createContext<BottomSheetContextType | null>(

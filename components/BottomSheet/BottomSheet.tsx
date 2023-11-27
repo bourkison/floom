@@ -1,9 +1,8 @@
 import React, {useEffect, useMemo} from 'react';
-import {StyleSheet, useWindowDimensions} from 'react-native';
+import {Modal, Pressable, StyleSheet, useWindowDimensions} from 'react-native';
 import Animated, {useAnimatedStyle} from 'react-native-reanimated';
 
 import {useBottomSheetContext} from '@/context/BottomSheet';
-import {HEADER_HEIGHT} from '@/nav/Headers';
 
 type BottomSheetContainerProps = {
     children: React.JSX.Element;
@@ -12,9 +11,19 @@ type BottomSheetContainerProps = {
 
 const BottomSheet = ({children, snapPoints}: BottomSheetContainerProps) => {
     const {height} = useWindowDimensions();
-    const {setSnapPoints, translateY} = useBottomSheetContext();
+    const {
+        setSnapPoints,
+        translateY,
+        modalExpanded,
+        closeBottomSheet,
+        overlayColor,
+    } = useBottomSheetContext();
 
-    const availableHeight = useMemo(() => height - HEADER_HEIGHT, [height]);
+    const rOverlayStyle = useAnimatedStyle(() => ({
+        backgroundColor: overlayColor.value,
+    }));
+
+    const availableHeight = useMemo(() => height, [height]);
 
     useEffect(() => {
         setSnapPoints(snapPoints);
@@ -25,14 +34,22 @@ const BottomSheet = ({children, snapPoints}: BottomSheetContainerProps) => {
     }));
 
     return (
-        <Animated.View
-            style={[
-                styles.container,
-                {height: availableHeight, top: availableHeight},
-                rStyle,
-            ]}>
-            {children}
-        </Animated.View>
+        <Modal visible={modalExpanded} transparent>
+            <Animated.View style={[StyleSheet.absoluteFill, rOverlayStyle]}>
+                <Pressable
+                    onPress={closeBottomSheet}
+                    style={StyleSheet.absoluteFill}
+                />
+            </Animated.View>
+            <Animated.View
+                style={[
+                    styles.container,
+                    {height: availableHeight, top: availableHeight},
+                    rStyle,
+                ]}>
+                {children}
+            </Animated.View>
+        </Modal>
     );
 };
 
