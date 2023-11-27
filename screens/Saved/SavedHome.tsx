@@ -15,7 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import AddToCollectionBottomSheet from '@/components/Save/AddToCollectionBottomSheet';
+import AddToCollectionBottomSheet from '@/components/Save/AddToCollectionSheet';
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
 import SaveListItem from '@/components/Save/SaveListItem';

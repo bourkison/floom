@@ -45,11 +45,16 @@ const BottomSheetProvider = ({children}: BottomSheetProviderProps) => {
         [translateY, height, renderedContent],
     );
 
+    const finishCloseBottomSheet = useCallback(() => {
+        setRenderedContent(undefined);
+        setSnapPoint(0);
+    }, []);
+
     const closeBottomSheet = useCallback(() => {
         translateY.value = withTiming(0, {}, () =>
-            runOnJS(setRenderedContent)(undefined),
+            runOnJS(finishCloseBottomSheet)(),
         );
-    }, [translateY]);
+    }, [finishCloseBottomSheet, translateY]);
 
     const rOverlayStyle = useAnimatedStyle(() => ({
         backgroundColor: overlayColor.value,
