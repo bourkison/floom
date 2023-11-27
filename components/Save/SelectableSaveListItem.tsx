@@ -16,8 +16,8 @@ import {Database} from '@/types/schema';
 
 type SelectableSaveListItemProps = {
     save: Database['public']['Views']['v_saves']['Row'];
+    selectedProducts: Database['public']['Views']['v_saves']['Row'][];
     onSelect: (product: Database['public']['Views']['v_saves']['Row']) => void;
-    selected: boolean;
 };
 
 const IMAGE_WIDTH_RATIO = 0.25;
@@ -30,7 +30,7 @@ const RADIO_DIAMETER = 20;
 const SelectableSaveListItem = ({
     save,
     onSelect,
-    selected,
+    selectedProducts,
 }: SelectableSaveListItemProps) => {
     const {width} = useWindowDimensions();
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
@@ -40,6 +40,18 @@ const SelectableSaveListItem = ({
     };
 
     const onSale = useMemo(() => save.sale_price < save.price, [save]);
+
+    const selected = useMemo(() => {
+        for (let i = 0; i < selectedProducts.length; i++) {
+            const sel = selectedProducts[i];
+
+            if (save.id === sel.id) {
+                return true;
+            }
+        }
+
+        return false;
+    }, [save, selectedProducts]);
 
     return (
         <TouchableHighlight

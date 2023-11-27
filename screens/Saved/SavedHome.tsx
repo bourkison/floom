@@ -16,8 +16,8 @@ import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 
-const INITIAL_SAVE_LOAD_AMOUNT = 10;
-const SUBSEQUENT_SAVE_LOAD_AMOUNT = 10;
+export const INITIAL_SAVE_LOAD_AMOUNT = 10;
+export const SUBSEQUENT_SAVE_LOAD_AMOUNT = 10;
 
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [searchText, setSearchText] = useState('');

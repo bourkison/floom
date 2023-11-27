@@ -7,8 +7,8 @@ import {
     StyleSheet,
     Pressable,
     TextInput,
-    ScrollView,
     ActivityIndicator,
+    FlatList,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -17,6 +17,10 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
+import {
+    INITIAL_SAVE_LOAD_AMOUNT,
+    SUBSEQUENT_SAVE_LOAD_AMOUNT,
+} from '@/screens/Saved/SavedHome';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
 
@@ -32,14 +36,20 @@ const CollectionNew = ({
 
     const {bottom} = useSafeAreaInsets();
 
-    const {saves, hasInitiallyLoadedSaves, isLoadingSaves, initFetchSaves} =
-        useSharedSavedContext();
+    const {
+        saves,
+        hasInitiallyLoadedSaves,
+        isLoadingSaves,
+        fetchSaves,
+        isLoadingMoreSaves,
+        moreSavesToLoad,
+    } = useSharedSavedContext();
 
     useEffect(() => {
         if (!hasInitiallyLoadedSaves) {
-            initFetchSaves();
+            fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, true);
         }
-    }, [hasInitiallyLoadedSaves, initFetchSaves]);
+    }, [hasInitiallyLoadedSaves, fetchSaves]);
 
     const createCollection = async () => {
         setIsCreating(true);
@@ -100,20 +110,6 @@ const CollectionNew = ({
         ]);
     };
 
-    const isProductSelected = (
-        product: Database['public']['Views']['v_saves']['Row'],
-    ): boolean => {
-        const findIndex = selectedProducts.findIndex(
-            p => product.product_id === p.product_id,
-        );
-
-        if (findIndex < 0) {
-            return false;
-        }
-
-        return true;
-    };
-
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
@@ -130,47 +126,53 @@ const CollectionNew = ({
                 </Pressable>
             </View>
 
-            <ScrollView
-                style={styles.contentContainer}
-                keyboardShouldPersistTaps={false}
-                keyboardDismissMode="on-drag">
-                <View style={styles.collectionInputContainer}>
-                    <Text style={styles.titleText}>Collection Name</Text>
+            <FlatList
+                ListHeaderComponent={
+                    <>
+                        <View style={styles.collectionInputContainer}>
+                            <Text style={styles.titleText}>
+                                Collection Name
+                            </Text>
 
-                    <TextInput
-                        onChangeText={setName}
-                        style={styles.textInput}
-                        value={name}
-                        returnKeyType="default"
-                    />
+                            <TextInput
+                                onChangeText={setName}
+                                style={styles.textInput}
+                                value={name}
+                                returnKeyType="default"
+                            />
 
-                    <Text style={styles.hintText}>
-                        Collections are a great way to organise products you
-                        want, and to build out mood boards!
-                    </Text>
-                </View>
-
-                <View style={styles.savedProductsSection}>
-                    <Text style={[styles.titleText, styles.addProductText]}>
-                        Add Products (optional)
-                    </Text>
-
-                    {isLoadingSaves ? (
-                        <ActivityIndicator style={styles.activityIndicator} />
-                    ) : (
-                        <View style={styles.savedProductsContainer}>
-                            {saves.map(save => (
-                                <SelectableSaveListItem
-                                    key={save.id}
-                                    save={save}
-                                    onSelect={productSelected}
-                                    selected={isProductSelected(save)}
-                                />
-                            ))}
+                            <Text style={styles.hintText}>
+                                Collections are a great way to organise products
+                                you want, and to build out mood boards!
+                            </Text>
                         </View>
-                    )}
-                </View>
-            </ScrollView>
+                        <Text style={[styles.titleText, styles.addProductText]}>
+                            Add Products (optional)
+                        </Text>
+                    </>
+                }
+                ListEmptyComponent={
+                    isLoadingSaves ? (
+                        <ActivityIndicator style={styles.activityIndicator} />
+                    ) : undefined
+                }
+                data={saves}
+                keyExtractor={item => item.id.toString()}
+                onEndReached={
+                    !isLoadingMoreSaves && moreSavesToLoad
+                        ? () => {
+                              fetchSaves(SUBSEQUENT_SAVE_LOAD_AMOUNT, false);
+                          }
+                        : undefined
+                }
+                renderItem={({item}) => (
+                    <SelectableSaveListItem
+                        save={item}
+                        onSelect={productSelected}
+                        selectedProducts={selectedProducts}
+                    />
+                )}
+            />
 
             <View
                 style={[styles.createButtonContainer, {paddingBottom: bottom}]}>
