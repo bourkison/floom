@@ -144,7 +144,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                         .from('v_saves')
                         .select('*', {count: 'exact'})
                         .eq('collection_id', collection.id)
-                        .order('created_at', {ascending: false})
+                        .order('updated_at', {ascending: false})
                         .limit(1);
 
                     if (saveError) {
@@ -177,6 +177,75 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         setCollections(tempCollections);
     }, []);
 
+    const deleteSavedProductsLocally = useCallback(
+        (savesToDelete: {id: number; collectionId: number | null}[]) => {
+            let temp = saves;
+
+            savesToDelete.forEach(s => {
+                if (s.collectionId === null) {
+                    const index = temp.findIndex(save => save.id === s.id);
+
+                    if (index > -1) {
+                        temp = [
+                            ...temp.slice(0, index),
+                            ...temp.slice(index + 1),
+                        ];
+                    }
+                }
+            });
+
+            setSaves(temp);
+        },
+        [saves],
+    );
+
+    const addSavesToCollection = useCallback(
+        async (
+            savesToUpdate: Database['public']['Views']['v_saves']['Row'][],
+            collectionId: number,
+        ) => {
+            deleteSavedProductsLocally(
+                savesToUpdate.map(saveToUpdate => ({
+                    id: saveToUpdate.id,
+                    collectionId: null,
+                })),
+            );
+
+            const collectionIndex = collections.findIndex(
+                collection => collection.id === collectionId,
+            );
+
+            if (collectionIndex > -1) {
+                setCollections([
+                    ...collections.slice(0, collectionIndex),
+                    {
+                        ...collections[collectionIndex],
+                        imageUrls:
+                            savesToUpdate[savesToUpdate.length - 1].images,
+                        productsAmount:
+                            collections[collectionIndex].productsAmount +
+                            savesToUpdate.length,
+                    },
+                    ...collections.slice(collectionIndex + 1),
+                ]);
+            }
+
+            const {error} = await supabase
+                .from('saves')
+                .update({collection_id: collectionId})
+                .in(
+                    'id',
+                    savesToUpdate.map(save => save.id),
+                );
+
+            if (error) {
+                console.error(error);
+                throw new Error(error.message);
+            }
+        },
+        [deleteSavedProductsLocally, collections],
+    );
+
     const saveProduct = useCallback(
         async (product: Database['public']['Views']['v_products']['Row']) => {
             const {data, error} = await supabase
@@ -202,22 +271,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
 
     const deleteSavedProducts = useCallback(
         async (savesToDelete: {id: number; collectionId: number | null}[]) => {
-            let temp = saves;
-
-            savesToDelete.forEach(s => {
-                if (s.collectionId === null) {
-                    const index = temp.findIndex(save => save.id === s.id);
-
-                    if (index > -1) {
-                        temp = [
-                            ...temp.slice(0, index),
-                            ...temp.slice(index + 1),
-                        ];
-                    }
-                }
-            });
-
-            setSaves(temp);
+            deleteSavedProductsLocally(savesToDelete);
 
             const {error} = await supabase
                 .from('saves')
@@ -232,7 +286,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 throw new Error(error.message);
             }
         },
-        [saves],
+        [deleteSavedProductsLocally],
     );
 
     const createCollection = useCallback(
@@ -319,6 +373,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 setCollectionsExpanded,
                 createCollection,
                 sliceSaves,
+                addSavesToCollection,
             }}>
             {children}
         </SavedContext.Provider>

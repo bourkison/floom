@@ -28,7 +28,7 @@ const CollectionView = ({
                 .from('v_saves')
                 .select()
                 .eq('collection_id', route.params.collectionId)
-                .order('created_at', {ascending: false});
+                .order('updated_at', {ascending: false});
 
             if (error) {
                 // TODO: Handle error

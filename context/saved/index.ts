@@ -39,6 +39,10 @@ type SavedContextType = {
 
     collectionsExpanded: boolean;
     setCollectionsExpanded: Dispatch<SetStateAction<boolean>>;
+    addSavesToCollection: (
+        savesToUpdate: Database['public']['Views']['v_saves']['Row'][],
+        collectionId: number,
+    ) => void;
 
     sliceSaves: () => void;
 

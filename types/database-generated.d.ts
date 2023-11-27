@@ -96,18 +96,21 @@ export interface Database {
           created_at: string | null
           homepage: string
           id: number
+          live: boolean
           name: string
         }
         Insert: {
           created_at?: string | null
           homepage: string
           id?: number
+          live: boolean
           name: string
         }
         Update: {
           created_at?: string | null
           homepage?: string
           id?: number
+          live?: boolean
           name?: string
         }
       }
@@ -173,6 +176,7 @@ export interface Database {
           created_at: string | null
           id: number
           product_id: number
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -180,6 +184,7 @@ export interface Database {
           created_at?: string | null
           id?: number
           product_id: number
+          updated_at?: string
           user_id?: string
         }
         Update: {
@@ -187,6 +192,7 @@ export interface Database {
           created_at?: string | null
           id?: number
           product_id?: number
+          updated_at?: string
           user_id?: string
         }
       }

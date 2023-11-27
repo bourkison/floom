@@ -82,3 +82,28 @@ export const convertDeleteToProduct = (
     partner_id: del.partner_id,
     partner: del.partner,
 });
+
+export const convertSaveToProduct = (
+    save: Database['public']['Views']['v_saves']['Row'],
+): Database['public']['Views']['v_products']['Row'] => ({
+    brand: save.brand,
+    brand_id: save.brand_id,
+    colors: save.colors,
+    created_at: new Date().toString(),
+    deleted: true,
+    gender: save.gender,
+    id: save.id,
+    images: save.images,
+    in_stock: save.in_stock,
+    link: save.link,
+    name: save.name,
+    price: save.price,
+    sale_price: save.sale_price,
+    saved: false,
+    updated_at: new Date().toString(),
+    vendor_product_id: save.vendor_product_id,
+    description: save.description,
+    product_type: save.product_type,
+    partner_id: save.partner_id,
+    partner: save.partner,
+});

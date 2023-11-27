@@ -84,7 +84,10 @@ const BottomSheetProvider = ({children}: BottomSheetProviderProps) => {
                         <Animated.View
                             style={[
                                 styles.container,
-                                {height, top: height},
+                                {
+                                    height: height * snapPoint,
+                                    top: height,
+                                },
                                 rStyle,
                             ]}>
                             {renderedContent}

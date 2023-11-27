@@ -52,7 +52,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         collectionsExpanded,
     } = useSharedSavedContext();
 
-    const {openBottomSheet} = useBottomSheetContext();
+    const {openBottomSheet, closeBottomSheet} = useBottomSheetContext();
 
     const filteredCollections = useMemo(() => {
         return collections.filter(collection =>
@@ -233,7 +233,13 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                     <TouchableOpacity
                         onPress={() => {
                             openBottomSheet(
-                                <AddToCollectionBottomSheet />,
+                                <AddToCollectionBottomSheet
+                                    onSelect={() => {
+                                        toggleSelectable();
+                                        closeBottomSheet();
+                                    }}
+                                    selectedSaves={selectedProducts}
+                                />,
                                 0.6,
                             );
                         }}>

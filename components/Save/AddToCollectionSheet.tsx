@@ -8,17 +8,34 @@ import {
     ScrollView,
     ActivityIndicator,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import CollectionListItemSmall from '@/components/Save/CollectionListItemSmall';
 import {PALETTE} from '@/constants';
 import {useBottomSheetContext} from '@/context/BottomSheet';
 import {useSharedSavedContext} from '@/context/saved';
+import {Database} from '@/types/schema';
 
-const AddToCollectionBottomSheet = () => {
+type AddToCollectionBottomSheetProps = {
+    selectedSaves: Database['public']['Views']['v_saves']['Row'][];
+    onSelect: () => void;
+};
+
+const AddToCollectionBottomSheet = ({
+    selectedSaves,
+    onSelect,
+}: AddToCollectionBottomSheetProps) => {
     const [isLoadingCollections, setIsLoadingCollections] = useState(false);
 
     const {closeBottomSheet} = useBottomSheetContext();
-    const {hasInitiallyLoadedCollections, initFetchCollections} =
-        useSharedSavedContext();
+    const {
+        hasInitiallyLoadedCollections,
+        initFetchCollections,
+        collections,
+        addSavesToCollection,
+    } = useSharedSavedContext();
+
+    const {bottom} = useSafeAreaInsets();
 
     useEffect(() => {
         const fetchCollections = async () => {
@@ -56,8 +73,18 @@ const AddToCollectionBottomSheet = () => {
             </View>
 
             {!isLoadingCollections ? (
-                <ScrollView style={styles.contentContainer}>
-                    <Text>Content</Text>
+                <ScrollView
+                    style={styles.contentContainer}
+                    contentContainerStyle={{paddingBottom: bottom}}>
+                    {collections.map(collection => (
+                        <CollectionListItemSmall
+                            collection={collection}
+                            onPress={id => {
+                                addSavesToCollection(selectedSaves, id);
+                                onSelect();
+                            }}
+                        />
+                    ))}
                 </ScrollView>
             ) : (
                 <ActivityIndicator style={styles.activityIndicator} />
