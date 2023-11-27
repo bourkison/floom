@@ -1,6 +1,11 @@
 import React, {useCallback, useState} from 'react';
 
-import {SavedContext, CollectionType} from '@/context/saved';
+import {
+    SavedContext,
+    CollectionType,
+    FetchType,
+    LoadingState,
+} from '@/context/saved';
 import {convertProductToSave} from '@/services/conversions';
 import {supabase} from '@/services/supabase';
 import {useAppDispatch} from '@/store/hooks';
@@ -12,9 +17,8 @@ type SavedProviderProps = {
 };
 
 const SavedProvider = ({children}: SavedProviderProps) => {
-    const [isLoadingSaves, setIsLoadingSaves] = useState(false);
-    const [isLoadingMoreSaves, setIsLoadingMoreSaves] = useState(false);
-    const [moreSavesToLoad, setMoreSavesToLoad] = useState(false);
+    const [loadingSavesState, setLoadingSavesState] =
+        useState<LoadingState>('idle');
 
     const [isLoadingCollections, setIsLoadingCollections] = useState(false);
 
@@ -33,15 +37,23 @@ const SavedProvider = ({children}: SavedProviderProps) => {
     const dispatch = useAppDispatch();
 
     const fetchSaves = useCallback(
-        async (loadAmount: number, isInitialLoad: boolean = true) => {
+        async (loadAmount: number, type: FetchType = 'initial') => {
             setHasInitiallyLoadedSaves(true);
 
-            if (isInitialLoad) {
+            if (type === 'initial') {
                 setSaves([]);
-                setIsLoadingSaves(true);
-                setMoreSavesToLoad(true);
-            } else {
-                setIsLoadingMoreSaves(true);
+                setLoadingSavesState('load');
+            } else if (type === 'refresh') {
+                setLoadingSavesState('refresh');
+            } else if (type === 'loadMore') {
+                if (loadingSavesState === 'complete') {
+                    console.warn(
+                        'Attempted to load more saves when all loaded in.',
+                    );
+                    return;
+                }
+
+                setLoadingSavesState('additional');
             }
 
             const {data, error} = await supabase
@@ -51,8 +63,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 .order('created_at', {ascending: false})
                 .range(saves.length, saves.length + loadAmount - 1);
 
-            setIsLoadingSaves(false);
-            setIsLoadingMoreSaves(false);
+            setLoadingSavesState('idle');
 
             if (error) {
                 // TODO: Handle error.
@@ -60,14 +71,17 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 throw new Error(error.message);
             }
 
-            console.log('SAVES AMOUNT', data.length);
-
             // If saves pulled < amount we requested, then we know there are no more to load.
             if (data.length < loadAmount) {
-                setMoreSavesToLoad(false);
+                setLoadingSavesState('complete');
             }
 
-            // Ensure that there are no duplicates.
+            if (type === 'refresh' || type === 'initial') {
+                setSaves(data);
+                return;
+            }
+
+            // Ensure that there are no duplicates when adding in additional.
             const temp: Database['public']['Views']['v_saves']['Row'][] = [];
 
             data.forEach(save => {
@@ -83,7 +97,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
 
             setSaves([...saves, ...temp]);
         },
-        [saves],
+        [saves, loadingSavesState],
     );
 
     const initFetchCollections = useCallback(async () => {
@@ -199,14 +213,12 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 fetchSaves,
                 saves,
                 initFetchCollections,
-                isLoadingSaves,
                 isLoadingCollections,
                 saveProduct,
                 deleteSavedProduct,
                 hasInitiallyLoadedSaves,
                 hasInitiallyLoadedCollections,
-                isLoadingMoreSaves,
-                moreSavesToLoad,
+                loadingSavesState,
                 collectionsExpanded,
                 setCollectionsExpanded,
             }}>

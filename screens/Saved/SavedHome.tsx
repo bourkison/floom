@@ -27,9 +27,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         fetchSaves,
         collections,
         saves,
-        isLoadingSaves,
-        isLoadingMoreSaves,
-        moreSavesToLoad,
+        loadingSavesState,
         isLoadingCollections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
@@ -54,7 +52,7 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         }
 
         if (!hasInitiallyLoadedSaves) {
-            fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, true);
+            fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, 'initial');
         }
     }, [
         fetchSaves,
@@ -64,12 +62,12 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     ]);
 
     const isLoading = useMemo<boolean>(() => {
-        if (isLoadingSaves || isLoadingCollections) {
+        if (loadingSavesState === 'load' || isLoadingCollections) {
             return true;
         }
 
         return false;
-    }, [isLoadingSaves, isLoadingCollections]);
+    }, [loadingSavesState, isLoadingCollections]);
 
     return (
         <View style={styles.scrollContainer}>
@@ -107,18 +105,19 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                     keyExtractor={item => item.id.toString()}
                     renderItem={({item}) => <SaveListItem save={item} />}
                     ListFooterComponent={
-                        isLoadingMoreSaves ? (
+                        loadingSavesState === 'additional' ? (
                             <ActivityIndicator
                                 style={styles.loadingMoreIndicator}
                             />
                         ) : undefined
                     }
                     onEndReached={
-                        !isLoadingMoreSaves && moreSavesToLoad
+                        loadingSavesState !== 'additional' &&
+                        loadingSavesState !== 'complete'
                             ? () => {
                                   fetchSaves(
                                       SUBSEQUENT_SAVE_LOAD_AMOUNT,
-                                      false,
+                                      'loadMore',
                                   );
                               }
                             : undefined

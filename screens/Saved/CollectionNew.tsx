@@ -36,18 +36,12 @@ const CollectionNew = ({
 
     const {bottom} = useSafeAreaInsets();
 
-    const {
-        saves,
-        hasInitiallyLoadedSaves,
-        isLoadingSaves,
-        fetchSaves,
-        isLoadingMoreSaves,
-        moreSavesToLoad,
-    } = useSharedSavedContext();
+    const {saves, hasInitiallyLoadedSaves, loadingSavesState, fetchSaves} =
+        useSharedSavedContext();
 
     useEffect(() => {
         if (!hasInitiallyLoadedSaves) {
-            fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, true);
+            fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, 'initial');
         }
     }, [hasInitiallyLoadedSaves, fetchSaves]);
 
@@ -152,16 +146,20 @@ const CollectionNew = ({
                     </>
                 }
                 ListEmptyComponent={
-                    isLoadingSaves ? (
+                    loadingSavesState === 'load' ? (
                         <ActivityIndicator style={styles.activityIndicator} />
                     ) : undefined
                 }
                 data={saves}
                 keyExtractor={item => item.id.toString()}
                 onEndReached={
-                    !isLoadingMoreSaves && moreSavesToLoad
+                    loadingSavesState !== 'additional' &&
+                    loadingSavesState !== 'complete'
                         ? () => {
-                              fetchSaves(SUBSEQUENT_SAVE_LOAD_AMOUNT, false);
+                              fetchSaves(
+                                  SUBSEQUENT_SAVE_LOAD_AMOUNT,
+                                  'loadMore',
+                              );
                           }
                         : undefined
                 }

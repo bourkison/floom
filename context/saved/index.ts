@@ -9,10 +9,18 @@ export type CollectionType = {
     productsAmount: number;
 };
 
+export type FetchType = 'initial' | 'loadMore' | 'refresh';
+export type LoadingState =
+    | 'idle'
+    | 'load'
+    | 'additional'
+    | 'refresh'
+    | 'complete';
+
 type SavedContextType = {
     collections: CollectionType[];
     saves: Database['public']['Views']['v_saves']['Row'][];
-    fetchSaves: (loadAmount: number, isInitialLoad?: boolean) => Promise<void>;
+    fetchSaves: (loadAmount: number, type?: FetchType) => Promise<void>;
     initFetchCollections: () => Promise<void>;
 
     saveProduct: (
@@ -23,9 +31,7 @@ type SavedContextType = {
         collectionId: number | null,
     ) => Promise<void>;
 
-    isLoadingSaves: boolean;
-    isLoadingMoreSaves: boolean;
-    moreSavesToLoad: boolean;
+    loadingSavesState: LoadingState;
 
     isLoadingCollections: boolean;
 
