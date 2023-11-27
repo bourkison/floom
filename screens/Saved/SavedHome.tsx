@@ -17,6 +17,7 @@ import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 
 const INITIAL_SAVE_LOAD_AMOUNT = 10;
+const SUBSEQUENT_SAVE_LOAD_AMOUNT = 10;
 
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [searchText, setSearchText] = useState('');
@@ -27,6 +28,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         collections,
         saves,
         isLoadingSaves,
+        isLoadingMoreSaves,
+        moreSavesToLoad,
         isLoadingCollections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
@@ -103,6 +106,23 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                     data={filteredSaves}
                     keyExtractor={item => item.id.toString()}
                     renderItem={({item}) => <SaveListItem save={item} />}
+                    ListFooterComponent={
+                        isLoadingMoreSaves ? (
+                            <ActivityIndicator
+                                style={styles.loadingMoreIndicator}
+                            />
+                        ) : undefined
+                    }
+                    onEndReached={
+                        !isLoadingMoreSaves && moreSavesToLoad
+                            ? () => {
+                                  fetchSaves(
+                                      SUBSEQUENT_SAVE_LOAD_AMOUNT,
+                                      false,
+                                  );
+                              }
+                            : undefined
+                    }
                 />
             ) : (
                 <ActivityIndicator />
@@ -142,6 +162,9 @@ const styles = StyleSheet.create({
     headerText: {
         fontWeight: '400',
         fontSize: 14,
+    },
+    loadingMoreIndicator: {
+        marginTop: 10,
     },
 });
 

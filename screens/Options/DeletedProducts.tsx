@@ -1,5 +1,4 @@
-import {FlashList} from '@shopify/flash-list';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
     View,
     ActivityIndicator,
@@ -9,11 +8,10 @@ import {
     Pressable,
     Text,
     useWindowDimensions,
+    FlatList,
 } from 'react-native';
 
-import ProductListItem, {
-    PRODUCT_LIST_ITEM_HEIGHT,
-} from '@/components/Product/ProductListItem';
+import ProductListItem from '@/components/Product/ProductListItem';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import SectionHeader from '@/components/Utility/SectionHeader';
 import {PALETTE} from '@/constants';
@@ -38,11 +36,6 @@ const DeletedProducts = () => {
         deleteAllDeletedProducts,
     } = useDeletedContext();
     const {height} = useWindowDimensions();
-
-    const ListRef =
-        useRef<FlashList<Database['public']['Views']['v_deletes']['Row']>>(
-            null,
-        );
 
     useEffect(() => {
         if (!hasInitiallyLoadedDeletes) {
@@ -120,8 +113,7 @@ const DeletedProducts = () => {
 
     return (
         <View style={styles.container}>
-            <FlashList
-                ref={ListRef}
+            <FlatList
                 data={deletes}
                 keyExtractor={item => item.id.toString()}
                 ListEmptyComponent={EmptyComponent}
@@ -134,7 +126,6 @@ const DeletedProducts = () => {
                     />
                 )}
                 onEndReached={undefined}
-                estimatedItemSize={PRODUCT_LIST_ITEM_HEIGHT}
                 ListHeaderComponent={
                     !isEmpty && !isLoadingDeletes ? (
                         <View style={styles.resetAllButtonContainer}>
