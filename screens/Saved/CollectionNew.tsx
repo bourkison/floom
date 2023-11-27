@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import SelectableSaveListItem from '@/components/Save/SelectableSaveListItem';
+import SaveListItem from '@/components/Save/SaveListItem';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
@@ -139,7 +139,8 @@ const CollectionNew = ({
                         : undefined
                 }
                 renderItem={({item}) => (
-                    <SelectableSaveListItem
+                    <SaveListItem
+                        selectable
                         save={item}
                         onSelect={productSelected}
                         selectedProducts={selectedProducts}

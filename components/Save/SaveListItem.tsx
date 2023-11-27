@@ -1,4 +1,4 @@
-import {SimpleLineIcons} from '@expo/vector-icons';
+import {Ionicons, SimpleLineIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import * as WebBrowser from 'expo-web-browser';
@@ -12,6 +12,14 @@ import {
     TouchableOpacity,
     TouchableHighlight,
 } from 'react-native';
+import Animated, {
+    FadeIn,
+    FadeInLeft,
+    FadeOut,
+    FadeOutLeft,
+    FadeOutUp,
+    Layout,
+} from 'react-native-reanimated';
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import BrandLogo from '@/components/Utility/BrandLogo';
@@ -20,10 +28,12 @@ import {useSharedSavedContext} from '@/context/saved';
 import {MainStackParamList} from '@/nav/Navigator';
 import {formatPrice} from '@/services';
 import {Database} from '@/types/schema';
-import Animated, {FadeOutUp} from 'react-native-reanimated';
 
 type SaveListItemProps = {
     save: Database['public']['Views']['v_saves']['Row'];
+    selectable: boolean;
+    onSelect: (product: Database['public']['Views']['v_saves']['Row']) => void;
+    selectedProducts: Database['public']['Views']['v_saves']['Row'][];
 };
 
 const IMAGE_WIDTH_RATIO = 0.25;
@@ -31,7 +41,16 @@ const IMAGE_WIDTH_RATIO = 0.25;
 const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];
 const TOUCHABLE_ACTIVE_OPACITY = 0.7;
 
-const SaveListItem = ({save}: SaveListItemProps) => {
+const RADIO_DIAMETER = 20;
+
+const SELECTABLE_ANIMATION_DURATION = 200;
+
+const SaveListItem = ({
+    save,
+    selectable,
+    onSelect,
+    selectedProducts,
+}: SaveListItemProps) => {
     const {width} = useWindowDimensions();
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
 
@@ -45,7 +64,12 @@ const SaveListItem = ({save}: SaveListItemProps) => {
         await WebBrowser.openBrowserAsync(save.link);
     };
 
-    const navigateTo = () => {
+    const onPress = () => {
+        if (selectable) {
+            onSelect(save);
+            return;
+        }
+
         navigation.navigate('ProductView', {
             reference: 'saved',
             product: {
@@ -73,78 +97,145 @@ const SaveListItem = ({save}: SaveListItemProps) => {
         });
     };
 
+    const selected = useMemo(() => {
+        for (let i = 0; i < selectedProducts.length; i++) {
+            const sel = selectedProducts[i];
+
+            if (save.id === sel.id) {
+                return true;
+            }
+        }
+
+        return false;
+    }, [save, selectedProducts]);
+
     return (
         <Animated.View exiting={FadeOutUp}>
             <TouchableHighlight
-                onPress={navigateTo}
+                onPress={onPress}
                 underlayColor={TOUCHABLE_UNDERLAY}
                 activeOpacity={TOUCHABLE_ACTIVE_OPACITY}>
                 <View style={styles.container}>
-                    <View style={styles.imageContainer}>
-                        <Image
-                            source={{uri: save.images[0]}}
-                            style={{
-                                width: IMAGE_WIDTH,
-                                height: IMAGE_WIDTH / IMAGE_RATIO,
-                            }}
-                        />
-                    </View>
-                    <View style={styles.contentContainer}>
-                        <View style={styles.topRowContainer}>
-                            <View>
-                                <Text style={styles.priceText}>
-                                    {formatPrice(save.price)}
-                                </Text>
+                    {selectable && (
+                        <Animated.View
+                            style={styles.selectedContainerContainer}
+                            entering={FadeInLeft.duration(
+                                SELECTABLE_ANIMATION_DURATION,
+                            )}
+                            exiting={FadeOutLeft.duration(
+                                SELECTABLE_ANIMATION_DURATION,
+                            )}>
+                            <View style={styles.selectedContainer}>
+                                <View
+                                    style={[
+                                        styles.selectedRadio,
+                                        selected
+                                            ? styles.selectedRadioSelected
+                                            : undefined,
+                                    ]}>
+                                    {selected && (
+                                        <Ionicons
+                                            name="checkmark"
+                                            color="#FFF"
+                                            size={15}
+                                        />
+                                    )}
+                                </View>
+                            </View>
+                        </Animated.View>
+                    )}
 
-                                {onSale && (
-                                    <Text>{formatPrice(save.sale_price)}</Text>
+                    <Animated.View
+                        layout={Layout.duration(SELECTABLE_ANIMATION_DURATION)}
+                        style={styles.imageContentContainer}>
+                        <View style={styles.imageContainer}>
+                            <Image
+                                source={{uri: save.images[0]}}
+                                style={{
+                                    width: IMAGE_WIDTH,
+                                    height: IMAGE_WIDTH / IMAGE_RATIO,
+                                }}
+                            />
+                        </View>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.topRowContainer}>
+                                <View>
+                                    <Text style={styles.priceText}>
+                                        {formatPrice(save.price)}
+                                    </Text>
+
+                                    {onSale && (
+                                        <Text>
+                                            {formatPrice(save.sale_price)}
+                                        </Text>
+                                    )}
+                                </View>
+
+                                {!selectable && (
+                                    <View>
+                                        <TouchableOpacity>
+                                            <SimpleLineIcons
+                                                name="options"
+                                                size={16}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
                                 )}
                             </View>
 
-                            <View>
-                                <TouchableOpacity>
-                                    <SimpleLineIcons name="options" size={16} />
-                                </TouchableOpacity>
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.titleText}>
+                                    {save.name}
+                                </Text>
                             </View>
-                        </View>
 
-                        <View style={styles.titleContainer}>
-                            <Text style={styles.titleText}>{save.name}</Text>
-                        </View>
-
-                        <View style={styles.inStockContainer}>
-                            <Text style={styles.inStockText}>
-                                {save.in_stock ? 'In stock' : 'Out of stock'}
-                            </Text>
-                        </View>
-
-                        <View style={styles.logoContainer}>
-                            <BrandLogo brand={save.brand} />
-                        </View>
-
-                        <View style={styles.buttonsContainer}>
-                            <AnimatedButton
-                                style={styles.deleteButton}
-                                onPress={() =>
-                                    deleteSavedProduct(
-                                        save.id,
-                                        save.collection_id,
-                                    )
-                                }>
-                                <Text style={styles.deleteText}>Remove</Text>
-                            </AnimatedButton>
-
-                            <View style={styles.flexOne}>
-                                <AnimatedButton
-                                    style={styles.buyButton}
-                                    onPress={buyProduct}>
-                                    <Text style={styles.buyText}>
-                                        {BUY_TEXT}
-                                    </Text>
-                                </AnimatedButton>
+                            <View style={styles.inStockContainer}>
+                                <Text style={styles.inStockText}>
+                                    {save.in_stock
+                                        ? 'In stock'
+                                        : 'Out of stock'}
+                                </Text>
                             </View>
+
+                            <View style={styles.logoContainer}>
+                                <BrandLogo brand={save.brand} />
+                            </View>
+
+                            {!selectable && (
+                                <Animated.View
+                                    style={styles.buttonsContainer}
+                                    exiting={FadeOut.duration(
+                                        SELECTABLE_ANIMATION_DURATION,
+                                    )}
+                                    entering={FadeIn.duration(
+                                        SELECTABLE_ANIMATION_DURATION,
+                                    )}>
+                                    <AnimatedButton
+                                        style={styles.deleteButton}
+                                        onPress={() =>
+                                            deleteSavedProduct(
+                                                save.id,
+                                                save.collection_id,
+                                            )
+                                        }>
+                                        <Text style={styles.deleteText}>
+                                            Remove
+                                        </Text>
+                                    </AnimatedButton>
+
+                                    <View style={styles.flexOne}>
+                                        <AnimatedButton
+                                            style={styles.buyButton}
+                                            onPress={buyProduct}>
+                                            <Text style={styles.buyText}>
+                                                {BUY_TEXT}
+                                            </Text>
+                                        </AnimatedButton>
+                                    </View>
+                                </Animated.View>
+                            )}
                         </View>
-                    </View>
+                    </Animated.View>
                 </View>
             </TouchableHighlight>
         </Animated.View>
@@ -215,6 +306,9 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         fontSize: 14,
     },
+    imageContentContainer: {
+        flexDirection: 'row',
+    },
     buyButton: {
         backgroundColor: SAVE_COLOR,
         borderColor: SAVE_COLOR,
@@ -230,6 +324,27 @@ const styles = StyleSheet.create({
     },
     flexOne: {
         flex: 1,
+    },
+    selectedContainerContainer: {
+        justifyContent: 'center',
+        marginRight: 15,
+    },
+    selectedContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    selectedRadio: {
+        width: RADIO_DIAMETER,
+        height: RADIO_DIAMETER,
+        borderRadius: RADIO_DIAMETER / 2,
+        borderColor: PALETTE.neutral[8],
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    selectedRadioSelected: {
+        backgroundColor: PALETTE.neutral[8],
     },
 });
 

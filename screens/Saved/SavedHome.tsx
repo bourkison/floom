@@ -6,6 +6,7 @@ import {
     ActivityIndicator,
     Text,
     RefreshControl,
+    TouchableOpacity,
 } from 'react-native';
 import Animated, {Layout} from 'react-native-reanimated';
 
@@ -16,12 +17,17 @@ import SearchInput from '@/components/Utility/SearchInput';
 import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
+import {Database} from '@/types/schema';
 
 export const INITIAL_SAVE_LOAD_AMOUNT = 10;
 export const SUBSEQUENT_SAVE_LOAD_AMOUNT = 10;
 
 const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [searchText, setSearchText] = useState('');
+    const [productsSelectable, setProductsSelectable] = useState(false);
+    const [selectedProducts, setSelectedProducts] = useState<
+        Database['public']['Views']['v_saves']['Row'][]
+    >([]);
 
     const {
         initFetchCollections,
@@ -65,6 +71,35 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, 'refresh');
     };
 
+    const toggleSelectable = () => {
+        if (productsSelectable) {
+            setProductsSelectable(false);
+            setSelectedProducts([]);
+
+            return;
+        }
+
+        setProductsSelectable(true);
+    };
+
+    const selectProduct = (
+        selected: Database['public']['Views']['v_saves']['Row'],
+    ) => {
+        const findIndex = selectedProducts.findIndex(
+            product => selected.product_id === product.product_id,
+        );
+
+        if (findIndex < 0) {
+            setSelectedProducts([...selectedProducts, selected]);
+            return;
+        }
+
+        setSelectedProducts([
+            ...selectedProducts.slice(0, findIndex),
+            ...selectedProducts.slice(findIndex + 1),
+        ]);
+    };
+
     const isLoading = useMemo<boolean>(() => {
         if (loadingSavesState === 'load' || isLoadingCollections) {
             return true;
@@ -104,7 +139,18 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                                 ))}
                             </CollapsibleSection>
                             <View style={styles.headerContainer}>
-                                <Text style={styles.headerText}>Saves</Text>
+                                <Text style={styles.headerText}>
+                                    {!productsSelectable
+                                        ? 'Saves'
+                                        : `${selectedProducts.length} selected`}
+                                </Text>
+                                <TouchableOpacity onPress={toggleSelectable}>
+                                    <Text>
+                                        {!productsSelectable
+                                            ? 'Select'
+                                            : 'Cancel'}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         </>
                     }
@@ -118,7 +164,13 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                     data={filteredSaves}
                     keyExtractor={item => item.id.toString()}
                     renderItem={({item}) => (
-                        <SaveListItem save={item} key={item.id.toString()} />
+                        <SaveListItem
+                            selectable={productsSelectable}
+                            selectedProducts={selectedProducts}
+                            onSelect={selectProduct}
+                            save={item}
+                            key={item.id.toString()}
+                        />
                     )}
                     ListFooterComponent={
                         loadingSavesState === 'additional' ? (
