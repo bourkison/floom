@@ -232,7 +232,10 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
 
                     <TouchableOpacity
                         onPress={() => {
-                            openBottomSheet();
+                            openBottomSheet(
+                                <AddToCollectionBottomSheet />,
+                                0.6,
+                            );
                         }}>
                         <Text
                             style={[
@@ -244,8 +247,6 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                     </TouchableOpacity>
                 </Animated.View>
             )}
-
-            <AddToCollectionBottomSheet />
         </View>
     );
 };

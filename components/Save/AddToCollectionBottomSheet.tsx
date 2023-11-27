@@ -1,61 +1,68 @@
 import {AntDesign} from '@expo/vector-icons';
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
     ScrollView,
+    ActivityIndicator,
 } from 'react-native';
 
-import BottomSheet from '@/components/BottomSheet/BottomSheet';
 import {PALETTE} from '@/constants';
 import {useBottomSheetContext} from '@/context/BottomSheet';
 import {useSharedSavedContext} from '@/context/saved';
 
 const AddToCollectionBottomSheet = () => {
+    const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+
     const {closeBottomSheet} = useBottomSheetContext();
     const {hasInitiallyLoadedCollections, initFetchCollections} =
         useSharedSavedContext();
 
-    const snapPoints = useMemo(() => [0.6], []);
-
     useEffect(() => {
+        const fetchCollections = async () => {
+            setIsLoadingCollections(true);
+            await initFetchCollections();
+            setIsLoadingCollections(false);
+        };
         if (!hasInitiallyLoadedCollections) {
-            initFetchCollections();
+            fetchCollections();
         }
     }, [hasInitiallyLoadedCollections, initFetchCollections]);
 
     return (
-        <BottomSheet snapPoints={snapPoints}>
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <TouchableOpacity
-                        style={[styles.column, styles.sideColumn]}
-                        onPress={closeBottomSheet}>
-                        <Text>Cancel</Text>
-                    </TouchableOpacity>
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity
+                    style={[styles.column, styles.sideColumn]}
+                    onPress={closeBottomSheet}>
+                    <Text>Cancel</Text>
+                </TouchableOpacity>
 
-                    <View style={styles.column}>
-                        <Text style={styles.headerText}>Add to Collection</Text>
-                    </View>
-
-                    <TouchableOpacity
-                        onPress={() => console.log('NEW')}
-                        style={[
-                            styles.column,
-                            styles.sideColumn,
-                            styles.rightColumn,
-                        ]}>
-                        <AntDesign name="plus" size={18} />
-                    </TouchableOpacity>
+                <View style={styles.column}>
+                    <Text style={styles.headerText}>Add to Collection</Text>
                 </View>
 
+                <TouchableOpacity
+                    onPress={() => console.log('NEW')}
+                    style={[
+                        styles.column,
+                        styles.sideColumn,
+                        styles.rightColumn,
+                    ]}>
+                    <AntDesign name="plus" size={18} />
+                </TouchableOpacity>
+            </View>
+
+            {!isLoadingCollections ? (
                 <ScrollView style={styles.contentContainer}>
                     <Text>Content</Text>
                 </ScrollView>
-            </View>
-        </BottomSheet>
+            ) : (
+                <ActivityIndicator style={styles.activityIndicator} />
+            )}
+        </View>
     );
 };
 
@@ -101,6 +108,9 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     contentContainer: {},
+    activityIndicator: {
+        marginTop: 25,
+    },
 });
 
 export default AddToCollectionBottomSheet;

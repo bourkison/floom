@@ -1,8 +1,9 @@
-import React, {useCallback, useMemo, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
-import {
+import React, {useCallback, useState} from 'react';
+import {Modal, Pressable, StyleSheet, useWindowDimensions} from 'react-native';
+import Animated, {
     interpolateColor,
     runOnJS,
+    useAnimatedStyle,
     useDerivedValue,
     useSharedValue,
     withTiming,
@@ -15,53 +16,88 @@ type BottomSheetProviderProps = {
 };
 
 const BottomSheetProvider = ({children}: BottomSheetProviderProps) => {
-    const [snapPoints, setSnapPoints] = useState<number[]>([]);
-    const [modalExpanded, setModalExpanded] = useState(false);
+    const [snapPoint, setSnapPoint] = useState<number>(0);
     const translateY = useSharedValue(0);
-    const {height} = useWindowDimensions();
+    const [renderedContent, setRenderedContent] = useState<React.JSX.Element>();
 
-    const availableHeight = useMemo(() => height, [height]);
+    const {height} = useWindowDimensions();
 
     const overlayColor = useDerivedValue(() =>
         interpolateColor(
             translateY.value,
-            [0, snapPoints[0] * availableHeight],
+            [0, snapPoint * height],
             ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.3)'],
         ),
     );
 
-    const openBottomSheet = useCallback(() => {
-        if (!snapPoints.length) {
-            throw new Error('No snap points set');
-        }
+    const openBottomSheet = useCallback(
+        (element: React.JSX.Element, sp: number) => {
+            if (renderedContent !== undefined) {
+                throw new Error('Bottom sheet already expanded');
+            }
 
-        setModalExpanded(true);
-        translateY.value = withTiming(
-            snapPoints[snapPoints.length - 1] * availableHeight,
-        );
-        console.log('OPEN BOTTOM SHEET');
-    }, [snapPoints, translateY, availableHeight]);
+            setSnapPoint(sp);
+            setRenderedContent(element);
+
+            translateY.value = withTiming(sp * height);
+            console.log('OPEN BOTTOM SHEET');
+        },
+        [translateY, height, renderedContent],
+    );
 
     const closeBottomSheet = useCallback(() => {
         translateY.value = withTiming(0, {}, () =>
-            runOnJS(setModalExpanded)(false),
+            runOnJS(setRenderedContent)(undefined),
         );
     }, [translateY]);
+
+    const rOverlayStyle = useAnimatedStyle(() => ({
+        backgroundColor: overlayColor.value,
+    }));
+
+    const rStyle = useAnimatedStyle(() => ({
+        transform: [{translateY: -translateY.value}],
+    }));
 
     return (
         <BottomSheetContext.Provider
             value={{
-                setSnapPoints,
-                translateY,
-                saves: [],
-                modalExpanded,
                 openBottomSheet,
-                overlayColor,
                 closeBottomSheet,
             }}>
-            {children}
+            <>
+                {children}
+                {renderedContent && (
+                    <Modal visible={renderedContent !== undefined} transparent>
+                        <Animated.View
+                            style={[StyleSheet.absoluteFill, rOverlayStyle]}>
+                            <Pressable
+                                onPress={closeBottomSheet}
+                                style={StyleSheet.absoluteFill}
+                            />
+                        </Animated.View>
+                        <Animated.View
+                            style={[
+                                styles.container,
+                                {height, top: height},
+                                rStyle,
+                            ]}>
+                            {renderedContent}
+                        </Animated.View>
+                    </Modal>
+                )}
+            </>
         </BottomSheetContext.Provider>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        width: '100%',
+        backgroundColor: 'white',
+        position: 'absolute',
+        borderRadius: 25,
+    },
+});
 
 export default BottomSheetProvider;

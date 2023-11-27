@@ -1,19 +1,8 @@
-import {Dispatch, SetStateAction, createContext, useContext} from 'react';
-import {SharedValue} from 'react-native-reanimated';
-
-import {Database} from '@/types/schema';
+import {createContext, useContext} from 'react';
 
 type BottomSheetContextType = {
-    translateY: SharedValue<number>;
-    overlayColor: SharedValue<string>;
-
-    setSnapPoints: Dispatch<SetStateAction<number[]>>;
-
-    openBottomSheet: () => void;
+    openBottomSheet: (element: React.JSX.Element, snapPoint: number) => void;
     closeBottomSheet: () => void;
-
-    saves: Database['public']['Views']['v_saves']['Row'][];
-    modalExpanded: boolean;
 };
 
 export const BottomSheetContext = createContext<BottomSheetContextType | null>(
