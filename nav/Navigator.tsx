@@ -1,3 +1,4 @@
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {
     CardStyleInterpolators,
     createStackNavigator,
@@ -5,6 +6,7 @@ import {
 import React from 'react';
 
 import AnimatedProductProvider from '@/context/animated/AnimatedProductProvider';
+import AddToCollectionProvider from '@/context/bottomSheet/AddToCollectionProvider';
 import DeletedProvider from '@/context/deleted/DeletedProvider';
 import SavedProvider from '@/context/saved/SavedProvider';
 import FiltersNavigator from '@/nav/FiltersNavigator';
@@ -74,67 +76,71 @@ export default function Navigator() {
     return (
         <SavedProvider>
             <DeletedProvider>
-                <AnimatedProductProvider>
-                    <MainStack.Navigator
-                        initialRouteName="Home"
-                        screenOptions={{
-                            cardStyleInterpolator:
-                                CardStyleInterpolators.forHorizontalIOS,
-                            gestureEnabled: true,
-                            headerStyle: {
-                                height: HEADER_HEIGHT_W_STATUS_BAR,
-                                elevation: 999,
-                                zIndex: 999,
-                            },
-                        }}>
-                        <MainStack.Screen
-                            name="Home"
-                            component={Home}
-                            options={{header: HomeHeader}}
-                        />
-                        <MainStack.Screen
-                            name="Filters"
-                            component={FiltersNavigator}
-                            options={{
-                                gestureDirection: 'vertical',
-                                headerShown: false,
-                                gestureEnabled: false,
-                                cardStyleInterpolator:
-                                    CardStyleInterpolators.forVerticalIOS,
-                            }}
-                        />
-                        <MainStack.Screen
-                            name="ProductView"
-                            component={ProductView}
-                            options={{
-                                cardStyleInterpolator:
-                                    CardStyleInterpolators.forModalPresentationIOS,
-                                presentation: 'modal',
-                                gestureDirection: 'vertical',
-                                headerShown: false,
-                                gestureEnabled: true,
-                            }}
-                        />
-                        <MainStack.Screen
-                            name="SavedProducts"
-                            component={SavedNavigator}
-                            options={{
-                                gestureDirection: 'horizontal',
-                                gestureEnabled: true,
-                                headerShown: false,
-                            }}
-                        />
-                        <MainStack.Screen
-                            name="Options"
-                            component={OptionsNavigator}
-                            options={{
-                                gestureDirection: 'horizontal-inverted',
-                                headerShown: false,
-                                gestureEnabled: true,
-                            }}
-                        />
-                    </MainStack.Navigator>
-                </AnimatedProductProvider>
+                <BottomSheetModalProvider>
+                    <AddToCollectionProvider>
+                        <AnimatedProductProvider>
+                            <MainStack.Navigator
+                                initialRouteName="Home"
+                                screenOptions={{
+                                    cardStyleInterpolator:
+                                        CardStyleInterpolators.forHorizontalIOS,
+                                    gestureEnabled: true,
+                                    headerStyle: {
+                                        height: HEADER_HEIGHT_W_STATUS_BAR,
+                                        elevation: 999,
+                                        zIndex: 999,
+                                    },
+                                }}>
+                                <MainStack.Screen
+                                    name="Home"
+                                    component={Home}
+                                    options={{header: HomeHeader}}
+                                />
+                                <MainStack.Screen
+                                    name="Filters"
+                                    component={FiltersNavigator}
+                                    options={{
+                                        gestureDirection: 'vertical',
+                                        headerShown: false,
+                                        gestureEnabled: false,
+                                        cardStyleInterpolator:
+                                            CardStyleInterpolators.forVerticalIOS,
+                                    }}
+                                />
+                                <MainStack.Screen
+                                    name="ProductView"
+                                    component={ProductView}
+                                    options={{
+                                        cardStyleInterpolator:
+                                            CardStyleInterpolators.forModalPresentationIOS,
+                                        presentation: 'modal',
+                                        gestureDirection: 'vertical',
+                                        headerShown: false,
+                                        gestureEnabled: true,
+                                    }}
+                                />
+                                <MainStack.Screen
+                                    name="SavedProducts"
+                                    component={SavedNavigator}
+                                    options={{
+                                        gestureDirection: 'horizontal',
+                                        gestureEnabled: true,
+                                        headerShown: false,
+                                    }}
+                                />
+                                <MainStack.Screen
+                                    name="Options"
+                                    component={OptionsNavigator}
+                                    options={{
+                                        gestureDirection: 'horizontal-inverted',
+                                        headerShown: false,
+                                        gestureEnabled: true,
+                                    }}
+                                />
+                            </MainStack.Navigator>
+                        </AnimatedProductProvider>
+                    </AddToCollectionProvider>
+                </BottomSheetModalProvider>
             </DeletedProvider>
         </SavedProvider>
     );

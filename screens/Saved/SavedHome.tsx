@@ -15,11 +15,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import AddToCollectionBottomSheet from '@/components/Save/AddToCollectionBottomSheet';
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
 import SaveListItem from '@/components/Save/SaveListItem';
 import SearchInput from '@/components/Utility/SearchInput';
 import {DELETE_COLOR, PALETTE} from '@/constants';
+import {useAddToCollectionContext} from '@/context/bottomSheet';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 import {Database} from '@/types/schema';
@@ -49,6 +51,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         setCollectionsExpanded,
         collectionsExpanded,
     } = useSharedSavedContext();
+
+    const {openModal} = useAddToCollectionContext();
 
     const filteredCollections = useMemo(() => {
         return collections.filter(collection =>
@@ -226,7 +230,10 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                         </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => {
+                            openModal(selectedProducts);
+                        }}>
                         <Text
                             style={[
                                 styles.bottomBarText,
@@ -237,6 +244,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
                     </TouchableOpacity>
                 </Animated.View>
             )}
+
+            <AddToCollectionBottomSheet />
         </View>
     );
 };
@@ -297,7 +306,9 @@ const styles = StyleSheet.create({
     removeText: {
         color: DELETE_COLOR,
     },
-    addToCollectionText: {},
+    addToCollectionText: {
+        fontWeight: '400',
+    },
 });
 
 export default SavedHome;

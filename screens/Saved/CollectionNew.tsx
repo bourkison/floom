@@ -146,6 +146,13 @@ const CollectionNew = ({
                         selectedProducts={selectedProducts}
                     />
                 )}
+                ListFooterComponent={
+                    loadingSavesState === 'additional' ? (
+                        <ActivityIndicator
+                            style={styles.loadingMoreIndicator}
+                        />
+                    ) : undefined
+                }
             />
 
             <View
@@ -262,6 +269,9 @@ const styles = StyleSheet.create({
         flexBasis: 14,
         flexShrink: 0,
         flexGrow: 0,
+    },
+    loadingMoreIndicator: {
+        marginTop: 10,
     },
 });
 
