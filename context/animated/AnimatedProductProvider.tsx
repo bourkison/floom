@@ -141,6 +141,7 @@ const AnimatedProductProvider = ({children}: AnimatedProductProviderProps) => {
             action.value = to;
             runOnJS(setActionJs)(to);
 
+            // TODO: Figure out wiht derived values. Derive the action button colours?
             if (from === 'buy') {
                 buyPing.value = withTiming(0, {duration: PING_DURATION});
             } else if (from === 'delete') {

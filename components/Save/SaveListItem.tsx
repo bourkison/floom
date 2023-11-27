@@ -12,7 +12,6 @@ import {
     TouchableOpacity,
     TouchableHighlight,
 } from 'react-native';
-import Animated, {Layout} from 'react-native-reanimated';
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import BrandLogo from '@/components/Utility/BrandLogo';
@@ -21,6 +20,7 @@ import {useSharedSavedContext} from '@/context/saved';
 import {MainStackParamList} from '@/nav/Navigator';
 import {formatPrice} from '@/services';
 import {Database} from '@/types/schema';
+import Animated, {FadeOutUp} from 'react-native-reanimated';
 
 type SaveListItemProps = {
     save: Database['public']['Views']['v_saves']['Row'];
@@ -74,7 +74,7 @@ const SaveListItem = ({save}: SaveListItemProps) => {
     };
 
     return (
-        <Animated.View layout={Layout.duration(1000)}>
+        <Animated.View exiting={FadeOutUp}>
             <TouchableHighlight
                 onPress={navigateTo}
                 underlayColor={TOUCHABLE_UNDERLAY}

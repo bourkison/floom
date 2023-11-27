@@ -4,10 +4,10 @@ import {
     View,
     StyleSheet,
     ActivityIndicator,
-    FlatList,
     Text,
     RefreshControl,
 } from 'react-native';
+import Animated, {Layout} from 'react-native-reanimated';
 
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
@@ -84,9 +84,10 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
             </View>
 
             {!isLoading ? (
-                <FlatList
+                <Animated.FlatList
                     keyboardDismissMode="on-drag"
                     keyboardShouldPersistTaps="never"
+                    itemLayoutAnimation={Layout.duration(300)}
                     ListHeaderComponent={
                         <>
                             <CollapsibleSection
