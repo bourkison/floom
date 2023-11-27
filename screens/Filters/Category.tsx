@@ -1,8 +1,10 @@
 import {Ionicons} from '@expo/vector-icons';
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {TouchableHighlight} from 'react-native-gesture-handler';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import SearchInput from '@/components/Utility/SearchInput';
 import {CATEGORY_OPTIONS, PALETTE} from '@/constants';
 import {useAppDispatch, useAppSelector} from '@/store/hooks';
 import {toggleCategory} from '@/store/slices/product';
@@ -55,11 +57,33 @@ const CategoryListItem = ({category}: CategoryProps) => {
 };
 
 const Category = () => {
+    const {bottom} = useSafeAreaInsets();
+    const [searchText, setSearchText] = useState('');
+
+    const filteredCategoryOptions = useMemo(() => {
+        return CATEGORY_OPTIONS.filter(category =>
+            category.label.includes(searchText),
+        );
+    }, [searchText]);
+
     return (
         <View style={styles.container}>
-            <ScrollView style={styles.scrollContainer}>
+            <View style={styles.searchContainer}>
+                <SearchInput
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    onClearPress={() => setSearchText('')}
+                />
+            </View>
+
+            <ScrollView
+                contentContainerStyle={[
+                    styles.scrollContent,
+                    {paddingBottom: bottom},
+                ]}
+                style={styles.scrollContainer}>
                 <View style={styles.listContainer}>
-                    {CATEGORY_OPTIONS.map(category => (
+                    {filteredCategoryOptions.map(category => (
                         <CategoryListItem
                             category={category}
                             key={category.value}
@@ -75,8 +99,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    scrollContainer: {
-        paddingVertical: 20,
+    scrollContainer: {},
+    scrollContent: {
+        paddingTop: 20,
     },
     listContainer: {
         shadowColor: '#000',
@@ -99,6 +124,19 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingVertical: 14,
         fontWeight: '500',
+    },
+    searchContainer: {
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        width: '100%',
+        flexBasis: 50,
+        backgroundColor: '#FFF',
+        shadowColor: '#1a1f25',
+        shadowOffset: {
+            height: -1,
+            width: -1,
+        },
+        shadowOpacity: 0.3,
     },
 });
 

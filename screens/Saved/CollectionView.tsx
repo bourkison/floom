@@ -27,7 +27,8 @@ const CollectionView = ({
             const {data, error} = await supabase
                 .from('v_saves')
                 .select()
-                .eq('collection_id', route.params.collectionId);
+                .eq('collection_id', route.params.collectionId)
+                .order('created_at', {ascending: false});
 
             if (error) {
                 // TODO: Handle error
