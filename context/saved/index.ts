@@ -26,9 +26,8 @@ type SavedContextType = {
     saveProduct: (
         product: Database['public']['Views']['v_products']['Row'],
     ) => Promise<void>;
-    deleteSavedProduct: (
-        id: number,
-        collectionId: number | null,
+    deleteSavedProducts: (
+        savesToDelete: {id: number; collectionId: number | null}[],
     ) => Promise<void>;
 
     loadingSavesState: LoadingState;

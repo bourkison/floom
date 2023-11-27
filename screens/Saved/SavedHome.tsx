@@ -8,13 +8,18 @@ import {
     RefreshControl,
     TouchableOpacity,
 } from 'react-native';
-import Animated, {Layout} from 'react-native-reanimated';
+import Animated, {
+    FadeInDown,
+    FadeOutDown,
+    Layout,
+} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
 import SaveListItem from '@/components/Save/SaveListItem';
 import SearchInput from '@/components/Utility/SearchInput';
-import {PALETTE} from '@/constants';
+import {DELETE_COLOR, PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
 import {Database} from '@/types/schema';
@@ -29,6 +34,8 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         Database['public']['Views']['v_saves']['Row'][]
     >([]);
 
+    const {bottom} = useSafeAreaInsets();
+
     const {
         initFetchCollections,
         fetchSaves,
@@ -38,8 +45,9 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         isLoadingCollections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
-        collectionsExpanded,
+        deleteSavedProducts,
         setCollectionsExpanded,
+        collectionsExpanded,
     } = useSharedSavedContext();
 
     const filteredCollections = useMemo(() => {
@@ -194,6 +202,41 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
             ) : (
                 <ActivityIndicator />
             )}
+
+            {productsSelectable && (
+                <Animated.View
+                    entering={FadeInDown}
+                    exiting={FadeOutDown}
+                    style={[
+                        styles.bottomBarContainer,
+                        {paddingBottom: bottom},
+                    ]}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            deleteSavedProducts(
+                                selectedProducts.map(p => ({
+                                    id: p.id,
+                                    collectionId: null,
+                                })),
+                            );
+                            toggleSelectable();
+                        }}>
+                        <Text style={[styles.bottomBarText, styles.removeText]}>
+                            Remove
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity>
+                        <Text
+                            style={[
+                                styles.bottomBarText,
+                                styles.addToCollectionText,
+                            ]}>
+                            Add to Collection
+                        </Text>
+                    </TouchableOpacity>
+                </Animated.View>
+            )}
         </View>
     );
 };
@@ -233,6 +276,28 @@ const styles = StyleSheet.create({
     loadingMoreIndicator: {
         marginTop: 10,
     },
+    bottomBarContainer: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: PALETTE.neutral[1],
+        paddingHorizontal: 25,
+        borderTopWidth: 1,
+        borderColor: PALETTE.neutral[2],
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    bottomBarText: {
+        paddingTop: 20,
+        paddingBottom: 5,
+        fontWeight: '500',
+    },
+    removeText: {
+        color: DELETE_COLOR,
+    },
+    addToCollectionText: {},
 });
 
 export default SavedHome;

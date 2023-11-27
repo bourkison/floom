@@ -200,20 +200,32 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         [saves, dispatch, sliceSaves],
     );
 
-    const deleteSavedProduct = useCallback(
-        async (id: number, collectionId: number | null) => {
-            if (collectionId === null) {
-                const index = saves.findIndex(save => save.id === id);
+    const deleteSavedProducts = useCallback(
+        async (savesToDelete: {id: number; collectionId: number | null}[]) => {
+            let temp = saves;
 
-                if (index > -1) {
-                    setSaves([
-                        ...saves.slice(0, index),
-                        ...saves.slice(index + 1),
-                    ]);
+            savesToDelete.forEach(s => {
+                if (s.collectionId === null) {
+                    const index = temp.findIndex(save => save.id === s.id);
+
+                    if (index > -1) {
+                        temp = [
+                            ...temp.slice(0, index),
+                            ...temp.slice(index + 1),
+                        ];
+                    }
                 }
-            }
+            });
 
-            const {error} = await supabase.from('saves').delete().eq('id', id);
+            setSaves(temp);
+
+            const {error} = await supabase
+                .from('saves')
+                .delete()
+                .in(
+                    'id',
+                    savesToDelete.map(s => s.id),
+                );
 
             if (error) {
                 console.error(error);
@@ -299,7 +311,7 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 initFetchCollections,
                 isLoadingCollections,
                 saveProduct,
-                deleteSavedProduct,
+                deleteSavedProducts,
                 hasInitiallyLoadedSaves,
                 hasInitiallyLoadedCollections,
                 loadingSavesState,

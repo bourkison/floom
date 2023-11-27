@@ -56,7 +56,7 @@ const SaveListItem = ({
 
     const onSale = useMemo(() => save.sale_price < save.price, [save]);
 
-    const {deleteSavedProduct} = useSharedSavedContext();
+    const {deleteSavedProducts} = useSharedSavedContext();
 
     const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
 
@@ -213,10 +213,13 @@ const SaveListItem = ({
                                     <AnimatedButton
                                         style={styles.deleteButton}
                                         onPress={() =>
-                                            deleteSavedProduct(
-                                                save.id,
-                                                save.collection_id,
-                                            )
+                                            deleteSavedProducts([
+                                                {
+                                                    id: save.id,
+                                                    collectionId:
+                                                        save.collection_id,
+                                                },
+                                            ])
                                         }>
                                         <Text style={styles.deleteText}>
                                             Remove

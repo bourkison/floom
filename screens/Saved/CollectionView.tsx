@@ -64,7 +64,13 @@ const CollectionView = ({
                     style={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}>
                     {filteredProducts.map(product => (
-                        <SaveListItem save={product} key={product.id} />
+                        <SaveListItem
+                            save={product}
+                            key={product.id}
+                            selectable={false}
+                            onSelect={() => {}}
+                            selectedProducts={[]}
+                        />
                     ))}
                 </ScrollView>
             )}
