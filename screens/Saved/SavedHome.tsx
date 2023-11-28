@@ -63,15 +63,18 @@ const SavedHome = ({
                 rightIcon={
                     activeTabIndex === 0 ? (
                         <TouchableOpacity
+                            style={[styles.headerIcon, styles.rightIcon]}
                             onPress={() =>
                                 setSavesSelectable(!savesSelectable)
                             }>
-                            <Text>Select</Text>
+                            <Text>
+                                {!savesSelectable ? 'Select' : 'Cancel'}
+                            </Text>
                         </TouchableOpacity>
                     ) : (
                         <Pressable
                             onPress={() => navigation.navigate('CollectionNew')}
-                            style={styles.headerIcon}>
+                            style={[styles.headerIcon, styles.rightIcon]}>
                             <AntDesign name="plus" size={24} />
                         </Pressable>
                     )
@@ -141,10 +144,15 @@ const styles = StyleSheet.create({
         borderBottomColor: PALETTE.neutral[2],
     },
     headerIcon: {
-        flexBasis: 24,
+        flexBasis: 60,
         flexGrow: 0,
         flexShrink: 0,
         flex: 1,
+        flexWrap: 'nowrap',
+        overflow: 'visible',
+    },
+    rightIcon: {
+        alignItems: 'flex-end',
     },
 });
 
