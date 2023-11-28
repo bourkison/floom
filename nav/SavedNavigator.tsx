@@ -2,7 +2,7 @@ import {StackScreenProps, createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 
 import {useSharedSavedContext} from '@/context/saved';
-import {CollectionViewHeader, SavedProductsHeader} from '@/nav/Headers';
+import {CollectionViewHeader} from '@/nav/Headers';
 import {MainStackParamList} from '@/nav/Navigator';
 import CollectionNew from '@/screens/Saved/CollectionNew';
 import CollectionView from '@/screens/Saved/CollectionView';
@@ -30,7 +30,7 @@ const SavedNavigator = ({
             <SavedStack.Screen
                 name="SavedHome"
                 component={SavedHome}
-                options={{header: SavedProductsHeader}}
+                options={{headerShown: false}}
             />
             <SavedStack.Screen
                 name="CollectionView"

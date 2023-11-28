@@ -1,6 +1,6 @@
 import {Ionicons, Feather} from '@expo/vector-icons';
 import React from 'react';
-import {View, TextInput, Pressable, StyleSheet} from 'react-native';
+import {View, TextInput, Pressable, StyleSheet, ViewStyle} from 'react-native';
 
 import {PALETTE} from '@/constants';
 
@@ -9,6 +9,7 @@ type SearchInputProps = {
     onChangeText: (val: string) => void;
     onSubmitEditing?: () => void;
     onClearPress: () => void;
+    style?: ViewStyle;
 };
 
 const SearchInput = ({
@@ -16,9 +17,10 @@ const SearchInput = ({
     onChangeText,
     onSubmitEditing,
     onClearPress,
+    style,
 }: SearchInputProps) => {
     return (
-        <View style={styles.searchSection}>
+        <View style={[styles.searchSection, style]}>
             <Ionicons
                 name="search"
                 style={styles.searchIcon}

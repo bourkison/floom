@@ -24,14 +24,16 @@ const CollectionListItemSmall = ({
             underlayColor={TOUCHABLE_UNDERLAY}
             activeOpacity={TOUCHABLE_ACTIVE_OPACITY}>
             <View style={styles.container}>
-                {collection.imageUrls[0] && (
-                    <View style={styles.imageContainer}>
+                <View style={styles.imageContainer}>
+                    {collection.imageUrls[0] ? (
                         <Image
                             source={{uri: collection.imageUrls[0]}}
                             style={styles.image}
                         />
-                    </View>
-                )}
+                    ) : (
+                        <View style={[styles.image, styles.placeholderImage]} />
+                    )}
+                </View>
 
                 <View style={styles.textContainer}>
                     <Text>{collection.name}</Text>
@@ -45,7 +47,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 5,
+        paddingVertical: 10,
         paddingHorizontal: 10,
         borderBottomWidth: 1,
         borderColor: PALETTE.neutral[2],
@@ -55,6 +57,9 @@ const styles = StyleSheet.create({
         width: IMAGE_DIAMETER,
         height: IMAGE_DIAMETER,
         borderRadius: IMAGE_DIAMETER / 2,
+    },
+    placeholderImage: {
+        backgroundColor: PALETTE.neutral[2],
     },
     textContainer: {
         marginLeft: 10,

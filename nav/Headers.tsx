@@ -29,7 +29,7 @@ export const HEADER_HEIGHT = 44;
 export const HEADER_HEIGHT_W_STATUS_BAR =
     HEADER_HEIGHT + Constants.statusBarHeight;
 
-const HeaderTemplate: React.FC<HeaderProps> = ({
+export const HeaderTemplate: React.FC<HeaderProps> = ({
     children,
     leftIcon,
     rightIcon,
@@ -405,7 +405,6 @@ export const PriceHeader: React.FC<StackHeaderProps> = ({navigation}) => {
 
 const styles = StyleSheet.create({
     headerContainer: {
-        flex: 1,
         backgroundColor: '#fff',
         paddingBottom: 5,
         paddingHorizontal: 14,

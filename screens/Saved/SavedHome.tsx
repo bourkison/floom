@@ -1,68 +1,36 @@
+import {AntDesign, Feather} from '@expo/vector-icons';
 import {StackScreenProps} from '@react-navigation/stack';
-import React, {useEffect, useMemo, useState} from 'react';
-import {
-    View,
-    StyleSheet,
-    ActivityIndicator,
-    Text,
-    RefreshControl,
-    TouchableOpacity,
-} from 'react-native';
-import Animated, {
-    FadeInDown,
-    FadeOutDown,
-    Layout,
-} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Pressable, Text, TouchableOpacity} from 'react-native';
 
-import AddToCollectionBottomSheet from '@/components/Save/AddToCollectionSheet';
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
-import SaveListItem from '@/components/Save/SaveListItem';
-import SearchInput from '@/components/Utility/SearchInput';
-import {DELETE_COLOR, PALETTE} from '@/constants';
-import {useBottomSheetContext} from '@/context/BottomSheet';
+import SavedList from '@/components/Save/SavedList';
+import Tabs from '@/components/Utility/Tabs';
+import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
+import {HeaderTemplate} from '@/nav/Headers';
 import {SavedStackParamList} from '@/nav/SavedNavigator';
-import {Database} from '@/types/schema';
 
 export const INITIAL_SAVE_LOAD_AMOUNT = 10;
 export const SUBSEQUENT_SAVE_LOAD_AMOUNT = 10;
 
-const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
-    const [searchText, setSearchText] = useState('');
-    const [productsSelectable, setProductsSelectable] = useState(false);
-    const [selectedProducts, setSelectedProducts] = useState<
-        Database['public']['Views']['v_saves']['Row'][]
-    >([]);
-
-    const {bottom} = useSafeAreaInsets();
+const SavedHome = ({
+    navigation,
+}: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
+    const [activeTabIndex, setActiveTabIndex] = useState(0);
+    const [savesSelectable, setSavesSelectable] = useState(false);
+    const [animationsEnabled, setAnimationsEnabled] = useState(false);
 
     const {
         initFetchCollections,
         fetchSaves,
         collections,
-        saves,
-        loadingSavesState,
-        isLoadingCollections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
-        deleteSavedProducts,
         setCollectionsExpanded,
         collectionsExpanded,
     } = useSharedSavedContext();
-
-    const {openBottomSheet, closeBottomSheet} = useBottomSheetContext();
-
-    const filteredCollections = useMemo(() => {
-        return collections.filter(collection =>
-            collection.name.includes(searchText),
-        );
-    }, [collections, searchText]);
-
-    const filteredSaves = useMemo(() => {
-        return saves.filter(save => save.name.includes(searchText));
-    }, [saves, searchText]);
 
     useEffect(() => {
         if (!hasInitiallyLoadedCollections) {
@@ -79,202 +47,78 @@ const SavedHome = (_: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
         hasInitiallyLoadedCollections,
     ]);
 
-    const refresh = async () => {
-        fetchSaves(INITIAL_SAVE_LOAD_AMOUNT, 'refresh');
-    };
-
-    const toggleSelectable = () => {
-        if (productsSelectable) {
-            setProductsSelectable(false);
-            setSelectedProducts([]);
-
-            return;
-        }
-
-        setProductsSelectable(true);
-    };
-
-    const selectProduct = (
-        selected: Database['public']['Views']['v_saves']['Row'],
-    ) => {
-        const findIndex = selectedProducts.findIndex(
-            product => selected.product_id === product.product_id,
-        );
-
-        if (findIndex < 0) {
-            setSelectedProducts([...selectedProducts, selected]);
-            return;
-        }
-
-        setSelectedProducts([
-            ...selectedProducts.slice(0, findIndex),
-            ...selectedProducts.slice(findIndex + 1),
-        ]);
-    };
-
-    const isLoading = useMemo<boolean>(() => {
-        if (loadingSavesState === 'load' || isLoadingCollections) {
-            return true;
-        }
-
-        return false;
-    }, [loadingSavesState, isLoadingCollections]);
-
     return (
-        <View style={styles.scrollContainer}>
-            <View style={styles.searchContainer}>
-                <SearchInput
-                    value={searchText}
-                    onChangeText={setSearchText}
-                    onClearPress={() => setSearchText('')}
-                />
-            </View>
-
-            {!isLoading ? (
-                <Animated.FlatList
-                    keyboardDismissMode="on-drag"
-                    keyboardShouldPersistTaps="never"
-                    itemLayoutAnimation={Layout.duration(300)}
-                    ListHeaderComponent={
-                        <>
+        <>
+            <HeaderTemplate
+                style={styles.hiddenShadowWithBorder}
+                leftIcon={
+                    <Pressable
+                        onPress={() => navigation.goBack()}
+                        style={styles.headerIcon}>
+                        <Feather name="chevron-left" size={24} />
+                    </Pressable>
+                }
+                rightIcon={
+                    activeTabIndex === 0 ? (
+                        <TouchableOpacity
+                            onPress={() =>
+                                setSavesSelectable(!savesSelectable)
+                            }>
+                            <Text>Select</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <Pressable
+                            onPress={() => navigation.navigate('CollectionNew')}
+                            style={styles.headerIcon}>
+                            <AntDesign name="plus" size={24} />
+                        </Pressable>
+                    )
+                }>
+                Saved
+            </HeaderTemplate>
+            <Tabs
+                onTabChange={toIndex => {
+                    setAnimationsEnabled(false);
+                    setActiveTabIndex(toIndex);
+                }}
+                activeTabIndex={activeTabIndex}
+                pages={[
+                    {
+                        header: 'Saves',
+                        content: (
+                            <SavedList
+                                savesSelectable={savesSelectable}
+                                setSavesSelectable={setSavesSelectable}
+                                animationsEnabled={animationsEnabled}
+                                setAnimationsEnabled={setAnimationsEnabled}
+                            />
+                        ),
+                    },
+                    {
+                        header: 'Collections',
+                        content: (
                             <CollapsibleSection
                                 headerText="Collections"
                                 onHeaderPress={() =>
                                     setCollectionsExpanded(!collectionsExpanded)
                                 }
                                 expanded={collectionsExpanded}>
-                                {filteredCollections.map(collection => (
+                                {collections.map(collection => (
                                     <CollectionListItem
                                         collection={collection}
                                         key={collection.id}
                                     />
                                 ))}
                             </CollapsibleSection>
-                            <View style={styles.headerContainer}>
-                                <Text style={styles.headerText}>
-                                    {!productsSelectable
-                                        ? 'Saves'
-                                        : `${selectedProducts.length} selected`}
-                                </Text>
-                                <TouchableOpacity onPress={toggleSelectable}>
-                                    <Text>
-                                        {!productsSelectable
-                                            ? 'Select'
-                                            : 'Cancel'}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        </>
-                    }
-                    refreshControl={
-                        <RefreshControl
-                            onRefresh={refresh}
-                            refreshing={loadingSavesState === 'refresh'}
-                        />
-                    }
-                    refreshing={loadingSavesState === 'refresh'}
-                    data={filteredSaves}
-                    keyExtractor={item => item.id.toString()}
-                    renderItem={({item}) => (
-                        <SaveListItem
-                            selectable={productsSelectable}
-                            selectedProducts={selectedProducts}
-                            onSelect={selectProduct}
-                            save={item}
-                            key={item.id.toString()}
-                        />
-                    )}
-                    ListFooterComponent={
-                        loadingSavesState === 'additional' ? (
-                            <ActivityIndicator
-                                style={styles.loadingMoreIndicator}
-                            />
-                        ) : undefined
-                    }
-                    onEndReached={
-                        loadingSavesState !== 'additional' &&
-                        loadingSavesState !== 'complete'
-                            ? () => {
-                                  fetchSaves(
-                                      SUBSEQUENT_SAVE_LOAD_AMOUNT,
-                                      'loadMore',
-                                  );
-                              }
-                            : undefined
-                    }
-                />
-            ) : (
-                <ActivityIndicator />
-            )}
-
-            {productsSelectable && (
-                <Animated.View
-                    entering={FadeInDown}
-                    exiting={FadeOutDown}
-                    style={[
-                        styles.bottomBarContainer,
-                        {paddingBottom: bottom},
-                    ]}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            deleteSavedProducts(
-                                selectedProducts.map(p => ({
-                                    id: p.id,
-                                    collectionId: null,
-                                })),
-                            );
-                            toggleSelectable();
-                        }}>
-                        <Text style={[styles.bottomBarText, styles.removeText]}>
-                            Remove
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        onPress={() => {
-                            openBottomSheet(
-                                <AddToCollectionBottomSheet
-                                    onSelect={() => {
-                                        toggleSelectable();
-                                        closeBottomSheet();
-                                    }}
-                                    selectedSaves={selectedProducts}
-                                />,
-                                0.6,
-                            );
-                        }}>
-                        <Text
-                            style={[
-                                styles.bottomBarText,
-                                styles.addToCollectionText,
-                            ]}>
-                            Add to Collection
-                        </Text>
-                    </TouchableOpacity>
-                </Animated.View>
-            )}
-        </View>
+                        ),
+                    },
+                ]}
+            />
+        </>
     );
 };
 
 const styles = StyleSheet.create({
-    searchContainer: {
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        width: '100%',
-        flexBasis: 50,
-        backgroundColor: '#FFF',
-        shadowColor: '#1a1f25',
-        shadowOffset: {
-            height: -1,
-            width: -1,
-        },
-        shadowOpacity: 0.3,
-    },
-    scrollContainer: {
-        flex: 1,
-        width: '100%',
-    },
     headerContainer: {
         backgroundColor: PALETTE.neutral[1],
         paddingVertical: 10,
@@ -289,32 +133,17 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         fontSize: 14,
     },
-    loadingMoreIndicator: {
-        marginTop: 10,
+
+    hiddenShadowWithBorder: {
+        shadowOpacity: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: PALETTE.neutral[2],
     },
-    bottomBarContainer: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: PALETTE.neutral[1],
-        paddingHorizontal: 25,
-        borderTopWidth: 1,
-        borderColor: PALETTE.neutral[2],
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    bottomBarText: {
-        paddingTop: 20,
-        paddingBottom: 5,
-        fontWeight: '500',
-    },
-    removeText: {
-        color: DELETE_COLOR,
-    },
-    addToCollectionText: {
-        fontWeight: '400',
+    headerIcon: {
+        flexBasis: 24,
+        flexGrow: 0,
+        flexShrink: 0,
+        flex: 1,
     },
 });
 

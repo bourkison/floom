@@ -42,7 +42,7 @@ type SavedContextType = {
     addSavesToCollection: (
         savesToUpdate: Database['public']['Views']['v_saves']['Row'][],
         collectionId: number,
-    ) => void;
+    ) => Promise<void>;
 
     sliceSaves: () => void;
 

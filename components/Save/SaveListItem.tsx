@@ -34,6 +34,7 @@ type SaveListItemProps = {
     selectable: boolean;
     onSelect: (product: Database['public']['Views']['v_saves']['Row']) => void;
     selectedProducts: Database['public']['Views']['v_saves']['Row'][];
+    animationsEnabled: boolean;
 };
 
 const IMAGE_WIDTH_RATIO = 0.25;
@@ -50,6 +51,7 @@ const SaveListItem = ({
     selectable,
     onSelect,
     selectedProducts,
+    animationsEnabled,
 }: SaveListItemProps) => {
     const {width} = useWindowDimensions();
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
@@ -110,7 +112,7 @@ const SaveListItem = ({
     }, [save, selectedProducts]);
 
     return (
-        <Animated.View exiting={FadeOutUp}>
+        <Animated.View exiting={animationsEnabled ? FadeOutUp : undefined}>
             <TouchableHighlight
                 onPress={onPress}
                 underlayColor={TOUCHABLE_UNDERLAY}
@@ -119,12 +121,20 @@ const SaveListItem = ({
                     {selectable && (
                         <Animated.View
                             style={styles.selectedContainerContainer}
-                            entering={FadeInLeft.duration(
-                                SELECTABLE_ANIMATION_DURATION,
-                            )}
-                            exiting={FadeOutLeft.duration(
-                                SELECTABLE_ANIMATION_DURATION,
-                            )}>
+                            entering={
+                                animationsEnabled
+                                    ? FadeInLeft.duration(
+                                          SELECTABLE_ANIMATION_DURATION,
+                                      )
+                                    : undefined
+                            }
+                            exiting={
+                                animationsEnabled
+                                    ? FadeOutLeft.duration(
+                                          SELECTABLE_ANIMATION_DURATION,
+                                      )
+                                    : undefined
+                            }>
                             <View style={styles.selectedContainer}>
                                 <View
                                     style={[
@@ -146,7 +156,11 @@ const SaveListItem = ({
                     )}
 
                     <Animated.View
-                        layout={Layout.duration(SELECTABLE_ANIMATION_DURATION)}
+                        layout={
+                            animationsEnabled
+                                ? Layout.duration(SELECTABLE_ANIMATION_DURATION)
+                                : undefined
+                        }
                         style={styles.imageContentContainer}>
                         <View style={styles.imageContainer}>
                             <Image
@@ -204,12 +218,20 @@ const SaveListItem = ({
                             {!selectable && (
                                 <Animated.View
                                     style={styles.buttonsContainer}
-                                    exiting={FadeOut.duration(
-                                        SELECTABLE_ANIMATION_DURATION,
-                                    )}
-                                    entering={FadeIn.duration(
-                                        SELECTABLE_ANIMATION_DURATION,
-                                    )}>
+                                    exiting={
+                                        animationsEnabled
+                                            ? FadeOut.duration(
+                                                  SELECTABLE_ANIMATION_DURATION,
+                                              )
+                                            : undefined
+                                    }
+                                    entering={
+                                        animationsEnabled
+                                            ? FadeIn.duration(
+                                                  SELECTABLE_ANIMATION_DURATION,
+                                              )
+                                            : undefined
+                                    }>
                                     <AnimatedButton
                                         style={styles.deleteButton}
                                         onPress={() =>
