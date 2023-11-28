@@ -36,9 +36,7 @@ export type MainStackParamList = {
     };
     Options: undefined;
     ProductView: {
-        product: Database['public']['Views']['v_products']['Row'];
-        reference: 'swipe' | 'saved' | 'deleted' | 'featured';
-        imageIndex?: number;
+        product: Database['public']['Views']['v_products']['Row'] | number;
     };
     SavedProducts: undefined;
 };
@@ -110,8 +108,7 @@ export default function Navigator() {
                                 component={ProductView}
                                 options={{
                                     cardStyleInterpolator:
-                                        CardStyleInterpolators.forModalPresentationIOS,
-                                    presentation: 'modal',
+                                        CardStyleInterpolators.forVerticalIOS,
                                     gestureDirection: 'vertical',
                                     headerShown: false,
                                     gestureEnabled: true,

@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
     FlatList,
 } from 'react-native';
+import {useSharedValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import SaveListItem from '@/components/Save/SaveListItem';
@@ -32,6 +33,8 @@ const CollectionNew = ({
     const [selectedProducts, setSelectedProducts] = useState<
         Database['public']['Views']['v_saves']['Row'][]
     >([]);
+
+    const animationsEnabled = useSharedValue(true);
 
     const {bottom} = useSafeAreaInsets();
 
@@ -140,6 +143,7 @@ const CollectionNew = ({
                 }
                 renderItem={({item}) => (
                     <SaveListItem
+                        animationsEnabled={animationsEnabled}
                         selectable
                         save={item}
                         onSelect={productSelected}
