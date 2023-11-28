@@ -2,6 +2,7 @@ import {AntDesign, Feather} from '@expo/vector-icons';
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Pressable, Text, TouchableOpacity} from 'react-native';
+import {useSharedValue} from 'react-native-reanimated';
 
 import CollapsibleSection from '@/components/Save/CollapsibleSection';
 import CollectionListItem from '@/components/Save/CollectionListItem';
@@ -20,7 +21,8 @@ const SavedHome = ({
 }: StackScreenProps<SavedStackParamList, 'SavedHome'>) => {
     const [activeTabIndex, setActiveTabIndex] = useState(0);
     const [savesSelectable, setSavesSelectable] = useState(false);
-    const [animationsEnabled, setAnimationsEnabled] = useState(false);
+    const animationsEnabled = useSharedValue(false);
+    // const [animationsEnabled, setAnimationsEnabled] = useState(false);
 
     const {
         initFetchCollections,
@@ -78,7 +80,7 @@ const SavedHome = ({
             </HeaderTemplate>
             <Tabs
                 onTabChange={toIndex => {
-                    setAnimationsEnabled(false);
+                    animationsEnabled.value = false;
                     setActiveTabIndex(toIndex);
                 }}
                 activeTabIndex={activeTabIndex}
@@ -90,7 +92,6 @@ const SavedHome = ({
                                 savesSelectable={savesSelectable}
                                 setSavesSelectable={setSavesSelectable}
                                 animationsEnabled={animationsEnabled}
-                                setAnimationsEnabled={setAnimationsEnabled}
                             />
                         ),
                     },

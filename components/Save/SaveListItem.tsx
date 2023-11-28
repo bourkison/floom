@@ -19,6 +19,8 @@ import Animated, {
     FadeOutLeft,
     FadeOutUp,
     Layout,
+    SharedValue,
+    LayoutAnimation,
 } from 'react-native-reanimated';
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
@@ -34,7 +36,7 @@ type SaveListItemProps = {
     selectable: boolean;
     onSelect: (product: Database['public']['Views']['v_saves']['Row']) => void;
     selectedProducts: Database['public']['Views']['v_saves']['Row'][];
-    animationsEnabled: boolean;
+    animationsEnabled: SharedValue<boolean>;
 };
 
 const IMAGE_WIDTH_RATIO = 0.25;
@@ -45,6 +47,11 @@ const TOUCHABLE_ACTIVE_OPACITY = 0.7;
 const RADIO_DIAMETER = 20;
 
 const SELECTABLE_ANIMATION_DURATION = 200;
+
+const fadeOut = new FadeOut().build();
+const fadeOutUp = new FadeOutUp().build();
+
+const fadeIn = new FadeIn().build();
 
 const SaveListItem = ({
     save,
@@ -111,8 +118,59 @@ const SaveListItem = ({
         return false;
     }, [save, selectedProducts]);
 
+    const ContainerExitAnimation = (values: any): LayoutAnimation => {
+        'worklet';
+
+        if (animationsEnabled.value) {
+            return fadeOutUp(values);
+        }
+
+        return {
+            initialValues: {
+                opacity: 1,
+            },
+            animations: {
+                opacity: 0,
+            },
+        };
+    };
+
+    const ButtonsContainerExitAnimation = (values: any): LayoutAnimation => {
+        'worklet';
+
+        if (animationsEnabled.value) {
+            return fadeOut(values);
+        }
+
+        return {
+            initialValues: {
+                opacity: 1,
+            },
+            animations: {
+                opacity: 0,
+            },
+        };
+    };
+
+    const ButtonsContainerEntryAnimation = (values: any): LayoutAnimation => {
+        'worklet';
+
+        if (animationsEnabled.value) {
+            return fadeIn(values);
+        }
+
+        return {
+            initialValues: {
+                opacity: 1,
+            },
+            animations: {
+                opacity: 1,
+            },
+        };
+    };
+
     return (
-        <Animated.View exiting={animationsEnabled ? FadeOutUp : undefined}>
+        <Animated.View exiting={ContainerExitAnimation}>
             <TouchableHighlight
                 onPress={onPress}
                 underlayColor={TOUCHABLE_UNDERLAY}
@@ -156,11 +214,7 @@ const SaveListItem = ({
                     )}
 
                     <Animated.View
-                        layout={
-                            animationsEnabled
-                                ? Layout.duration(SELECTABLE_ANIMATION_DURATION)
-                                : undefined
-                        }
+                        layout={Layout.duration(SELECTABLE_ANIMATION_DURATION)}
                         style={styles.imageContentContainer}>
                         <View style={styles.imageContainer}>
                             <Image
@@ -218,20 +272,8 @@ const SaveListItem = ({
                             {!selectable && (
                                 <Animated.View
                                     style={styles.buttonsContainer}
-                                    exiting={
-                                        animationsEnabled
-                                            ? FadeOut.duration(
-                                                  SELECTABLE_ANIMATION_DURATION,
-                                              )
-                                            : undefined
-                                    }
-                                    entering={
-                                        animationsEnabled
-                                            ? FadeIn.duration(
-                                                  SELECTABLE_ANIMATION_DURATION,
-                                              )
-                                            : undefined
-                                    }>
+                                    exiting={ButtonsContainerExitAnimation}
+                                    entering={ButtonsContainerEntryAnimation}>
                                     <AnimatedButton
                                         style={styles.deleteButton}
                                         onPress={() =>

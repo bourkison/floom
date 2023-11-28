@@ -11,6 +11,7 @@ import Animated, {
     FadeInDown,
     FadeOutDown,
     Layout,
+    SharedValue,
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -29,15 +30,13 @@ import {Database} from '@/types/schema';
 type SavedListProps = {
     savesSelectable: boolean;
     setSavesSelectable: (s: boolean) => void;
-    animationsEnabled: boolean;
-    setAnimationsEnabled: (enabled: boolean) => void;
+    animationsEnabled: SharedValue<boolean>;
 };
 
 const SavedList = ({
     savesSelectable,
     setSavesSelectable,
     animationsEnabled,
-    setAnimationsEnabled,
 }: SavedListProps) => {
     const [searchText, setSearchText] = useState('');
     const [selectedProducts, setSelectedProducts] = useState<
@@ -45,8 +44,8 @@ const SavedList = ({
     >([]);
 
     useLayoutEffect(() => {
-        setAnimationsEnabled(true);
-    }, [setAnimationsEnabled]);
+        animationsEnabled.value = true;
+    }, [animationsEnabled]);
 
     const {fetchSaves, saves, loadingSavesState, deleteSavedProducts} =
         useSharedSavedContext();
@@ -96,9 +95,7 @@ const SavedList = ({
                 <Animated.FlatList
                     keyboardDismissMode="on-drag"
                     keyboardShouldPersistTaps="never"
-                    itemLayoutAnimation={
-                        animationsEnabled ? Layout.duration(300) : undefined
-                    }
+                    itemLayoutAnimation={Layout.duration(300)}
                     refreshControl={
                         <RefreshControl
                             onRefresh={refresh}
@@ -153,8 +150,8 @@ const SavedList = ({
 
             {savesSelectable && (
                 <Animated.View
-                    entering={animationsEnabled ? FadeInDown : undefined}
-                    exiting={animationsEnabled ? FadeOutDown : undefined}
+                    entering={FadeInDown}
+                    exiting={FadeOutDown}
                     style={[
                         styles.bottomBarContainer,
                         {paddingBottom: bottom},
