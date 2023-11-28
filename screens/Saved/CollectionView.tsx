@@ -1,6 +1,7 @@
 import {StackScreenProps} from '@react-navigation/stack';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useMemo, useState} from 'react';
 import {View, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
+import {useSharedValue} from 'react-native-reanimated';
 
 import SaveListItem from '@/components/Save/SaveListItem';
 import SearchInput from '@/components/Utility/SearchInput';
@@ -17,6 +18,11 @@ const CollectionView = ({
     const [products, setProducts] = useState<
         Database['public']['Views']['v_saves']['Row'][]
     >([]);
+    const animationsEnabled = useSharedValue(false);
+
+    useLayoutEffect(() => {
+        animationsEnabled.value = true;
+    });
 
     const {collections} = useSharedSavedContext();
 
@@ -65,6 +71,7 @@ const CollectionView = ({
                     showsVerticalScrollIndicator={false}>
                     {filteredProducts.map(product => (
                         <SaveListItem
+                            animationsEnabled={animationsEnabled}
                             save={product}
                             key={product.id}
                             selectable={false}

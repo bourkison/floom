@@ -4,8 +4,7 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, Pressable, Text, TouchableOpacity} from 'react-native';
 import {useSharedValue} from 'react-native-reanimated';
 
-import CollapsibleSection from '@/components/Save/CollapsibleSection';
-import CollectionListItem from '@/components/Save/CollectionListItem';
+import CollectionList from '@/components/Save/CollectionList';
 import SavedList from '@/components/Save/SavedList';
 import Tabs from '@/components/Utility/Tabs';
 import {PALETTE} from '@/constants';
@@ -25,18 +24,15 @@ const SavedHome = ({
     // const [animationsEnabled, setAnimationsEnabled] = useState(false);
 
     const {
-        initFetchCollections,
+        fetchCollections,
         fetchSaves,
-        collections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
-        setCollectionsExpanded,
-        collectionsExpanded,
     } = useSharedSavedContext();
 
     useEffect(() => {
         if (!hasInitiallyLoadedCollections) {
-            initFetchCollections();
+            fetchCollections('initial');
         }
 
         if (!hasInitiallyLoadedSaves) {
@@ -44,7 +40,7 @@ const SavedHome = ({
         }
     }, [
         fetchSaves,
-        initFetchCollections,
+        fetchCollections,
         hasInitiallyLoadedSaves,
         hasInitiallyLoadedCollections,
     ]);
@@ -84,12 +80,13 @@ const SavedHome = ({
             <Tabs
                 onTabChange={toIndex => {
                     animationsEnabled.value = false;
+                    setSavesSelectable(false);
                     setActiveTabIndex(toIndex);
                 }}
                 activeTabIndex={activeTabIndex}
                 pages={[
                     {
-                        header: 'Saves',
+                        header: 'Saved Items',
                         content: (
                             <SavedList
                                 savesSelectable={savesSelectable}
@@ -100,21 +97,7 @@ const SavedHome = ({
                     },
                     {
                         header: 'Collections',
-                        content: (
-                            <CollapsibleSection
-                                headerText="Collections"
-                                onHeaderPress={() =>
-                                    setCollectionsExpanded(!collectionsExpanded)
-                                }
-                                expanded={collectionsExpanded}>
-                                {collections.map(collection => (
-                                    <CollectionListItem
-                                        collection={collection}
-                                        key={collection.id}
-                                    />
-                                ))}
-                            </CollapsibleSection>
-                        ),
+                        content: <CollectionList />,
                     },
                 ]}
             />

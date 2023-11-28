@@ -21,8 +21,10 @@ const MAX_STORED_SAVED_PRODUCTS = 50;
 const SavedProvider = ({children}: SavedProviderProps) => {
     const [loadingSavesState, setLoadingSavesState] =
         useState<LoadingState>('idle');
+    const [loadingCollectionsState, setLoadingCollectionsState] =
+        useState<LoadingState>('idle');
 
-    const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+    // const [isLoadingCollections, setIsLoadingCollections] = useState(false);
 
     const [hasInitiallyLoadedSaves, setHasInitiallyLoadedSaves] =
         useState(false);
@@ -116,66 +118,80 @@ const SavedProvider = ({children}: SavedProviderProps) => {
         [saves, loadingSavesState],
     );
 
-    const initFetchCollections = useCallback(async () => {
-        setIsLoadingCollections(true);
-        setHasInitiallyLoadedCollections(true);
-
-        const {data: collData, error: collError} = await supabase
-            .from('collections')
-            .select()
-            .order('created_at', {ascending: false});
-
-        if (collError) {
-            console.error('coll error', collError);
-            setIsLoadingCollections(false);
-            throw new Error(collError.message);
-        }
-
-        const promises: Promise<CollectionType>[] = [];
-
-        collData.forEach(collection => {
-            promises.push(
-                new Promise(async (resolve, reject) => {
-                    const {
-                        data: saveData,
-                        error: saveError,
-                        count,
-                    } = await supabase
-                        .from('v_saves')
-                        .select('*', {count: 'exact'})
-                        .eq('collection_id', collection.id)
-                        .order('updated_at', {ascending: false})
-                        .limit(1);
-
-                    if (saveError) {
-                        return reject(saveError);
-                    }
-
-                    resolve({
-                        id: collection.id,
-                        name: collection.name,
-                        imageUrls: [saveData[0]?.images[0] || ''],
-                        productsAmount: count || 0,
-                    });
-                }),
-            );
-        });
-
-        const response = await Promise.allSettled(promises);
-        const tempCollections: CollectionType[] = [];
-
-        response.forEach(r => {
-            if (r.status === 'rejected') {
-                console.error('SAVES ERROR:', r.reason);
+    const fetchCollections = useCallback(
+        async (type: FetchType = 'initial') => {
+            if (type === 'loadMore') {
+                console.warn('Called fetchCollections with loadMore');
                 return;
             }
 
-            tempCollections.push(r.value);
-        });
+            setHasInitiallyLoadedCollections(true);
 
-        setIsLoadingCollections(false);
-        setCollections(tempCollections);
-    }, []);
+            if (type === 'initial') {
+                setCollections([]);
+                setLoadingCollectionsState('load');
+            } else if (type === 'refresh') {
+                setLoadingCollectionsState('refresh');
+            }
+
+            const {data: collData, error: collError} = await supabase
+                .from('collections')
+                .select()
+                .order('created_at', {ascending: false});
+
+            if (collError) {
+                console.error('coll error', collError);
+                setLoadingCollectionsState('idle');
+                throw new Error(collError.message);
+            }
+
+            const promises: Promise<CollectionType>[] = [];
+
+            collData.forEach(collection => {
+                promises.push(
+                    new Promise(async (resolve, reject) => {
+                        const {
+                            data: saveData,
+                            error: saveError,
+                            count,
+                        } = await supabase
+                            .from('v_saves')
+                            .select('*', {count: 'exact'})
+                            .eq('collection_id', collection.id)
+                            .order('updated_at', {ascending: false})
+                            .limit(1);
+
+                        if (saveError) {
+                            return reject(saveError);
+                        }
+
+                        resolve({
+                            id: collection.id,
+                            name: collection.name,
+                            imageUrls: [saveData[0]?.images[0] || ''],
+                            productsAmount: count || 0,
+                        });
+                    }),
+                );
+            });
+
+            const response = await Promise.allSettled(promises);
+            const tempCollections: CollectionType[] = [];
+
+            response.forEach(r => {
+                if (r.status === 'rejected') {
+                    console.error('SAVES ERROR:', r.reason);
+                    return;
+                }
+
+                tempCollections.push(r.value);
+            });
+
+            setLoadingCollectionsState('idle');
+            setCollections(tempCollections);
+        },
+        [],
+    );
 
     const deleteSavedProductsLocally = useCallback(
         (savesToDelete: {id: number; collectionId: number | null}[]) => {
@@ -362,8 +378,8 @@ const SavedProvider = ({children}: SavedProviderProps) => {
                 collections,
                 fetchSaves,
                 saves,
-                initFetchCollections,
-                isLoadingCollections,
+                fetchCollections,
+                loadingCollectionsState,
                 saveProduct,
                 deleteSavedProducts,
                 hasInitiallyLoadedSaves,

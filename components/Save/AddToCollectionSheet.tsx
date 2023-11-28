@@ -47,7 +47,7 @@ const AddToCollectionBottomSheet = ({
     const {closeBottomSheet} = useBottomSheetContext();
     const {
         hasInitiallyLoadedCollections,
-        initFetchCollections,
+        fetchCollections,
         collections,
         addSavesToCollection,
         createCollection,
@@ -56,15 +56,16 @@ const AddToCollectionBottomSheet = ({
     const {bottom} = useSafeAreaInsets();
 
     useEffect(() => {
-        const fetchCollections = async () => {
+        const fetch = async () => {
             setIsLoadingCollections(true);
-            await initFetchCollections();
+            await fetchCollections('initial');
             setIsLoadingCollections(false);
         };
+
         if (!hasInitiallyLoadedCollections) {
-            fetchCollections();
+            fetch();
         }
-    }, [hasInitiallyLoadedCollections, initFetchCollections]);
+    }, [hasInitiallyLoadedCollections, fetchCollections]);
 
     const create = async () => {
         setIsCreating(true);
@@ -119,7 +120,10 @@ const AddToCollectionBottomSheet = ({
                     exiting={SlideOutLeft}>
                     {!isLoadingCollections ? (
                         <ScrollView
-                            style={styles.contentContainer}
+                            style={[
+                                styles.contentContainer,
+                                {paddingBottom: bottom},
+                            ]}
                             contentContainerStyle={{paddingBottom: bottom}}>
                             {collections.map(collection => (
                                 <CollectionListItemSmall

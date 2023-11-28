@@ -21,7 +21,7 @@ type SavedContextType = {
     collections: CollectionType[];
     saves: Database['public']['Views']['v_saves']['Row'][];
     fetchSaves: (loadAmount: number, type?: FetchType) => Promise<void>;
-    initFetchCollections: () => Promise<void>;
+    fetchCollections: (type?: FetchType) => Promise<void>;
 
     saveProduct: (
         product: Database['public']['Views']['v_products']['Row'],
@@ -31,8 +31,7 @@ type SavedContextType = {
     ) => Promise<void>;
 
     loadingSavesState: LoadingState;
-
-    isLoadingCollections: boolean;
+    loadingCollectionsState: LoadingState;
 
     hasInitiallyLoadedSaves: boolean;
     hasInitiallyLoadedCollections: boolean;
