@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useMemo, useState} from 'react';
 import {
     View,
@@ -12,6 +13,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {IMAGE_RATIO, PALETTE} from '@/constants';
 import {supabase} from '@/services/supabase';
+import {RootStackScreenProps} from '@/types/nav';
 import {Database} from '@/types/schema';
 
 const ITEMS_PER_SCREEN_WIDTH = 2.9;
@@ -43,6 +45,8 @@ const RelatedProducts = () => {
     }, []);
 
     const {width} = useWindowDimensions();
+    const navigation =
+        useNavigation<RootStackScreenProps<'ProductView'>['navigation']>();
 
     const itemWidth = useMemo(() => width / ITEMS_PER_SCREEN_WIDTH, [width]);
     const itemHeight = useMemo(() => itemWidth / IMAGE_RATIO, [itemWidth]);
@@ -59,6 +63,9 @@ const RelatedProducts = () => {
                         {products.map(product => (
                             <TouchableOpacity
                                 key={product.id}
+                                onPress={() =>
+                                    navigation.push('ProductView', {product})
+                                }
                                 style={styles.relatedProductContainer}>
                                 <Image
                                     style={{
