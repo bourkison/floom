@@ -1,10 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {PALETTE} from '@/constants';
-import {MainStackParamList} from '@/nav/Navigator';
 
 export const FILTERS_HEIGHT = 44;
 
@@ -13,10 +11,10 @@ type SortFilterProps = {
 };
 
 const SortFilter = (_: SortFilterProps) => {
-    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+    const navigation = useNavigation();
 
     const expandFilters = () => {
-        navigation.navigate('Filters');
+        navigation.navigate('Filters', {screen: 'FiltersHome'});
     };
 
     return (

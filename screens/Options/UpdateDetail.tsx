@@ -6,7 +6,7 @@ import DeleteAccountWidget from '@/components/Options/DeleteAccountWidget';
 import UpdatePasswordWidget from '@/components/Options/UpdatePasswordWidget';
 import SectionHeader from '@/components/Utility/SectionHeader';
 import {PALETTE} from '@/constants';
-import {OptionsStackParamList} from '@/nav/OptionsNavigator';
+import {OptionsStackParamList} from '@/nav/types';
 import {useAppSelector} from '@/store/hooks';
 
 const UpdateDetail: React.FC<

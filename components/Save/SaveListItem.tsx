@@ -1,6 +1,5 @@
 import {Ionicons, SimpleLineIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import * as WebBrowser from 'expo-web-browser';
 import React, {useMemo} from 'react';
 import {
@@ -27,7 +26,6 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 import BrandLogo from '@/components/Utility/BrandLogo';
 import {BUY_TEXT, IMAGE_RATIO, PALETTE, SAVE_COLOR} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
-import {MainStackParamList} from '@/nav/Navigator';
 import {formatPrice} from '@/services';
 import {Database} from '@/types/schema';
 
@@ -67,7 +65,7 @@ const SaveListItem = ({
 
     const {deleteSavedProducts} = useSharedSavedContext();
 
-    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+    const navigation = useNavigation();
 
     const buyProduct = async () => {
         await WebBrowser.openBrowserAsync(save.link);
@@ -80,7 +78,6 @@ const SaveListItem = ({
         }
 
         navigation.navigate('ProductView', {
-            reference: 'saved',
             product: {
                 brand: save.brand,
                 brand_id: save.brand_id,

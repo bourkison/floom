@@ -3,24 +3,16 @@ import React from 'react';
 
 import {useSharedSavedContext} from '@/context/saved';
 import {CollectionViewHeader} from '@/nav/Headers';
-import {MainStackParamList} from '@/nav/Navigator';
+import {RootStackParamList, SavedStackParamList} from '@/nav/types';
 import CollectionNew from '@/screens/Saved/CollectionNew';
 import CollectionView from '@/screens/Saved/CollectionView';
 import SavedHome from '@/screens/Saved/SavedHome';
-
-export type SavedStackParamList = {
-    SavedHome: undefined;
-    CollectionView: {
-        collectionId: number;
-    };
-    CollectionNew: undefined;
-};
 
 const SavedStack = createStackNavigator<SavedStackParamList>();
 
 const SavedNavigator = ({
     navigation,
-}: StackScreenProps<MainStackParamList, 'SavedProducts'>) => {
+}: StackScreenProps<RootStackParamList, 'SavedProducts'>) => {
     const {sliceSaves} = useSharedSavedContext();
 
     navigation.addListener('beforeRemove', sliceSaves);

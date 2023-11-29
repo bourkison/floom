@@ -12,7 +12,7 @@ import {
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
-import {AuthStackParamList} from '@/nav/Navigator';
+import {RootStackParamList} from '@/nav/types';
 import {supabase} from '@/services/supabase';
 import {useAppDispatch} from '@/store/hooks';
 import {login} from '@/store/slices/user';
@@ -24,7 +24,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const navigation = useNavigation<StackNavigationProp<AuthStackParamList>>();
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
     const supabaseLogin = async () => {
         setIsLoading(true);

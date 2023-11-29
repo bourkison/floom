@@ -9,21 +9,13 @@ import {
     GenderHeader,
     PriceHeader,
 } from '@/nav/Headers';
+import {FiltersStackParamList} from '@/nav/types';
 import Brand from '@/screens/Filters/Brand';
 import Category from '@/screens/Filters/Category';
 import Color from '@/screens/Filters/Color';
 import FiltersHome from '@/screens/Filters/FiltersHome';
 import Gender from '@/screens/Filters/Gender';
 import Price from '@/screens/Filters/Price';
-
-export type FiltersStackParamList = {
-    FiltersHome: undefined;
-    Brand: undefined;
-    Color: undefined;
-    Category: undefined;
-    Gender: undefined;
-    Price: undefined;
-};
 
 const FiltersStack = createStackNavigator<FiltersStackParamList>();
 

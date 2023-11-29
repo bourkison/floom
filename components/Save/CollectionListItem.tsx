@@ -1,6 +1,5 @@
 import {SimpleLineIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import React from 'react';
 import {
     View,
@@ -14,7 +13,6 @@ import {
 
 import {IMAGE_RATIO, PALETTE} from '@/constants';
 import {CollectionType} from '@/context/saved';
-import {SavedStackParamList} from '@/nav/SavedNavigator';
 
 type CollectionListItemProps = {
     collection: CollectionType;
@@ -29,12 +27,12 @@ const CollectionListItem = ({collection}: CollectionListItemProps) => {
     const {width} = useWindowDimensions();
     const IMAGE_WIDTH = width * IMAGE_WIDTH_RATIO;
 
-    const navigation =
-        useNavigation<StackNavigationProp<SavedStackParamList, 'SavedHome'>>();
+    const navigation = useNavigation();
 
     const navigateTo = () => {
-        navigation.navigate('CollectionView', {
-            collectionId: collection.id,
+        navigation.navigate('SavedProducts', {
+            screen: 'CollectionView',
+            params: {collectionId: collection.id},
         });
     };
 

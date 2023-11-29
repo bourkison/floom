@@ -13,12 +13,13 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import RelatedProducts from '@/components/Product/RelatedProducts';
 import AddToCollectionBottomSheet from '@/components/Save/AddToCollectionSheet';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import ImageCarousel from '@/components/Utility/ImageCarousel';
 import {IMAGE_RATIO, PALETTE, SAVE_COLOR} from '@/constants';
 import {useBottomSheetContext} from '@/context/BottomSheet';
-import {MainStackParamList} from '@/nav/Navigator';
+import {RootStackParamList} from '@/nav/types';
 import {formatPrice} from '@/services';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
@@ -28,13 +29,13 @@ const HEADER_BAR_ICON_SIZE = 22;
 const ProductView = ({
     route,
     navigation,
-}: StackScreenProps<MainStackParamList, 'ProductView'>) => {
+}: StackScreenProps<RootStackParamList, 'ProductView'>) => {
     const {width} = useWindowDimensions();
     const [isLoading, setIsLoading] = useState(false);
     const [product, setProduct] =
         useState<Database['public']['Views']['v_products']['Row']>();
 
-    const {top} = useSafeAreaInsets();
+    const {top, bottom} = useSafeAreaInsets();
     const {openBottomSheet} = useBottomSheetContext();
 
     useEffect(() => {
@@ -111,7 +112,7 @@ const ProductView = ({
                     />
                 </View>
             </View>
-            <ScrollView>
+            <ScrollView contentContainerStyle={{paddingBottom: bottom}}>
                 <View style={styles.imageContainer}>
                     <ImageCarousel
                         images={product.images}
@@ -207,6 +208,9 @@ const ProductView = ({
                             {product.description}
                         </Text>
                     </View>
+                </View>
+                <View style={styles.relatedProductsContainer}>
+                    <RelatedProducts />
                 </View>
             </ScrollView>
         </View>
@@ -343,6 +347,9 @@ const styles = StyleSheet.create({
         fontWeight: '300',
         fontSize: 12,
         marginTop: 4,
+    },
+    relatedProductsContainer: {
+        marginTop: 40,
     },
 });
 

@@ -1,5 +1,4 @@
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import {LinearGradient} from 'expo-linear-gradient';
 import React, {useState, useEffect} from 'react';
 import {
@@ -26,7 +25,7 @@ import {
     PALETTE,
     IMAGE_ANIMATED_AMOUNT,
 } from '@/constants';
-import {MainStackParamList} from '@/nav/Navigator';
+import {RootStackParamList} from '@/nav/types';
 import {capitaliseString, formatPrice} from '@/services';
 import {Database} from '@/types/schema';
 
@@ -36,8 +35,8 @@ type ProductComponentProps = {
 };
 
 const Product: React.FC<ProductComponentProps> = ({product, index}) => {
-    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
-    const route = useRoute<RouteProp<MainStackParamList, 'Home'>>();
+    const navigation = useNavigation();
+    const route = useRoute<RouteProp<RootStackParamList, 'Home'>>();
 
     const {width} = useWindowDimensions();
 

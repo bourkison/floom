@@ -13,13 +13,13 @@ import {
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
-import {AuthStackParamList} from '@/nav/Navigator';
+import {RootStackParamList} from '@/nav/types';
 
 // Video found here: https://www.pexels.com/video/a-woman-sitting-on-the-chair-8400304/
 
 const HomeAuth = ({
     navigation,
-}: StackScreenProps<AuthStackParamList, 'HomeAuth'>) => {
+}: StackScreenProps<RootStackParamList, 'HomeAuth'>) => {
     const {height} = useWindowDimensions();
     const VideoRef = useRef<Video>(null);
 

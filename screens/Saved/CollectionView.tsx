@@ -6,7 +6,7 @@ import {useSharedValue} from 'react-native-reanimated';
 import SaveListItem from '@/components/Save/SaveListItem';
 import SearchInput from '@/components/Utility/SearchInput';
 import {useSharedSavedContext} from '@/context/saved';
-import {SavedStackParamList} from '@/nav/SavedNavigator';
+import {SavedStackParamList} from '@/nav/types';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
 

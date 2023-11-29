@@ -1,5 +1,4 @@
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import * as Haptics from 'expo-haptics';
 import * as WebBrowser from 'expo-web-browser';
 import React, {useCallback, useEffect, useMemo} from 'react';
@@ -33,7 +32,6 @@ import {ACTION_THRESHOLD, OVERLAY_PERCENTAGE} from '@/constants/animations';
 import {useAnimatedProductContext} from '@/context/animated';
 import {useDeletedContext} from '@/context/deleted';
 import {useSharedSavedContext} from '@/context/saved';
-import {MainStackParamList} from '@/nav/Navigator';
 import {Database} from '@/types/schema';
 
 type AnimatedProductProps = {
@@ -70,7 +68,7 @@ const AnimatedProduct = ({
     const {deleteProduct} = useDeletedContext();
 
     const {width} = useWindowDimensions();
-    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+    const navigation = useNavigation();
 
     useEffect(() => {
         runOnUI(reset)(false);
@@ -185,8 +183,6 @@ const AnimatedProduct = ({
 
         navigation.navigate('ProductView', {
             product,
-            imageIndex,
-            reference: 'swipe',
         });
     };
 

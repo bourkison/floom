@@ -3,10 +3,9 @@ import React from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 
 import LoginForm from '@/components/User/LoginForm';
-import {AuthStackParamList} from '@/nav/Navigator';
+import {RootStackParamList} from '@/nav/types';
 
-// eslint-disable-next-line no-empty-pattern
-const Login = ({}: StackScreenProps<AuthStackParamList, 'Login'>) => {
+const Login = (_: StackScreenProps<RootStackParamList, 'Login'>) => {
     return (
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.formCont}>

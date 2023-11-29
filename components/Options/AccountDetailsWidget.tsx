@@ -6,7 +6,7 @@ import React from 'react';
 import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
 
 import {GENDER_OPTIONS, PALETTE} from '@/constants';
-import {OptionsStackParamList} from '@/nav/OptionsNavigator';
+import {OptionsStackParamList} from '@/nav/types';
 import {useAppSelector} from '@/store/hooks';
 
 type OptionProps = {

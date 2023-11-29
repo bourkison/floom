@@ -14,10 +14,10 @@ import {
     FEATURED_PRODUCT_SIZE,
 } from '@/constants';
 import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
-import {MainStackParamList} from '@/nav/Navigator';
+import {RootStackParamList} from '@/nav/types';
 import {useAppSelector} from '@/store/hooks';
 
-const Home = (_: StackScreenProps<MainStackParamList, 'Home'>) => {
+const Home = (_: StackScreenProps<RootStackParamList, 'Home'>) => {
     const {width, height} = useWindowDimensions();
 
     const isLoading = useAppSelector(state => state.product.unsaved.isLoading);

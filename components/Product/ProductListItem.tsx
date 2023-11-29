@@ -1,5 +1,4 @@
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import * as Haptics from 'expo-haptics';
 import * as WebBrowser from 'expo-web-browser';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -25,7 +24,6 @@ import Animated, {
 import BrandLogo from '@/components/Utility/BrandLogo';
 import {BUY_COLOR, PALETTE, SAVE_COLOR, SAVE_TEXT, BUY_TEXT} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
-import {MainStackParamList} from '@/nav/Navigator';
 import {capitaliseString, formatPrice} from '@/services';
 import {Database} from '@/types/schema';
 
@@ -41,12 +39,12 @@ export type ProductListItemProps = {
 export const PRODUCT_LIST_ITEM_HEIGHT = 108;
 const ACTION_THRESHOLD = 0.4;
 
-const ProductListItem: React.FC<ProductListItemProps> = ({
+const ProductListItem = ({
     product,
     index,
     type,
     onDelete,
-}) => {
+}: ProductListItemProps) => {
     const contextX = useSharedValue(0);
     const offsetX = useSharedValue(0);
     const rightSwipeOpacity = useSharedValue(0);
@@ -62,7 +60,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     const [imageContSize, setImageContSize] = useState(1);
     const [imageSize, setImageSize] = useState({width: 0, height: 0});
 
-    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+    const navigation = useNavigation();
 
     const {saveProduct} = useSharedSavedContext();
 
@@ -133,9 +131,8 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     const navigateToProduct = useCallback(() => {
         navigation.navigate('ProductView', {
             product,
-            reference: type,
         });
-    }, [navigation, product, type]);
+    }, [navigation, product]);
 
     const panGesture = Gesture.Pan()
         .activeOffsetX([-10, 10])

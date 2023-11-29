@@ -12,13 +12,7 @@ import AppInfo from '@/screens/Options/AppInfo';
 import DeletedProducts from '@/screens/Options/DeletedProducts';
 import OptionsHome from '@/screens/Options/OptionsHome';
 import UpdateDetail from '@/screens/Options/UpdateDetail';
-
-export type OptionsStackParamList = {
-    OptionsHome: undefined;
-    DeletedProducts: undefined;
-    AppInfo: undefined;
-    UpdateDetail: undefined;
-};
+import {OptionsStackParamList} from './types';
 
 const OptionsStack = createStackNavigator<OptionsStackParamList>();
 

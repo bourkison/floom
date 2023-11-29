@@ -23,7 +23,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SetGender from '@/components/User/SetGender';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {MIN_AGE, PALETTE} from '@/constants';
-import {AuthStackParamList} from '@/nav/Navigator';
+import {RootStackParamList} from '@/nav/types';
 import {supabase} from '@/services/supabase';
 import {Gender} from '@/types';
 
@@ -61,7 +61,7 @@ const slideOutRightAnimation = new SlideOutRight()
 
 dayjs.extend(advancedFormat);
 
-const SignUp = ({route}: StackScreenProps<AuthStackParamList, 'SignUp'>) => {
+const SignUp = ({route}: StackScreenProps<RootStackParamList, 'SignUp'>) => {
     const [pageIndex, setPageIndex] = useState(route.params.startPageIndex);
     const transitionDirection = useSharedValue<'next' | 'previous' | ''>('');
 

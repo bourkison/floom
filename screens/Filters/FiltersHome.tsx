@@ -10,7 +10,7 @@ import {
 
 import ExcludeFilters from '@/components/Utility/ExcludeFilters';
 import {PALETTE} from '@/constants';
-import {FiltersStackParamList} from '@/nav/FiltersNavigator';
+import {FiltersStackParamList} from '@/nav/types';
 import {useAppSelector} from '@/store/hooks';
 
 const TOUCHABLE_UNDERLAY = PALETTE.neutral[2];

@@ -1,5 +1,4 @@
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import * as Haptics from 'expo-haptics';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
@@ -12,7 +11,6 @@ import {
 } from 'react-native';
 
 import {FEATURED_PRODUCT_SIZE, PALETTE} from '@/constants';
-import {MainStackParamList} from '@/nav/Navigator';
 import {capitaliseString, formatPrice} from '@/services';
 import {supabase} from '@/services/supabase';
 import {useAppSelector} from '@/store/hooks';
@@ -28,7 +26,7 @@ const FeaturedProduct = () => {
     const [type, setType] = useState<FeaturedProductType>('topliked');
     const [filter, setFilter] = useState<Gender>('male');
 
-    const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+    const navigation = useNavigation();
 
     const userGender = useAppSelector(
         state => state.user.userData?.gender || 'both',
@@ -87,7 +85,6 @@ const FeaturedProduct = () => {
         if (product) {
             navigation.navigate('ProductView', {
                 product,
-                reference: 'featured',
             });
         }
     };
