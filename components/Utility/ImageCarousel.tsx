@@ -1,14 +1,17 @@
 import React, {useState} from 'react';
-import {Image, StyleSheet} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
     Extrapolation,
     interpolate,
+    Easing,
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
+
+import ImageIndicator from '@/components/Utility/ImageIndicator';
 
 type ImageCarouselProps = {
     images: string[];
@@ -47,8 +50,6 @@ const ImageCarousel = ({images, width, height}: ImageCarouselProps) => {
             );
         })
         .onFinalize(e => {
-            console.log('VELOCITY', e.velocityX);
-
             let targetIndex = -1;
 
             // First check velocity to see if this is a flick.
@@ -61,25 +62,19 @@ const ImageCarousel = ({images, width, height}: ImageCarouselProps) => {
                 targetIndex = selectedImageIndex - 1;
             }
 
-            // TODO: All this might be completely unnecessary ???
-            // Duration appears to be around 150 - 200 most of the time anyway.
-            // Then run animation, maintaining velocity by calculating distance
-            // then using time = distance / speed to calculate animation duration.
             if (targetIndex > -1) {
                 const targetTranslationX = targetIndex * -width;
-                const distanceToTarget = targetTranslationX - translateX.value;
-                const animationTime = (distanceToTarget / e.velocityX) * 1000;
-
-                console.log('DURATION', animationTime);
 
                 translateX.value = withTiming(targetTranslationX, {
-                    duration: animationTime,
+                    duration: 150,
+                    easing: Easing.inOut(Easing.quad),
                 });
                 runOnJS(setSelectedImageIndex)(targetIndex);
                 return;
             }
 
             // If we weren't flicking fast enough, animate to nearest image.
+            // TODO: A better way to do would just be to check -1 and +1 index.
             let closestIndex = 0;
             let closestPosition = 0;
             let closestDifference = width;
@@ -106,23 +101,38 @@ const ImageCarousel = ({images, width, height}: ImageCarouselProps) => {
     }));
 
     return (
-        <GestureDetector gesture={panGesture}>
-            <Animated.View style={[styles.imagesContainer, rStyle]}>
-                {images.map((image, index) => (
-                    <Image
-                        style={{width, height}}
-                        source={{uri: image}}
-                        key={index}
-                    />
-                ))}
-            </Animated.View>
-        </GestureDetector>
+        <View>
+            <GestureDetector gesture={panGesture}>
+                <Animated.View style={[styles.imagesContainer, rStyle]}>
+                    {images.map((image, index) => (
+                        <Image
+                            style={{width, height}}
+                            source={{uri: image}}
+                            key={index}
+                        />
+                    ))}
+                </Animated.View>
+            </GestureDetector>
+            <View style={styles.imageIndicatorContainer}>
+                <ImageIndicator
+                    amount={images.length}
+                    selectedIndex={selectedImageIndex}
+                />
+            </View>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     imagesContainer: {
         flexDirection: 'row',
+    },
+    imageIndicatorContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
     },
 });
 
