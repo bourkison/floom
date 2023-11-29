@@ -12,7 +12,7 @@ import {
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
-import {RootStackParamList} from '@/nav/types';
+import {RootStackParamList} from '@/types/nav';
 import {supabase} from '@/services/supabase';
 import {useAppDispatch} from '@/store/hooks';
 import {login} from '@/store/slices/user';

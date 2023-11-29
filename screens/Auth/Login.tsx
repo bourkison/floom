@@ -3,7 +3,7 @@ import React from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 
 import LoginForm from '@/components/User/LoginForm';
-import {RootStackParamList} from '@/nav/types';
+import {RootStackParamList} from '@/types/nav';
 
 const Login = (_: StackScreenProps<RootStackParamList, 'Login'>) => {
     return (

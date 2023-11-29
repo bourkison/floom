@@ -25,7 +25,7 @@ import {
     PALETTE,
     IMAGE_ANIMATED_AMOUNT,
 } from '@/constants';
-import {RootStackParamList} from '@/nav/types';
+import {RootStackParamList} from '@/types/nav';
 import {capitaliseString, formatPrice} from '@/services';
 import {Database} from '@/types/schema';
 

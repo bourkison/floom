@@ -13,7 +13,7 @@ import {
 
 import {PALETTE} from '@/constants';
 import {useDeletedContext} from '@/context/deleted';
-import {OptionsStackParamList} from '@/nav/types';
+import {OptionsStackParamList} from '@/types/nav';
 
 const NUM_PRODUCTS = 5;
 

@@ -13,7 +13,7 @@ import {
 
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
-import {RootStackParamList} from '@/nav/types';
+import {RootStackParamList} from '@/types/nav';
 
 // Video found here: https://www.pexels.com/video/a-woman-sitting-on-the-chair-8400304/
 

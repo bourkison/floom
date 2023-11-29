@@ -23,7 +23,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import SetGender from '@/components/User/SetGender';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {MIN_AGE, PALETTE} from '@/constants';
-import {RootStackParamList} from '@/nav/types';
+import {RootStackParamList} from '@/types/nav';
 import {supabase} from '@/services/supabase';
 import {Gender} from '@/types';
 

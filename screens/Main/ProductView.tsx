@@ -19,7 +19,7 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 import ImageCarousel from '@/components/Utility/ImageCarousel';
 import {IMAGE_RATIO, PALETTE, SAVE_COLOR} from '@/constants';
 import {useBottomSheetContext} from '@/context/BottomSheet';
-import {RootStackParamList} from '@/nav/types';
+import {RootStackParamList} from '@/types/nav';
 import {formatPrice} from '@/services';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';

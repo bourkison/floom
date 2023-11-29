@@ -14,7 +14,7 @@ import {
     FEATURED_PRODUCT_SIZE,
 } from '@/constants';
 import {HEADER_HEIGHT_W_STATUS_BAR} from '@/nav/Headers';
-import {RootStackParamList} from '@/nav/types';
+import {RootStackParamList} from '@/types/nav';
 import {useAppSelector} from '@/store/hooks';
 
 const Home = (_: StackScreenProps<RootStackParamList, 'Home'>) => {

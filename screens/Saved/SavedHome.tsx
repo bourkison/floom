@@ -10,7 +10,7 @@ import Tabs from '@/components/Utility/Tabs';
 import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
 import {HeaderTemplate} from '@/nav/Headers';
-import {SavedStackParamList} from '@/nav/types';
+import {SavedStackParamList} from '@/types/nav';
 
 export const INITIAL_SAVE_LOAD_AMOUNT = 10;
 export const SUBSEQUENT_SAVE_LOAD_AMOUNT = 10;

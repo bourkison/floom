@@ -17,7 +17,7 @@ import SaveListItem from '@/components/Save/SaveListItem';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
 import {PALETTE} from '@/constants';
 import {useSharedSavedContext} from '@/context/saved';
-import {SavedStackParamList} from '@/nav/types';
+import {SavedStackParamList} from '@/types/nav';
 import {
     INITIAL_SAVE_LOAD_AMOUNT,
     SUBSEQUENT_SAVE_LOAD_AMOUNT,

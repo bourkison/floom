@@ -9,7 +9,7 @@ import {
     GenderHeader,
     PriceHeader,
 } from '@/nav/Headers';
-import {FiltersStackParamList} from '@/nav/types';
+import {FiltersStackParamList} from '@/types/nav';
 import Brand from '@/screens/Filters/Brand';
 import Category from '@/screens/Filters/Category';
 import Color from '@/screens/Filters/Color';

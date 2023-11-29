@@ -3,7 +3,7 @@ import React from 'react';
 
 import {useSharedSavedContext} from '@/context/saved';
 import {CollectionViewHeader} from '@/nav/Headers';
-import {RootStackParamList, SavedStackParamList} from '@/nav/types';
+import {RootStackParamList, SavedStackParamList} from '@/types/nav';
 import CollectionNew from '@/screens/Saved/CollectionNew';
 import CollectionView from '@/screens/Saved/CollectionView';
 import SavedHome from '@/screens/Saved/SavedHome';
