@@ -1,28 +1,27 @@
 import {AntDesign, Feather, Ionicons} from '@expo/vector-icons';
 import {StackScreenProps} from '@react-navigation/stack';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
-    Image,
     StyleSheet,
     useWindowDimensions,
     ActivityIndicator,
-    ScrollView,
     Pressable,
     TouchableOpacity,
+    ScrollView,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+import AddToCollectionBottomSheet from '@/components/Save/AddToCollectionSheet';
 import AnimatedButton from '@/components/Utility/AnimatedButton';
+import ImageCarousel from '@/components/Utility/ImageCarousel';
 import {IMAGE_RATIO, PALETTE, SAVE_COLOR} from '@/constants';
+import {useBottomSheetContext} from '@/context/BottomSheet';
 import {MainStackParamList} from '@/nav/Navigator';
 import {formatPrice} from '@/services';
 import {supabase} from '@/services/supabase';
 import {Database} from '@/types/schema';
-import {useBottomSheetContext} from '@/context/BottomSheet';
-import AddToCollectionBottomSheet from '@/components/Save/AddToCollectionSheet';
-import {useSharedSavedContext} from '@/context/saved';
 
 const HEADER_BAR_ICON_SIZE = 22;
 
@@ -114,12 +113,10 @@ const ProductView = ({
             </View>
             <ScrollView>
                 <View style={styles.imageContainer}>
-                    <Image
-                        style={[
-                            styles.image,
-                            {width, height: width / IMAGE_RATIO},
-                        ]}
-                        source={{uri: product.images[0]}}
+                    <ImageCarousel
+                        images={product.images}
+                        width={width}
+                        height={width / IMAGE_RATIO}
                     />
                 </View>
 
