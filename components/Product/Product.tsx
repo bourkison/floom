@@ -175,9 +175,9 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                         </LinearGradient>
                     </View>
                 </View>
-                {isLoadingImage ? (
+                {isLoadingImage && (
                     <ActivityIndicator style={styles.loadingImage} />
-                ) : undefined}
+                )}
             </ImageBackground>
         </View>
     );

@@ -236,6 +236,26 @@ const ProductView = ({
                         relatedProduct={product}
                     />
                 </View>
+
+                <View style={[styles.bottomButtonsContainer]}>
+                    <TouchableOpacity style={styles.reportContainer}>
+                        <AntDesign
+                            name="warning"
+                            size={24}
+                            color={PALETTE.neutral[8]}
+                        />
+                        <Text style={styles.reportText}>Report Issue</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.hideContainer}>
+                        <Feather
+                            name="x"
+                            size={24}
+                            color={PALETTE.neutral[8]}
+                        />
+                        <Text style={styles.hideText}>Hide Product</Text>
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         </View>
     );
@@ -377,6 +397,34 @@ const styles = StyleSheet.create({
     },
     soldByContainer: {
         flexDirection: 'row',
+    },
+    bottomButtonsContainer: {
+        flexDirection: 'row',
+        paddingTop: 15,
+        paddingBottom: 10,
+        marginTop: 25,
+        borderColor: PALETTE.neutral[2],
+        borderTopWidth: 1,
+    },
+    reportContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    reportText: {
+        fontSize: 10,
+        marginTop: 6,
+        fontWeight: '300',
+    },
+    hideContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    hideText: {
+        fontSize: 10,
+        marginTop: 6,
+        fontWeight: '300',
     },
 });
 
