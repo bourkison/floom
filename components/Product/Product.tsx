@@ -15,6 +15,7 @@ import {
 
 import AnimatedProduct from '@/components/Product/AnimatedProduct';
 import BrandLogo from '@/components/Utility/BrandLogo';
+import ImageIndicator from '@/components/Utility/ImageIndicator';
 import {
     IMAGE_RATIO,
     IMAGE_PADDING,
@@ -25,8 +26,8 @@ import {
     PALETTE,
     IMAGE_ANIMATED_AMOUNT,
 } from '@/constants';
-import {RootStackParamList} from '@/types/nav';
 import {capitaliseString, formatPrice} from '@/services';
+import {RootStackParamList} from '@/types/nav';
 import {Database} from '@/types/schema';
 
 type ProductComponentProps = {
@@ -66,26 +67,6 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
             }
         }
     }, [imageIndex, product, prefetchedImages]);
-
-    const calculateImageIndicator = (i: number) => {
-        const style: ViewStyle = JSON.parse(
-            JSON.stringify(styles.selectedImageIndicator),
-        );
-
-        if (imageIndex === i) {
-            style.backgroundColor = 'rgba(243, 252, 240, 0.8)';
-        }
-
-        if (i === 0) {
-            style.marginLeft = 0;
-        }
-
-        if (i === product.images.length - 1) {
-            style.marginRight = 0;
-        }
-
-        return style;
-    };
 
     const calculateSavedOrDeletedStyle = (type: 'text' | 'container') => {
         const response: ViewStyle[] | TextStyle[] = [];
@@ -155,9 +136,10 @@ const Product: React.FC<ProductComponentProps> = ({product, index}) => {
                 onLoadStart={() => setLoader(true)}
                 onLoad={() => setLoader(false)}>
                 <View style={styles.selectedImageContainer}>
-                    {product.images.map((s, i) => (
-                        <View style={calculateImageIndicator(i)} key={i} />
-                    ))}
+                    <ImageIndicator
+                        amount={product.images.length}
+                        selectedIndex={imageIndex}
+                    />
                 </View>
                 <View style={calculateSavedOrDeletedStyle('container')}>
                     <Text style={calculateSavedOrDeletedStyle('text')}>
@@ -228,21 +210,11 @@ const styles = StyleSheet.create({
     },
     selectedImageContainer: {
         position: 'absolute',
-        top: 0,
+        top: 14,
         left: 0,
         right: 0,
-        flex: 1,
-        height: 8,
         justifyContent: 'center',
         flexDirection: 'row',
-    },
-    selectedImageIndicator: {
-        flex: 1,
-        marginLeft: 3,
-        marginRight: 3,
-        borderRadius: 2,
-        backgroundColor: 'rgba(26, 31, 37, 0.3)',
-        maxWidth: '33%',
     },
     imageOverlayContainer: {
         position: 'absolute',

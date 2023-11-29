@@ -19,9 +19,9 @@ import AnimatedButton from '@/components/Utility/AnimatedButton';
 import ImageCarousel from '@/components/Utility/ImageCarousel';
 import {IMAGE_RATIO, PALETTE, SAVE_COLOR} from '@/constants';
 import {useBottomSheetContext} from '@/context/BottomSheet';
-import {RootStackParamList} from '@/types/nav';
 import {formatPrice} from '@/services';
 import {supabase} from '@/services/supabase';
+import {RootStackParamList} from '@/types/nav';
 import {Database} from '@/types/schema';
 
 const HEADER_BAR_ICON_SIZE = 22;
@@ -208,9 +208,33 @@ const ProductView = ({
                             {product.description}
                         </Text>
                     </View>
+
+                    <View style={styles.colorsContainer}>
+                        <Text style={styles.colorHeader}>Brand:</Text>
+                        <Text style={[styles.colorHeader, styles.colorText]}>
+                            {product.brand}
+                        </Text>
+                    </View>
+
+                    <View style={styles.soldByContainer}>
+                        <Text style={styles.colorHeader}>Sold By:</Text>
+                        <Text style={[styles.colorHeader, styles.colorText]}>
+                            {product.partner}
+                        </Text>
+                    </View>
                 </View>
                 <View style={styles.relatedProductsContainer}>
-                    <RelatedProducts />
+                    <RelatedProducts
+                        type="similarProducts"
+                        relatedProduct={product}
+                    />
+                </View>
+
+                <View style={styles.relatedProductsContainer}>
+                    <RelatedProducts
+                        type="peopleAlsoBought"
+                        relatedProduct={product}
+                    />
                 </View>
             </ScrollView>
         </View>
@@ -281,7 +305,7 @@ const styles = StyleSheet.create({
     },
     colorText: {
         fontWeight: '300',
-        marginLeft: 5,
+        marginLeft: 3,
         textTransform: 'capitalize',
     },
     inStockContainer: {
@@ -350,6 +374,9 @@ const styles = StyleSheet.create({
     },
     relatedProductsContainer: {
         marginTop: 40,
+    },
+    soldByContainer: {
+        flexDirection: 'row',
     },
 });
 
